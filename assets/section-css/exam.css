@@ -6,3 +6,85 @@
 .exam-button:hover{
     background-color: black;
 }
+
+/* Mobile responsiveness for exam page - Landscape only */
+@media (max-width: 767px) and (orientation: landscape) {
+    #exam-content .row {
+        flex-direction: row;
+    }
+    #exam-content .d-flex.justify-content-center {
+        width: 70% !important;
+    }
+    #exam-content .px-4.py-3.text-center.overflow-auto {
+        width: 30% !important;
+        order: 2;
+    }
+    #question-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: calc(100vh - 120px);
+    }
+    #answer-sheet .col-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+    #prev-btn, #next-btn {
+        font-size: 10px;
+        padding: 6px;
+        margin: 2px;
+    }
+    .exam-button {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+    .row.shadow-sm {
+        height: 60px !important;
+    }
+    .fs-5 {
+        font-size: 0.9rem !important;
+    }
+    /* Fullscreen optimizations */
+    body:fullscreen #entire-section,
+    body:-webkit-full-screen #entire-section,
+    body:-moz-full-screen #entire-section {
+        height: 100vh !important;
+    }
+    body:fullscreen #exam-content,
+    body:-webkit-full-screen #exam-content,
+    body:-moz-full-screen #exam-content {
+        height: calc(100vh - 60px) !important;
+    }
+    body:fullscreen #question-container,
+    body:-webkit-full-screen #question-container,
+    body:-moz-full-screen #question-container {
+        height: calc(100vh - 80px) !important;
+    }
+}
+
+/* Mobile landscape card responsiveness */
+@media (max-width: 767px) and (orientation: landscape) {
+    .card.shadow.col-8.offset-2 {
+        flex: 0 0 90%;
+        max-width: 90%;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+    .card.shadow.mt-4 {
+        flex: 0 0 90%;
+        max-width: 90%;
+    }
+    .p-5 {
+        padding: 1rem !important;
+    }
+    .fs-5 {
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Mobile portrait - hide content except orientation overlay */
+@media (max-width: 767px) and (orientation: portrait) {
+    #entire-section {
+        display: none !important;
+    }
+}

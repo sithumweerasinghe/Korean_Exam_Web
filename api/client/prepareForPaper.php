@@ -1,5 +1,5 @@
 <?php
-require_once "../config/dbconnection.php";
+require_once __DIR__ . "/../config/dbconnection.php";
 header("Content-Type: application/json");
 
 if ($_SERVER["REQUEST_METHOD"] !== "GET") {
@@ -88,7 +88,7 @@ if ($isSamplePaper == "false") {
 
             $examQuery = "SELECT COUNT(*) FROM exam_time_table WHERE id = :exam_id AND papers_paper_id = :paper_id";
             $examExistStmt = $conn->prepare($examQuery);
-            $examExistStmt->bindParam(":exam_id", $_exam_id);
+            $examExistStmt->bindParam(":exam_id", $exam_id);
             $examExistStmt->bindParam(":paper_id", $paper_id);
             $examExistStmt->execute();
 
@@ -128,6 +128,7 @@ if ($isSamplePaper == "false") {
 }
 
 try {
+    // First, get all questions
     $questionsQuery = "SELECT 
     q.id AS question_id,
     q.question,
@@ -139,15 +140,7 @@ try {
     q.marks,
     q.isSample,
     qg.question_group_name,
-    p.isSample AS paperIsSample,
-    JSON_ARRAYAGG(
-        JSON_OBJECT(
-            'id', a.id,
-            'answer', a.answer,
-            'isMedia', a.is_media,
-            'correctAnswer', a.correct_answer 
-        )
-    ) AS options
+    p.isSample AS paperIsSample
 FROM 
     questions q
 JOIN 
@@ -156,12 +149,8 @@ JOIN
     papers p ON qg.papers_paper_id = p.paper_id
 JOIN 
     question_categories qc ON q.question_categories_id = qc.id
-LEFT JOIN 
-    answers a ON a.questions_id = q.id
 WHERE 
     p.paper_id = :paper_id
-GROUP BY 
-    q.id, qc.question_category, p.isSample, q.isSample
 ORDER BY 
     FIELD(qc.question_category, 'Reading', 'Listening'),
     qg.question_group_name ASC,                       
@@ -175,8 +164,26 @@ ORDER BY
     $questionStmt = $conn->prepare($questionsQuery);
     $questionStmt->bindParam(":paper_id", $paper_id);
     $questionStmt->execute();
-
     $questions = $questionStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Then, get all answers for each question
+    foreach ($questions as &$question) {
+        $answersQuery = "SELECT 
+            a.id,
+            a.answer,
+            a.is_media AS isMedia,
+            a.correct_answer AS correctAnswer
+        FROM answers a 
+        WHERE a.questions_id = :question_id
+        ORDER BY a.id";
+        
+        $answersStmt = $conn->prepare($answersQuery);
+        $answersStmt->bindParam(":question_id", $question['question_id']);
+        $answersStmt->execute();
+        $question['options'] = $answersStmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    unset($question); // break the reference
+
     $_SESSION["questions"] = $questions;
     echo json_encode([
         "success" => true,

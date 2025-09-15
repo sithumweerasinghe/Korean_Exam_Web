@@ -55,11 +55,77 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         ::-webkit-scrollbar-thumb:hover {
             background-color: #555;
         }
+        
+        /* Orientation overlay styles */
+        #orientation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        #orientation-overlay .rotate-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: rotatePhone 2s infinite;
+        }
+        
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+            100% { transform: rotate(0deg); }
+        }
+        
+        /* Fullscreen mobile styles */
+        @media (max-width: 767px) and (orientation: landscape) {
+            body:-webkit-full-screen {
+                width: 100vw;
+                height: 100vh;
+            }
+            body:-moz-full-screen {
+                width: 100vw;
+                height: 100vh;
+            }
+            body:fullscreen {
+                width: 100vw;
+                height: 100vh;
+            }
+            #entire-section {
+                height: 100vh !important;
+            }
+            .row.shadow-sm {
+                height: 60px !important;
+            }
+            #exam-content {
+                height: calc(100vh - 60px) !important;
+            }
+            #main-content {
+                height: calc(100vh - 60px) !important;
+            }
+        }
     </style>
 </head>
 
 
 <body class="element-wrapper ">
+    <!-- Orientation Overlay for Mobile Portrait Mode -->
+    <div id="orientation-overlay">
+        <div class="rotate-icon">📱</div>
+        <h2>Please Rotate Your Device</h2>
+        <p>For the best exam experience, please rotate your device to landscape mode.</p>
+        <p>회전하여 가로 모드로 사용해주세요</p>
+    </div>
+    
     <div id="preloader">
         <div id="ed-preloader" class="ed-preloader">
             <div class="animation-preloader">
@@ -72,7 +138,9 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
     </div>
     <?php
     require_once "api/config/dbconnection.php";
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     include("api/client/services/userService.php");
     $userService = new UserService();
     $userArray = $userService->validateUserLoggedIn();
@@ -431,8 +499,83 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         function isMobileDevice() {
             return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile|Windows Phone|webOS/i.test(navigator.userAgent);
         }
-        if (isMobileDevice()) {
-            window.location.href = "./mobile";
+        
+        // Force landscape orientation on mobile devices
+        function checkOrientation() {
+            if (isMobileDevice()) {
+                const orientationOverlay = document.getElementById('orientation-overlay');
+                if (window.innerHeight > window.innerWidth) {
+                    // Portrait mode - show overlay
+                    orientationOverlay.style.display = 'flex';
+                    exitFullscreen();
+                } else {
+                    // Landscape mode - hide overlay and enter fullscreen
+                    orientationOverlay.style.display = 'none';
+                    requestFullscreen();
+                }
+            }
+        }
+        
+        // Fullscreen functions
+        function requestFullscreen() {
+            if (isMobileDevice()) {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().catch(err => console.log('Fullscreen request failed:', err));
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                }
+            }
+        }
+        
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(err => console.log('Exit fullscreen failed:', err));
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            }
+        }
+        
+        // Check orientation on load and resize
+        window.addEventListener('load', function() {
+            checkOrientation();
+            // Add fullscreen change listeners
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+        });
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', function() {
+            setTimeout(checkOrientation, 100);
+        });
+        
+        // Handle fullscreen changes
+        function handleFullscreenChange() {
+            if (isMobileDevice()) {
+                const isFullscreen = document.fullscreenElement || 
+                                   document.webkitFullscreenElement || 
+                                   document.mozFullScreenElement || 
+                                   document.msFullscreenElement;
+                
+                if (isFullscreen) {
+                    console.log('Entered fullscreen mode');
+                    // Hide browser UI elements if any
+                    setTimeout(() => {
+                        window.scrollTo(0, 1);
+                    }, 500);
+                } else {
+                    console.log('Exited fullscreen mode');
+                }
+            }
         }
         document.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);

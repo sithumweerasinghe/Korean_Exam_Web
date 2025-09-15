@@ -478,17 +478,20 @@ function prepareForPaper(paper_id, application_no, exam_id, sample) {
     $('#main-content').html(prepareContent);
     prepareContent.removeClass('d-none');
 
-    const csrf_token = $('#csrf_token').val().trim();
     const examDetails = exam_id ? `&exam_id=${exam_id}` : '';
 
     fetch(`api/client/prepareForPaper?paper_id=${paper_id}&application_no=${application_no}&sample=${sample}${examDetails}`, {
-        method: 'GET',
-        headers: {
-            'X-CSRF-TOKEN': csrf_token
-        }
+        method: 'GET'
     })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('API Response:', data);
             if (data.success === true) {
                 $('#main-content').addClass('d-none');
                 examContent.removeClass('d-none')
@@ -497,16 +500,26 @@ function prepareForPaper(paper_id, application_no, exam_id, sample) {
                     window.location = "index"
                     showToast('error', 'No questions available')
                 } else {
-                    loadQuestions(data.questions, data.isSample, data.isExam, paper_id, exam_id);
+                    // Wait a bit for the DOM to be ready
+                    setTimeout(() => {
+                        try {
+                            loadQuestions(data.questions, data.isSample, data.isExam, paper_id, exam_id);
+                            console.log('loadQuestions called successfully');
+                        } catch (loadError) {
+                            console.error('Error in loadQuestions:', loadError);
+                            showToast("error", "Error loading exam questions.");
+                        }
+                    }, 100);
                 }
             } else {
+                console.log('API returned error:', data.message);
                 window.location = "index"
                 showToast("error", data.message);
             }
         })
         .catch(error => {
+            console.error("Fetch error details:", error);
             showToast("error", "An error occurred while preparing for the paper.");
-            console.error("Error:", error);
         });
 }
 

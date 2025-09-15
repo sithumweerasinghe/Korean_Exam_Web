@@ -27,31 +27,52 @@ let isReadingCompleted = false;
 
 
 function loadQuestions(questions_array, isSample, isExam, paper_id, exam_id) {
-  isExamPaper = isExam;
-  isSamplePaper = isSample;
-  paperId = paper_id;
-  examId = exam_id;
+  try {
+    console.log('loadQuestions called with:', { questions_array: questions_array.length, isSample, isExam, paper_id, exam_id });
+    
+    isExamPaper = isExam;
+    isSamplePaper = isSample;
+    paperId = paper_id;
+    examId = exam_id;
 
-  readingQuestions = questions_array.filter(q => q.question_category === "reading");
-  const listeningQuestions = questions_array.filter(q => q.question_category === "listening");
+    console.log('Filtering questions...');
+    readingQuestions = questions_array.filter(q => q.question_category === "reading");
+    const listeningQuestions = questions_array.filter(q => q.question_category === "listening");
+    console.log('Questions filtered:', { reading: readingQuestions.length, listening: listeningQuestions.length });
 
-  totalReadingTime = readingQuestions.reduce((sum, q) => sum + Number(q.timeLimit), 0);
-  totalListeningTime = listeningQuestions.reduce((sum, q) => sum + Number(q.timeLimit), 0);
+    console.log('Calculating time...');
+    totalReadingTime = readingQuestions.reduce((sum, q) => sum + Number(q.timeLimit), 0);
+    totalListeningTime = listeningQuestions.reduce((sum, q) => sum + Number(q.timeLimit), 0);
+    console.log('Total times:', { reading: totalReadingTime, listening: totalListeningTime });
 
-  readingTimeLeft = formatTime(totalReadingTime);
-  listeningTimeLeft = formatTime(totalListeningTime);
+    console.log('Formatting time...');
+    readingTimeLeft = formatTime(totalReadingTime);
+    listeningTimeLeft = formatTime(totalListeningTime);
+    console.log('Formatted times:', { reading: readingTimeLeft, listening: listeningTimeLeft });
 
-  $("#reading-remaining").html(readingTimeLeft);
-  $("#listening-remaining").html(listeningTimeLeft);
+    console.log('Updating DOM elements...');
+    $("#reading-remaining").html(readingTimeLeft);
+    $("#listening-remaining").html(listeningTimeLeft);
+    console.log('DOM elements updated');
 
-  let currentQuestionNumber = 1;
-  currentQuestionNumber = renderCategory("reading", readingQuestions, currentQuestionNumber);
-  currentQuestionNumber = renderCategory("listening", listeningQuestions, currentQuestionNumber);
+    console.log('Rendering categories...');
+    let currentQuestionNumber = 1;
+    currentQuestionNumber = renderCategory("reading", readingQuestions, currentQuestionNumber);
+    currentQuestionNumber = renderCategory("listening", listeningQuestions, currentQuestionNumber);
+    console.log('Categories rendered');
 
-  questions = questions_array;
-  displayQuestion(currentQuestionIndex);
+    console.log('Setting up questions and display...');
+    questions = questions_array;
+    displayQuestion(currentQuestionIndex);
+    console.log('Question displayed');
 
-  startSectionTimers();
+    console.log('Starting timers...');
+    startSectionTimers();
+    console.log('loadQuestions completed successfully');
+  } catch (error) {
+    console.error('Error in loadQuestions:', error);
+    throw error;
+  }
 }
 
 function displayQuestion(index) {
@@ -80,7 +101,7 @@ function displayQuestion(index) {
     startListeningTimer();
   }
 
-  const options = JSON.parse(question.options);
+  const options = question.options;
   const currentGroup = question.question_group_name;
   const previousGroup = index > 0 ? questions[index - 1].question_group_name : null;
   const showGroupName = currentGroup !== previousGroup;
