@@ -86,6 +86,145 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             100% { transform: rotate(0deg); }
         }
         
+        /* Multi-line toast styling */
+        .multi-line-toast {
+            white-space: pre-line !important;
+            text-align: left !important;
+            font-family: monospace !important;
+            line-height: 1.4 !important;
+        }
+        
+        /* Permission toast styling */
+        .permission-toast {
+            font-size: 16px !important;
+            font-weight: bold !important;
+            border: 3px solid #fff !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+            z-index: 10000 !important;
+        }
+        
+        /* Face verification modal styling */
+        #faceVerificationModal .modal-content {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Square frame design for cameras */
+        .square-frame {
+            border-radius: 15px !important;
+            border: 4px solid #28a745 !important;
+            transition: all 0.3s ease;
+        }
+        
+        .camera-video {
+            border-color: #007bff !important;
+        }
+        
+        .camera-video.verification-active {
+            border-color: #ffc107 !important;
+            animation: cameraGlow 2s infinite;
+        }
+        
+        @keyframes cameraGlow {
+            0%, 100% { 
+                border-color: #007bff; 
+                box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+            }
+            50% { 
+                border-color: #ffc107; 
+                box-shadow: 0 0 0 8px rgba(255, 193, 7, 0.3);
+            }
+        }
+        
+        /* Face guide overlay */
+        .camera-overlay {
+            pointer-events: none;
+            border-radius: 15px;
+        }
+        
+        .face-guide-circle {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: guidePulse 2s infinite;
+        }
+        
+        @keyframes guidePulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 767px) {
+            .square-frame {
+                width: 180px !important;
+                height: 180px !important;
+            }
+            
+            .camera-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .camera-instructions {
+                font-size: 14px;
+            }
+            
+            .verification-instruction {
+                font-size: 14px;
+            }
+            
+            .profile-title, .camera-title {
+                font-size: 14px;
+            }
+            
+            .face-guide-circle {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .square-frame {
+                width: 150px !important;
+                height: 150px !important;
+            }
+            
+            .verification-badge, .verification-status {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 14px !important;
+            }
+        }
+        
+        /* Touch-friendly buttons */
+        .camera-btn {
+            min-height: 50px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .camera-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* Status badges */
+        .verification-badge, .verification-status {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        /* Progress bar enhancements */
+        .progress {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        
         /* Fullscreen mobile styles */
         @media (max-width: 767px) and (orientation: landscape) {
             body:-webkit-full-screen {
@@ -246,7 +385,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                             </div>
 
                                             <div class="ed-hero__btn text-center mb-4">
-                                                <a href="exam?<?= $_SERVER['QUERY_STRING'] ?>&notice" class="ed-btn">Confirm<i
+                                                <a href="javascript:void(0)" onclick="startFaceVerification('<?= $profileImage ?>')" class="ed-btn">Confirm<i
                                                         class="fi fi-rr-arrow-small-right"></i></a>
                                             </div>
                                         <?php
@@ -265,6 +404,19 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                 </div>
                                                 <div class="p-3 text-white bg-dark text-center d-flex justify-content-center align-items-center">
                                                     <i class="fa fa-volume-up me-3 fs-2 text-white "></i>After being fully aware of applicant notice below, click the [Confirm] button
+                                                </div>
+                                                <!-- Face Verification Status -->
+                                                <div class="bg-light p-3 border-bottom">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa fa-shield-alt text-success me-3 fs-4"></i>
+                                                        <div>
+                                                            <strong class="text-success">Face Verification Completed</strong>
+                                                            <br><small class="text-muted">Identity verified successfully with <span id="verificationScoreDisplay">--</span>% similarity</small>
+                                                        </div>
+                                                        <div class="ms-auto">
+                                                            <span class="badge bg-success">✓ Verified</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="bg-white p-5" style="max-height: 300px; overflow-y: auto;">
                                                     <div class="row align-items-center">
@@ -340,10 +492,10 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                 </div>
                                             </div>
                                             <div class="ed-hero__btn text-center mb-4">
-                                                <a onclick="prepareForPaper('<?= htmlspecialchars($_GET['paper_id'], ENT_QUOTES) ?>', 
+                                                <a onclick="handleReadyClick('<?= htmlspecialchars($_GET['paper_id'], ENT_QUOTES) ?>', 
                              '<?= htmlspecialchars($application_no, ENT_QUOTES) ?>', 
                              '<?= htmlspecialchars($_GET['exam_id'] ?? '', ENT_QUOTES) ?>',
-                             '<?= htmlspecialchars($_GET['sample'] ?? '', ENT_QUOTES) ?>');" class="ed-btn">Ready<i
+                             '<?= htmlspecialchars($_GET['sample'] ?? 'true', ENT_QUOTES) ?>');" class="ed-btn">Ready<i
                                                         class="fi fi-rr-arrow-small-right"></i></a>
                                             </div>
                                         <?php
@@ -494,7 +646,85 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
     <script src="assets/plugins/js/active.js"></script>
     <script src="assets/js/questions.js"></script>
     <script src="assets/js/clientScript.js"></script>
+    <script src="assets/js/face-verification.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        // Global function to start face verification
+        function startFaceVerification(profileImageUrl) {
+            showFaceVerification(profileImageUrl);
+        }
+
+        // Check face verification status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // If we're on the notice page, check verification status
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('notice')) {
+                checkFaceVerificationStatus();
+            }
+        });
+
+        function checkFaceVerificationStatus() {
+            const verificationPassed = sessionStorage.getItem('faceVerificationPassed') === 'true';
+            const verificationScore = sessionStorage.getItem('faceVerificationScore');
+            
+            if (!verificationPassed) {
+                // Redirect back to initial page if verification not completed
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.delete('notice');
+                currentUrl.searchParams.set('sample', 'true');
+                
+                Toastify({
+                    text: "Face verification must be completed before proceeding to notice.",
+                    duration: 5000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                    stopOnFocus: true
+                }).showToast();
+                
+                setTimeout(() => {
+                    window.location.href = currentUrl.toString();
+                }, 2000);
+                return;
+            }
+            
+            // Update verification score display
+            const scoreDisplay = document.getElementById('verificationScoreDisplay');
+            if (scoreDisplay && verificationScore) {
+                scoreDisplay.textContent = parseFloat(verificationScore).toFixed(1);
+            }
+        }
+
+        // Function to proceed to next step after successful face verification
+        window.proceedToNextStep = function() {
+            console.log('🚀 Proceeding to next step after face verification');
+            
+            // If we're on the sample page, proceed to notice
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('sample')) {
+                // Redirect to notice page
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.delete('sample');
+                newUrl.searchParams.set('notice', 'true');
+                
+                setTimeout(() => {
+                    window.location.href = newUrl.toString();
+                }, 1000);
+            } else {
+                // For other pages, just update the UI to show verification complete
+                const verificationStatus = document.querySelector('.face-verification-status');
+                if (verificationStatus) {
+                    verificationStatus.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fa fa-check-circle me-2"></i>
+                            <strong class="text-success">Face Verification Completed</strong>
+                            <small class="d-block mt-1">Similarity: <span id="verificationScoreDisplay">${sessionStorage.getItem('faceVerificationScore') || '0'}%</span></small>
+                        </div>
+                    `;
+                }
+            }
+        };
+    </script>
     <script>
         function isMobileDevice() {
             return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile|Windows Phone|webOS/i.test(navigator.userAgent);
@@ -558,6 +788,34 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             setTimeout(checkOrientation, 100);
         });
         
+        // Handle ready button click
+        function handleReadyClick(paper_id, application_no, exam_id, sample) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const startTime = urlParams.get("start_time");
+            const examDate = urlParams.get("exam_date");
+            
+            // If there's a scheduled start time, don't allow starting early
+            if (startTime && examDate) {
+                const now = new Date();
+                const [year, month, day] = examDate.split("-").map(Number);
+                const [startHours, startMinutes, startSeconds] = startTime.split(":").map(Number);
+                const startTimeDate = new Date(year, month - 1, day, startHours, startMinutes, startSeconds);
+                
+                if (now < startTimeDate) {
+                    showToast('error', 'Please wait for the scheduled exam start time');
+                    return;
+                }
+            }
+            
+            // If no scheduled time or time has passed, start the exam
+            // Ensure sample parameter has a valid value
+            if (!sample || sample === '') {
+                sample = 'true'; // Default to sample exam if not specified
+            }
+            
+            prepareForPaper(paper_id, application_no, exam_id, sample);
+        }
+        
         // Handle fullscreen changes
         function handleFullscreenChange() {
             if (isMobileDevice()) {
@@ -616,17 +874,39 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                             document.body.style.overflow = "auto";
                             countdownElement.textContent = "Exam has started!";
 
-                            const questions = JSON.parse(localStorage.getItem('examQuestions'));
-                            const isSample = localStorage.getItem('isSample') === 'true';
-                            const isExam = localStorage.getItem('isExam') === 'true';
-                            const paperId = localStorage.getItem('paperId');
-                            const examId = localStorage.getItem('examId');
+                            // Get the parameters from the URL
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const paperId = urlParams.get('paper_id');
+                            const sample = urlParams.get('sample') || 'true'; // Default to 'true' if not specified
+                            const examId = urlParams.get('exam_id') || '';
+                            const applicationNo = '<?= $application_no ?>';
 
-                            var examContent = $('#exam-content');
-                            $('#main-content').addClass('d-none');
-                            examContent.removeClass('d-none')
+                            console.log('Starting exam with parameters:', {
+                                paperId: paperId,
+                                sample: sample,
+                                examId: examId,
+                                applicationNo: applicationNo,
+                                currentURL: window.location.href
+                            });
 
-                            loadQuestions(questions, isSample, isExam, paperId, examId);
+                            // Call prepareForPaper function to start the exam
+                            if (paperId && applicationNo && sample) {
+                                console.log('Calling prepareForPaper...');
+                                prepareForPaper(paperId, applicationNo, examId, sample);
+                            } else {
+                                console.error('Missing required parameters to start exam', {
+                                    paperId: paperId,
+                                    applicationNo: applicationNo,
+                                    sample: sample,
+                                    missingPaperId: !paperId,
+                                    missingApplicationNo: !applicationNo,
+                                    missingSample: sample === null
+                                });
+                                showToast('error', 'Missing required parameters to start exam');
+                                setTimeout(() => {
+                                    window.location = "index";
+                                }, 2000);
+                            }
 
                         } else {
                             // Calculate days, hours, minutes, and seconds

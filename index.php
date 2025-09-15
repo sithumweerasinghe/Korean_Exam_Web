@@ -31,8 +31,8 @@
     <link rel="stylesheet" href="assets/plugins/css/animate.min.css" />
     <link rel="stylesheet" href="assets/plugins/css/owl.carousel.min.css" />
     <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.cs" />
-    <link rel=" stylesheet" href="assets/plugins/css/swiper-bundle.min.css" />
+        href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+    <link rel="stylesheet" href="assets/plugins/css/swiper-bundle.min.css" />
     <link rel="stylesheet" href="assets/plugins/css/maginific-popup.min.css" />
     <link rel="stylesheet" href="assets/plugins/css/nice-select.min.css" />
     <link rel="stylesheet" href="assets/plugins/css/icofont.css" />
@@ -416,9 +416,9 @@
                                                         <?php
 
                                                         ?>
-                                                        <input type="text" id="exam_date" value="<?= $exam["exam_date"] ?>"
+                                                        <input type="text" id="exam_date_<?= $exam['id'] ?>" value="<?= $exam["exam_date"] ?>"
                                                             hidden>
-                                                        <input type="text" id="start_time" value="<?= $exam["start_time"] ?>"
+                                                        <input type="text" id="start_time_<?= $exam['id'] ?>" value="<?= $exam["start_time"] ?>"
                                                             hidden>
 
                                                         <div id="countdown-<?= $exam['id'] ?>" class="countdown mb-3"
@@ -949,8 +949,8 @@
             const paperId = button.getAttribute("data-paper-id");
             const examId = button.getAttribute("data-exam-id");
             const application_no = document.getElementById("application_no").value;
-            const examDate = document.getElementById("exam_date").value;
-            const startTime = document.getElementById("start_time").value;
+            const examDate = document.getElementById("exam_date_" + examId).value;
+            const startTime = document.getElementById("start_time_" + examId).value;
             const csrf_token = document.getElementById("csrf_token").value.trim();
 
             let link;

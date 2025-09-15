@@ -92,7 +92,7 @@ include("api/client/services/packgeService.php");
                                     <div class="single_price_plan wow shadow fadeInUp "
                                         data-wow-delay="0.2s"
                                         style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                                        <?php if ($plan['popular']): ?>
+                                        <?php if (isset($plan['popular']) && $plan['popular']): ?>
                                             <div class="side-shape">
                                                 <img src="https://bootdey.com/img/popular-pricing.png" alt="">
                                             </div>

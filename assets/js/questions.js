@@ -68,6 +68,10 @@ function loadQuestions(questions_array, isSample, isExam, paper_id, exam_id) {
 
     console.log('Starting timers...');
     startSectionTimers();
+    
+    console.log('Initializing question buttons...');
+    initializeQuestionButtons();
+    
     console.log('loadQuestions completed successfully');
   } catch (error) {
     console.error('Error in loadQuestions:', error);
@@ -307,15 +311,30 @@ function formatTime(seconds) {
   return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
 
-document.getElementById("next-btn").addEventListener("click", async () => {
-  saveAnswer();
-  nextQuestion();
-});
+// Initialize event listeners when DOM is ready or when buttons are available
+function initializeQuestionButtons() {
+  const nextBtn = document.getElementById("next-btn");
+  if (nextBtn) {
+    nextBtn.addEventListener("click", async () => {
+      saveAnswer();
+      nextQuestion();
+    });
+  }
 
-document.getElementById("prev-btn").addEventListener("click", () => {
-  saveAnswer();
-  previousQuestion();
-});
+  const prevBtn = document.getElementById("prev-btn");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      saveAnswer();
+      previousQuestion();
+    });
+  }
+}
+
+// Try to initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', initializeQuestionButtons);
+
+// Also provide a way to initialize manually when elements are created dynamically
+window.initializeQuestionButtons = initializeQuestionButtons;
 
 
 function saveAnswer() {

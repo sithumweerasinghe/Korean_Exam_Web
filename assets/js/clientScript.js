@@ -473,14 +473,19 @@ function completeOrder(invoiceNo, isExam) {
 }
 
 function prepareForPaper(paper_id, application_no, exam_id, sample) {
+    console.log('prepareForPaper called with:', { paper_id, application_no, exam_id, sample });
+    
     var prepareContent = $('#prepare-content');
     var examContent = $('#exam-content');
     $('#main-content').html(prepareContent);
     prepareContent.removeClass('d-none');
 
     const examDetails = exam_id ? `&exam_id=${exam_id}` : '';
+    const apiUrl = `api/client/prepareForPaper?paper_id=${paper_id}&application_no=${application_no}&sample=${sample}${examDetails}`;
+    
+    console.log('Making API call to:', apiUrl);
 
-    fetch(`api/client/prepareForPaper?paper_id=${paper_id}&application_no=${application_no}&sample=${sample}${examDetails}`, {
+    fetch(apiUrl, {
         method: 'GET'
     })
         .then(response => {
@@ -497,8 +502,11 @@ function prepareForPaper(paper_id, application_no, exam_id, sample) {
                 examContent.removeClass('d-none')
 
                 if (data.questions.length == 0) {
-                    window.location = "index"
+                    console.error('No questions available from API');
                     showToast('error', 'No questions available')
+                    setTimeout(() => {
+                        window.location = "index"
+                    }, 2000);
                 } else {
                     // Wait a bit for the DOM to be ready
                     setTimeout(() => {
@@ -513,13 +521,18 @@ function prepareForPaper(paper_id, application_no, exam_id, sample) {
                 }
             } else {
                 console.log('API returned error:', data.message);
-                window.location = "index"
                 showToast("error", data.message);
+                setTimeout(() => {
+                    window.location = "index"
+                }, 2000);
             }
         })
         .catch(error => {
             console.error("Fetch error details:", error);
-            showToast("error", "An error occurred while preparing for the paper.");
+            showToast("error", "An error occurred while preparing for the paper: " + error.message);
+            setTimeout(() => {
+                window.location = "index"
+            }, 2000);
         });
 }
 
