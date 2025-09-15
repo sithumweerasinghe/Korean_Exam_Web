@@ -1,0 +1,27 @@
+.custom-active {
+  border-color: #2ca347!important; 
+}
+
+.custom-active .nav-link {
+  background-color: #f0faf0; 
+  color: #2ca347; 
+}
+
+.custom-active .nav-link i {
+  color: #2ca347; /* Green icon */
+}
+
+.nav-link {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: #eef5ee; 
+  color: #2ca347;
+  border-radius: 8px;
+}
+
+.table-columns>tr:nth-child(odd){
+  background-color:red;
+}
+

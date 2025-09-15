@@ -1,0 +1,8 @@
+.exam-button{
+    background-color: #2ca347;
+    color: #fff;
+}
+
+.exam-button:hover{
+    background-color: black;
+}
