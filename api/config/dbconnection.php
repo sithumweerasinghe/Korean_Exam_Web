@@ -10,11 +10,17 @@ class Database
 
     public function __construct()
     {
-        $this->host = "153.92.15.44";
+        // $this->host = "153.92.15.44";
+        // $this->port = "3306";
+        // $this->db_name = "u617196622_topiksir";
+        // $this->username = "u617196622_root_topiksir";
+        // $this->password = "V3:24q3be>v";
+
+        $this->host = "localhost";
         $this->port = "3306";
-        $this->db_name = "u617196622_topiksir";
-        $this->username = "u617196622_root_topiksir";
-        $this->password = "V3:24q3be>v";
+        $this->db_name = "topiksir";
+        $this->username = "root";
+        $this->password = "";
     }
 
     public function getConnection()
