@@ -597,7 +597,22 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                 <span id="qm-answered">Answered: --</span>
                                 <span id="qm-remaining">Remaining: --</span>
                             </div>
-                            <div class="qgrid" id="question-map-grid"></div>
+                            <div class="qm-sections">
+                                <div class="qm-section">
+                                    <div class="qm-section-header">
+                                        <i class="fa fa-book me-1 text-success"></i>
+                                        <span>Reading (<span id="qm-reading-count">--</span> questions)</span>
+                                    </div>
+                                    <div class="qgrid" id="qm-grid-reading"></div>
+                                </div>
+                                <div class="qm-section">
+                                    <div class="qm-section-header">
+                                        <i class="fa fa-headphones me-1 text-success"></i>
+                                        <span>Listening (<span id="qm-listening-count">--</span> questions)</span>
+                                    </div>
+                                    <div class="qgrid" id="qm-grid-listening"></div>
+                                </div>
+                            </div>
                             <div class="qm-legend">
                                 <span><span class="dot answered"></span> Answered</span>
                                 <span><span class="dot current"></span> Current</span>

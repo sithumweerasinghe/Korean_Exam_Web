@@ -675,9 +675,10 @@ function closeQuestionMap(){
   if (modal) modal.classList.add('d-none');
 }
 function renderQuestionMap(openIfClosed){
-  const grid = document.getElementById('question-map-grid');
+  const gridReading = document.getElementById('qm-grid-reading');
+  const gridListening = document.getElementById('qm-grid-listening');
   const modal = document.getElementById('questionMapModal');
-  if (!grid || !modal || !Array.isArray(questions)) return;
+  if (!gridReading || !gridListening || !modal || !Array.isArray(questions)) return;
 
   // Only render if explicitly opening or if modal is already visible
   const isVisible = !modal.classList.contains('d-none');
@@ -685,46 +686,49 @@ function renderQuestionMap(openIfClosed){
     return; // do nothing when hidden unless explicitly opened
   }
 
-  const nonSampleIndices = questions
+  const readingIndices = questions
     .map((q, idx) => ({q, idx}))
-    .filter(({q}) => !q.questionIsSample);
+    .filter(({q}) => !q.questionIsSample && q.question_category === 'reading');
+  const listeningIndices = questions
+    .map((q, idx) => ({q, idx}))
+    .filter(({q}) => !q.questionIsSample && q.question_category === 'listening');
 
   // Stats
-  const total = nonSampleIndices.length;
-  const answeredCount = nonSampleIndices.reduce((acc,{idx})=> acc + (answers[idx] !== null && answers[idx] !== undefined && answers[idx] !== 'sample' ? 1 : 0), 0);
+  const total = readingIndices.length + listeningIndices.length;
+  const answeredCount = [...readingIndices, ...listeningIndices].reduce((acc,{idx})=> acc + (answers[idx] !== null && answers[idx] !== undefined && answers[idx] !== 'sample' ? 1 : 0), 0);
   const remaining = total - answeredCount;
   const qmTotal = document.getElementById('qm-total');
   const qmAnswered = document.getElementById('qm-answered');
   const qmRemaining = document.getElementById('qm-remaining');
+  const qmReadingCount = document.getElementById('qm-reading-count');
+  const qmListeningCount = document.getElementById('qm-listening-count');
   if (qmTotal) qmTotal.textContent = `Total: ${total}`;
   if (qmAnswered) qmAnswered.textContent = `Answered: ${answeredCount}`;
   if (qmRemaining) qmRemaining.textContent = `Remaining: ${remaining}`;
+  if (qmReadingCount) qmReadingCount.textContent = readingIndices.length;
+  if (qmListeningCount) qmListeningCount.textContent = listeningIndices.length;
 
   // Build tiles
-  grid.innerHTML = '';
-  let dispNum = 0;
-  nonSampleIndices.forEach(({q, idx}) => {
-    dispNum++;
+  gridReading.innerHTML = '';
+  gridListening.innerHTML = '';
+
+  const buildTile = (dispNum, idx, isListeningCategory) => {
     const tile = document.createElement('button');
     tile.type = 'button';
     tile.className = 'qtile';
     tile.textContent = dispNum;
 
-    // States
     const isCurrent = idx === currentQuestionIndex;
     const isAnswered = answers[idx] !== null && answers[idx] !== undefined && answers[idx] !== 'sample';
     if (isAnswered) tile.classList.add('answered');
     if (isCurrent) tile.classList.add('current');
 
-    // Lock rules: no jumping to Listening before allowed
-    const isListening = q.question_category === 'listening';
-    if (isListening && !isListeningStarted) {
+    if (isListeningCategory && !isListeningStarted) {
       tile.classList.add('locked');
     } else {
       tile.addEventListener('click', () => {
-        // Respect restrictions during transition
         if (isTransitioningToListening) return;
-        if (isListening && !isListeningStarted) return;
+        if (isListeningCategory && !isListeningStarted) return;
         currentQuestionIndex = idx;
         displayQuestion(currentQuestionIndex);
         closeQuestionMap();
@@ -736,7 +740,18 @@ function renderQuestionMap(openIfClosed){
       dot.className = 'dot';
       tile.appendChild(dot);
     }
-    grid.appendChild(tile);
+    return tile;
+  };
+
+  // Reading numbering starts at 1
+  readingIndices.forEach(({idx}, i) => {
+    const tile = buildTile(i + 1, idx, false);
+    gridReading.appendChild(tile);
+  });
+  // Listening numbering continues after reading (e.g., 21..40)
+  listeningIndices.forEach(({idx}, i) => {
+    const tile = buildTile(readingIndices.length + i + 1, idx, true);
+    gridListening.appendChild(tile);
   });
 
   if (openIfClosed) {

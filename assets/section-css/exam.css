@@ -133,21 +133,42 @@
 .qmap-btn:hover{ background:#2ca347; color:#fff; border-color:#2ca347; }
 
 .qm-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1050; }
-.qm-card{ width:min(900px, 92vw); background:#fff; border-radius:12px; box-shadow:0 16px 40px rgba(0,0,0,0.25); overflow:hidden; }
+.qm-card{ width:min(900px, 92vw); max-height: 88vh; background:#fff; border-radius:12px; box-shadow:0 16px 40px rgba(0,0,0,0.25); overflow:hidden; display:flex; flex-direction:column; }
 .qm-header{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#e8ffed; border-bottom:1px solid #cde9d5; }
 .qm-close{ background:#ff5b5b; color:#fff; border:none; width:28px; height:28px; border-radius:50%; line-height:26px; text-align:center; font-weight:700; }
 .qm-meta{ display:flex; gap:14px; padding:10px 14px; font-size:13px; color:#2c3e50; }
 .qgrid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap:8px; padding:12px 14px; }
-.qtile{ display:flex; align-items:center; justify-content:center; height:44px; border:1px solid #dfe7ec; border-radius:6px; cursor:pointer; font-weight:600; font-size:13px; color:#2c3e50; position:relative; }
+.qtile{ display:flex; align-items:center; justify-content:center; height:44px; border:1px solid #dfe7ec; border-radius:6px; cursor:pointer; font-weight:600; font-size:13px; color:#2c3e50; position:relative; font-variant-numeric: tabular-nums; padding: 0 2px; }
 .qtile.answered{ border-color:#2ca347; background:#e8ffed; }
 .qtile.current{ outline:2px solid #2ca347; }
 .qtile.locked{ opacity:0.5; pointer-events:none; }
 .qtile .dot{ position:absolute; right:6px; top:6px; width:8px; height:8px; border-radius:50%; background:#2ca347; }
+.qm-sections{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; padding: 0 14px 12px; }
+.qm-section{ border:1px solid #eef3f6; border-radius:10px; overflow:hidden; }
+.qm-section-header{ display:flex; align-items:center; gap:6px; padding:8px 12px; background:#f7fbf9; border-bottom:1px solid #eef3f6; font-weight:600; color:#2c3e50; font-size:13px; }
 .qm-legend{ display:flex; gap:16px; padding:10px 14px 14px; border-top:1px solid #eef3f6; font-size:12px; color:#556; }
 .qm-legend .dot{ display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle; }
 .qm-legend .dot.answered{ background:#2ca347; }
 .qm-legend .dot.current{ background:#2ca347; }
 .qm-legend .dot.locked{ background:#adb5bd; }
+
+@media (max-width: 768px){
+    .qm-card{ width: 96vw; max-height: 86vh; }
+    .qm-header{ padding:8px 12px; }
+    .qm-meta{ padding:8px 12px; font-size:12px; gap:10px; }
+    /* Keep Reading and Listening side-by-side on mobile */
+    .qm-sections{ grid-template-columns: 1fr 1fr; gap:10px; padding: 0 10px 10px; overflow: auto; }
+    .qm-section-header{ padding:6px 10px; font-size:13px; }
+    .qgrid{ grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap:6px; padding:10px; }
+    .qtile{ height:36px; font-size:12px; }
+    .qtile .dot{ width:7px; height:7px; right:5px; top:5px; }
+    .qm-legend{ padding:8px 12px; font-size:11px; gap:10px; }
+}
+
+@media (max-width: 420px){
+    .qgrid{ grid-template-columns: repeat(auto-fill, minmax(32px, 1fr)); gap:5px; }
+    .qtile{ height:32px; font-size:11px; }
+}
 
 /* ---- New Top/Bottom Bars (no sidebar layout) ---- */
 .exam-topbar{ background:rgba(232,255,237,0.9); backdrop-filter:saturate(120%) blur(6px); border:1px solid #cde9d5; border-radius:10px; padding:8px 12px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
@@ -224,6 +245,16 @@
         /* Hide text buttons in bottom bar; use floating controls */
         .exam-bottombar #prev-btn,
         .exam-bottombar #next-btn{ display:none !important; }
+    /* Slightly smaller floating arrows */
+    .mob-nav-btn{ width:36px; height:36px; }
+    .mob-nav-btn i{ font-size:14px; }
+    /* Slightly smaller question text */
+    #question-container h5{ font-size:0.95rem; }
+    #question-container h6{ font-size:0.9rem; }
+    #question-container p,
+    #question-container li,
+    #question-container label,
+    #question-container .form-check-label{ font-size:0.9rem; }
 }
 
     /* Keep Map visible in docked topbar, hide only its text label */
@@ -240,4 +271,27 @@
     .exam-bottombar{ padding:4px 8px; }
     .time-chip{ gap:4px; font-size:10px; }
     .time-chip .label{ font-size:10px; }
+}
+
+/* Ultra-compact tweaks for tiny phones */
+@media (max-width: 380px){
+    /* Time chips even tighter */
+    .time-chip{ padding:1px 5px; font-size:10px; gap:4px; }
+    .time-chip .label{ padding:0 5px; font-size:10px; }
+    /* Question Map super compact */
+    .qm-card{ width:98vw; max-height:84vh; }
+    .qm-meta{ font-size:11px; gap:8px; padding:6px 10px; }
+    .qm-section-header{ font-size:11px; padding:5px 8px; }
+    .qgrid{ grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap:4px; padding:8px; }
+    .qtile{ height:30px; font-size:10.5px; }
+    .qtile .dot{ width:6px; height:6px; right:4px; top:4px; }
+    /* Hide legend to save space */
+    .qm-legend{ display:none; }
+}
+
+@media (max-width: 340px){
+    .qgrid{ grid-template-columns: repeat(auto-fill, minmax(28px, 1fr)); gap:4px; }
+    .qtile{ height:28px; font-size:10px; }
+    .mob-nav-btn{ width:32px; height:32px; }
+    .mob-nav-btn i{ font-size:13px; }
 }
