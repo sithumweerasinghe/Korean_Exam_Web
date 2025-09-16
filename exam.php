@@ -335,25 +335,25 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                     </div>
                     <!-- Header End -->
 
-                    <div class="col-12 d-flex align-items-center justify-content-center" id="main-content" style="height: calc(100vh - 155px);">
+                    <div class="col-12 d-flex align-items-center justify-content-center" id="main-content" style="height: calc(100vh - 155px); overflow-y: scroll; overflow-x: hidden;">
                         <div class="row">
                             <?php
                             if (!isset($_GET['start_exam'])) {
                             ?>
                                 <div class="">
-                                    <div class="">
+                                    <div class="" style="justify-items: center; ">
                                         <!-- Enter Ticket Start-->
                                         <?php
                                         if ((isset($_GET["paper_id"]) && isset($_GET["sample"]) && count($_GET) === 2)) {
                                         ?>
-                                            <div class="card shadow mt-4" style="border-radius: 12px;  width: 100%; max-height:  calc(100vh - 300px); overflow-y: auto;">
+                                            <div class="card shadow mt-4" style="border-radius: 12px;  width: 100%; max-height:  calc(120vh - 300px); overflow-y: auto;">
                                                 <div class="p-3 text-white text-center" style="background-color: #2ca347; font-weight: 600; font-size: 19px;">
                                                     Information Check of Applicant
                                                 </div>
                                                 <div class="p-3 text-white bg-dark text-center d-flex justify-content-center align-items-center">
                                                     <i class="fa fa-volume-up me-3 fs-2 text-white "></i>Check your application and if there is no problem, click the confirm button.
                                                 </div>
-                                                <div class="bg-white p-5">
+                                                <div class="bg-white p-4">
                                                     <div class="row align-items-center">
                                                         <div class="col-4 text-center">
                                                             <img
@@ -384,7 +384,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                 </div>
                                             </div>
 
-                                            <div class="ed-hero__btn text-center mb-4">
+                                            <div class="ed-hero__btn text-center mb-1 mt-3">
                                                 <a href="javascript:void(0)" onclick="startFaceVerification('<?= $profileImage ?>')" class="ed-btn">Confirm<i
                                                         class="fi fi-rr-arrow-small-right"></i></a>
                                             </div>
@@ -398,7 +398,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                         <?php
                                         if (isset($_GET["notice"])) {
                                         ?>
-                                            <div class="card shadow offset-2 col-8 mt-4" style="border-radius: 12px;  max-height:  calc(100vh - 300px); overflow-y: auto;">
+                                            <div class="card shadow  col-8 " style="border-radius: 12px;  width: 80%; overflow-y: auto; margin-top: 200px;">
                                                 <div class="p-3 text-white text-center" style="background-color: #2ca347; font-weight: 600; font-size: 19px;">
                                                     Notice of Applicant
                                                 </div>
@@ -418,7 +418,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="bg-white p-5" style="max-height: 300px; overflow-y: auto;">
+                                                <div class="bg-white p-5" style="overflow-y: auto;">
                                                     <div class="row align-items-center">
                                                         <ul class="list-unstyled">
                                                             <li class="d-flex align-items-center mb-2">
@@ -449,7 +449,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="ed-hero__btn text-center mb-4">
+                                            <div class="ed-hero__btn text-center mb-1 mt-3">
                                                 <a href="exam?<?= str_replace('notice', 'instructions', $_SERVER['QUERY_STRING']) ?>" class="ed-btn">Confirm<i
                                                         class="fi fi-rr-arrow-small-right"></i></a>
                                             </div>
@@ -463,14 +463,14 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                         <?php
                                         if (isset($_GET["instructions"])) {
                                         ?>
-                                            <div class="card shadow col-8 offset-2 mt-4" style="border-radius: 12px;  max-height: calc(100vh - 300px); overflow-y: auto">
+                                            <div class="card shadow col-8 " style="border-radius: 12px;  overflow-y: auto; margin-top: 20px;">
                                                 <div class="p-3 text-white text-center" style="background-color: #2ca347; font-weight: 600; font-size: 19px;">
                                                     Practice Test of Proficiency in Korea(CBT)
                                                 </div>
                                                 <div class="p-3 text-white bg-dark text-center d-flex justify-content-center align-items-center">
                                                     <i class="fa fa-volume-up  fs-2 text-white "></i>After clicking [Practice Test] button, proceed practice test and if there is nothing wrong, click [Ready] button.
                                                 </div>
-                                                <div class="bg-white p-5" style="max-height: 300px; overflow-y: auto;">
+                                                <div class="bg-white p-4" style=" overflow-y: auto;">
                                                     <div class="row align-items-center">
                                                         <ul class="list-unstyled">
                                                             <li class="d-flex align-items-center mb-2">
@@ -491,7 +491,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="ed-hero__btn text-center mb-4">
+                                            <div class="ed-hero__btn text-center mb-1 mt-3">
                                                 <a onclick="handleReadyClick('<?= htmlspecialchars($_GET['paper_id'], ENT_QUOTES) ?>', 
                              '<?= htmlspecialchars($application_no, ENT_QUOTES) ?>', 
                              '<?= htmlspecialchars($_GET['exam_id'] ?? '', ENT_QUOTES) ?>',
