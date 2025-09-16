@@ -1,8 +1,8 @@
 .ed-paper__card-item {
   position: relative;
-  border-radius: 8px;
-  background: var(--ed-offwhite-color);
-  height: 200px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0f9f0 100%);
+  height: 220px;
   margin-top: 20px;
   background-position: center;
   background-repeat: no-repeat;
@@ -10,7 +10,9 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  transition: transform 0.5s ease, background-size 0.5s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(76, 175, 80, 0.1);
+  box-shadow: 0 4px 20px rgba(46, 125, 50, 0.08);
 }
 .ed-paper__card-item::before {
   content: "";
@@ -19,15 +21,23 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.7) 0%, rgba(76, 175, 80, 0.8) 100%);
+  border-radius: 16px;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .ed-paper__card-item:hover {
-  transform: scale(1.1);
-  transition: transform 0.5s ease, opacity 0.5s ease;
+  transform: translateY(-8px) scale(1.02);
+  border-color: #4caf50;
+  box-shadow: 0 12px 40px rgba(46, 125, 50, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+}
+
+.ed-paper__card-item:hover::before {
+  opacity: 1;
 }
 
 .ed-paper__card-item .ed-paper__card-info {

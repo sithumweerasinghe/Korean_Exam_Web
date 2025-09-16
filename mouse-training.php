@@ -1,3 +1,4 @@
+<?php include("includes/lang/lang-check.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -171,11 +172,11 @@
     </div>
     <div class="container">
         <img src="assets/images/logo.png" alt="Site Logo" id="site-logo" style="width: 150px; margin-bottom: 20px;">
-        <h1>Mouse Training Game</h1>
-        <p>Sharpen your mouse skills with fun and engaging levels!</p>
+        <h1><?= $translations['mouse_training_game']; ?></h1>
+        <p><?= $translations['mouse_training_description']; ?></p>
         <div style="display: flex; flex-direction: row; gap: 10px;">
-            <button class="button" onclick="startGame()">Start Game</button>
-            <button class="button" onclick="window.location='https://topiksir.com'">Go to Home</button>
+            <button class="button" onclick="startGame()"><?= $translations['start_game']; ?></button>
+            <button class="button" onclick="window.location='https://topiksir.com'"><?= $translations['go_to_home']; ?></button>
         </div>
         <div id="gameArea" class="game-area"></div>
         <div id="stats" class="stats"></div>

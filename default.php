@@ -1,3 +1,4 @@
+<?php include("includes/lang/lang-check.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
     <head>

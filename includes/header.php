@@ -31,7 +31,7 @@ require_once "api/config/dbconnection.php";
                             <a class="offcanvas__menu_item <?php echo $contact ?>" href="contact"> <?= $translations['contact']; ?></a>
                         </li>
                         <li class="offcanvas__menu_li">
-                            <a class="offcanvas__menu_item <?php echo $contact ?>" href="mouse-training">Mouse Training</a>
+                            <a class="offcanvas__menu_item <?php echo $contact ?>" href="mouse-training"><?= $translations['mouse_training']; ?></a>
                         </li>
                     </ul>
                 </nav>
@@ -69,7 +69,7 @@ require_once "api/config/dbconnection.php";
                         <a href="contact"><?= $translations['contact']; ?></a>
                     </li>
                     <li style="padding-left: 20px;">
-                        <a href="mouse-training">Mouse Training</a>
+                        <a href="mouse-training"><?= $translations['mouse_training']; ?></a>
                     </li>
                 </ul>
             </nav>
@@ -79,6 +79,7 @@ require_once "api/config/dbconnection.php";
                         <select id="language-select" class="form-select" onchange="changeLanguage(this.value)">
                             <option value="en" <?php echo ($_SESSION['lang'] ?? 'en') == 'en' ? 'selected' : ''; ?>>English</option>
                             <option value="si" <?php echo ($_SESSION['lang'] ?? 'si') == 'si' ? 'selected' : ''; ?>>සිංහල</option>
+                            <option value="ko" <?php echo ($_SESSION['lang'] ?? 'ko') == 'ko' ? 'selected' : ''; ?>>한국어</option>
                         </select>
                     </div>
 

@@ -7,6 +7,23 @@ return [
     'papers' => 'Practice Papers',
     'login' => 'Login',
     'register' => 'Register',
+    'mouse_training' => 'Mouse Training',
+    'mouse_training_game' => 'Mouse Training Game',
+    'mouse_training_description' => 'Sharpen your mouse skills with fun and engaging levels!',
+    'start_game' => 'Start Game',
+    'go_to_home' => 'Go to Home',
+    'go_to_homepage' => 'Go to Homepage',
+    
+    // Exam-related translations
+    'exam_instructions' => [
+        'technical_problem' => 'If there is a <span class="fw-semibold">technical problem</span> with the computer during the test, please raise your hand quietly without making any noise. If needed, you can move to another PC and continue the test from the previous question.',
+        'test_duration' => 'This test will proceed for <span class="fw-semibold">50 minutes without a break.</span> It has all 40 questions. The reading test is from 1 to 20, and the listening test is from 21 to 40. The listening test will be played twice.',
+        'answer_warning' => '<span class="fw-semibold">Once you choose an answer, you can\'t change the answer.</span> Please mark the answer carefully.'
+    ],
+    'submit_answers' => 'Submit Answers',
+    'question_time' => 'Question Time:',
+    'previous' => 'Previous',
+    'next' => 'Next',
 
     'welcome_message' => 'Welcome to Topik Sir!!',
     'hero_title' => 'The Best Place to Pass the EPS Topik Exam <br /> Topiksir.com',
