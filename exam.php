@@ -1011,6 +1011,31 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             transition: width 0.3s ease;
             border-radius: 10px;
         }
+
+        /* Headphone indicator */
+        .headphone-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2px 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .headphone-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.95);
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.7);
+            display: inline-block;
+        }
+        .status-connected { background: #28a745; }
+        .status-disconnected { background: #dc3545; }
+        .status-unknown { background: #ffc107; }
         
         /* Fullscreen mobile styles */
         @media (max-width: 767px) and (orientation: landscape) {
@@ -1130,13 +1155,20 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                             </div>
                             
                             <!-- Volume Control -->
-                            <div class="control-group">
+                            <div class="control-group me-2">
                                 <label class="control-label">
                                     <i class="fa fa-volume-up"></i>
                                 </label>
                                 <button class="control-btn compact" onclick="adjustVolume(-10)">-</button>
                                 <input type="range" class="control-range" id="volumeRange" min="0" max="100" value="50" onchange="setVolume(this.value)">
                                 <button class="control-btn compact" onclick="adjustVolume(10)">+</button>
+                            </div>
+
+                            <!-- Headphone Indicator -->
+                            <div class="headphone-indicator" id="headphoneIndicator" title="Headphone status">
+                                <i class="fa fa-headphones"></i>
+                                <span class="headphone-label" id="headphoneLabel">Checking…</span>
+                                <span class="status-dot status-unknown" id="headphoneDot"></span>
                             </div>
                         </div>
                     </div>
@@ -1479,6 +1511,101 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         // Global function to start face verification
         function startFaceVerification(profileImageUrl) {
             showFaceVerification(profileImageUrl);
+        }
+
+        // Headphone detection
+        async function detectHeadphones() {
+            const labelEl = document.getElementById('headphoneLabel');
+            const dotEl = document.getElementById('headphoneDot');
+            const containerEl = document.getElementById('headphoneIndicator');
+            if (!labelEl || !dotEl) return;
+
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                    labelEl.textContent = 'Unknown';
+                    dotEl.className = 'status-dot status-unknown';
+                    if (containerEl) containerEl.title = 'Headphone status: Unknown';
+                    return;
+                }
+
+                let devices = await navigator.mediaDevices.enumerateDevices();
+                const labelsAvailable = devices.some(d => !!d.label);
+                const audioOutputs = devices.filter(d => d.kind === 'audiooutput');
+
+                // Resolve the actual default output device using groupId when possible
+                const defaultStub = audioOutputs.find(d => d.deviceId === 'default');
+                let actualDefault = defaultStub;
+                if (defaultStub && defaultStub.groupId) {
+                    const matchByGroup = audioOutputs.find(d => d.groupId === defaultStub.groupId && d.deviceId !== 'default');
+                    if (matchByGroup) actualDefault = matchByGroup;
+                }
+                // Fallback to a single non-default output if no default stub
+                if (!actualDefault && audioOutputs.length > 0) {
+                    actualDefault = audioOutputs[0];
+                }
+
+                // Device label to classify
+                const name = actualDefault ? (actualDefault.label || actualDefault.deviceId || '').toString() : '';
+
+                // Strict classification: only flag headphones with explicit terms on the DEFAULT output
+                const headphoneRegex = /(\bheadphones?\b|\bheadset\b|\bearbuds?\b|\bear\s?phones?\b|\bairpods?\b|\bbluetooth\b)/i;
+                const speakersRegex = /(\bspeakers?\b|\bmonitor\b|display\s*audio|\bhdmi\b|\btv\b)/i;
+                const isHeadphone = !!name && headphoneRegex.test(name);
+                const isSpeakers = !!name && speakersRegex.test(name);
+
+                // As a fallback, if only one output device and it's default with no label, status unknown
+                if (audioOutputs.length === 0) {
+                    labelEl.textContent = 'No output';
+                    dotEl.className = 'status-dot status-disconnected';
+                    if (containerEl) containerEl.title = 'No audio output device detected';
+                } else if (isHeadphone) {
+                    labelEl.textContent = 'Headphones';
+                    dotEl.className = 'status-dot status-connected';
+                    if (containerEl) containerEl.title = name ? `Default output: ${name}` : 'Headphones detected';
+                } else {
+                    // Not headphones: prefer classifying as Speakers if label suggests, else Unknown/Output
+                    if (labelsAvailable && isSpeakers) {
+                        labelEl.textContent = 'Speakers';
+                        dotEl.className = 'status-dot status-disconnected';
+                        if (containerEl) containerEl.title = name ? `Default output: ${name}` : 'Output: Speakers';
+                    } else if (labelsAvailable && name) {
+                        labelEl.textContent = 'Output';
+                        dotEl.className = 'status-dot status-disconnected';
+                        if (containerEl) containerEl.title = `Default output: ${name}`;
+                    } else {
+                        labelEl.textContent = 'Unknown';
+                        dotEl.className = 'status-dot status-unknown';
+                        if (containerEl) containerEl.title = 'Unknown output. Click to re-check (may request mic permission).';
+                    }
+                }
+            } catch (err) {
+                console.warn('Headphone detection error:', err);
+                labelEl.textContent = 'Unknown';
+                dotEl.className = 'status-dot status-unknown';
+                if (containerEl) containerEl.title = 'Headphone status: Unknown';
+            }
+        }
+
+        function initHeadphoneDetection() {
+            detectHeadphones();
+            if (navigator.mediaDevices && 'ondevicechange' in navigator.mediaDevices) {
+                navigator.mediaDevices.addEventListener('devicechange', () => {
+                    detectHeadphones();
+                });
+            }
+            const containerEl = document.getElementById('headphoneIndicator');
+            if (containerEl) {
+                containerEl.addEventListener('click', async () => {
+                    // Try to reveal device labels only on user interaction
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        stream.getTracks().forEach(t => t.stop());
+                    } catch (_) {
+                        // ignore
+                    }
+                    detectHeadphones();
+                });
+            }
         }
 
         // Handle confirm click with face verification step selection
@@ -1854,6 +1981,8 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize controls
             initializeControls();
+            // Initialize headphone detection
+            initHeadphoneDetection();
             
             // Check which step we're on and handle face verification
             const urlParams = new URLSearchParams(window.location.search);
@@ -2041,6 +2170,8 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             }
         }
         document.addEventListener("DOMContentLoaded", () => {
+            // Also refresh headphone status after second phase init
+            setTimeout(() => { try { detectHeadphones(); } catch(_) {} }, 500);
             const urlParams = new URLSearchParams(window.location.search);
             const startTime = urlParams.get("start_time"); // Start time in format HH:MM:SS
             const examDate = urlParams.get("exam_date"); // Exam date in format YYYY-MM-DD
