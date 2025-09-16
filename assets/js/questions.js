@@ -151,6 +151,7 @@ function loadQuestions(questions_array, isSample, isExam, paper_id, exam_id) {
     console.error('Error in loadQuestions:', error);
     throw error;
   }
+        updateMobileNavState();
 }
 
 function displayQuestion(index) {
@@ -166,42 +167,44 @@ function displayQuestion(index) {
   // Play audio if available
   if (question.audio) {
     currentAudio = new Audio(question.audio);
-    
+
     // Apply current volume setting
     const savedVolume = localStorage.getItem('examVolume') || '50';
     currentAudio.volume = parseInt(savedVolume) / 100;
-    
+
     // Add mobile-friendly play handling
     const playPromise = currentAudio.play();
-    
     if (playPromise !== undefined) {
       playPromise.then(() => {
-        console.log('Audio started successfully');
         isAudioPlaying = true;
         document.getElementById("next-btn").disabled = true;
+        updateMobileNavState();
       }).catch(error => {
         console.warn('Audio autoplay failed:', error);
         showAudioPlayButton(currentAudio);
       });
     }
-    
+
     currentAudio.onended = () => {
       isAudioPlaying = false;
       document.getElementById("next-btn").disabled = false;
       removeAudioPlayButton();
+      updateMobileNavState();
     };
-    
+
     // Handle audio errors
     currentAudio.onerror = (error) => {
       console.error('Audio playback error:', error);
       isAudioPlaying = false;
       document.getElementById("next-btn").disabled = false;
       showAudioError();
+      updateMobileNavState();
     };
   }
 
   if (question.question_category === "listening") {
     startListeningTimer();
+          updateMobileNavState();
   }
 
   const options = question.options;
@@ -252,6 +255,10 @@ function displayQuestion(index) {
 `;
 
   document.getElementById("prev-btn").style.display = index > 0 ? "inline-block" : "none";
+  updateMobileNavState();
+
+  // Update question counter (exclude samples)
+  updateQuestionCounter();
 
   const radioButtons = document.querySelectorAll('input[name="question"]');
   radioButtons.forEach((radio) => {
@@ -452,6 +459,8 @@ function saveAnswer() {
   const category = questions[currentQuestionIndex].question_category;
   const categoryQuestions = questions.filter(q => q.question_category === category);
   renderCategory(category, categoryQuestions, category === "reading" ? 1 : readingQuestions.length + 1);
+  // Re-render question map to reflect answered state
+  renderQuestionMap(false);
 }
 
 function nextQuestion() {
@@ -615,3 +624,126 @@ function submitAnswers() {
     endQuiz();
   }
 }
+
+// ---- Question Counter ----
+function updateQuestionCounter(){
+  const counterEl = document.getElementById('question-counter');
+  if (!counterEl || !Array.isArray(questions) || questions.length === 0) return;
+  // Compute display index excluding sample questions
+  let displayIdx = 0;
+  for (let i=0;i<=currentQuestionIndex;i++){
+    if (!questions[i].questionIsSample) displayIdx++;
+  }
+  const totalNonSample = questions.filter(q=>!q.questionIsSample).length;
+  counterEl.textContent = `${displayIdx} / ${totalNonSample}`;
+}
+
+// Keep mobile floating nav buttons in sync with main prev/next
+function updateMobileNavState(){
+  try{
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const mobPrev = document.querySelector('.mob-prev');
+    const mobNext = document.querySelector('.mob-next');
+    if (mobPrev && prevBtn){
+      const isPrevVisible = prevBtn && prevBtn.style.display !== 'none';
+      mobPrev.style.display = isPrevVisible ? 'flex' : 'none';
+    }
+    if (mobNext && nextBtn){
+      if (nextBtn.disabled){
+        mobNext.classList.add('disabled');
+      } else {
+        mobNext.classList.remove('disabled');
+      }
+    }
+  } catch(e){
+    console.warn('updateMobileNavState error:', e);
+  }
+}
+
+// Sync on viewport changes
+window.addEventListener('resize', () => {
+  updateMobileNavState();
+});
+
+// ---- Question Map Modal ----
+function openQuestionMap(){
+  renderQuestionMap(true);
+}
+function closeQuestionMap(){
+  const modal = document.getElementById('questionMapModal');
+  if (modal) modal.classList.add('d-none');
+}
+function renderQuestionMap(openIfClosed){
+  const grid = document.getElementById('question-map-grid');
+  const modal = document.getElementById('questionMapModal');
+  if (!grid || !modal || !Array.isArray(questions)) return;
+
+  // Only render if explicitly opening or if modal is already visible
+  const isVisible = !modal.classList.contains('d-none');
+  if (!openIfClosed && !isVisible) {
+    return; // do nothing when hidden unless explicitly opened
+  }
+
+  const nonSampleIndices = questions
+    .map((q, idx) => ({q, idx}))
+    .filter(({q}) => !q.questionIsSample);
+
+  // Stats
+  const total = nonSampleIndices.length;
+  const answeredCount = nonSampleIndices.reduce((acc,{idx})=> acc + (answers[idx] !== null && answers[idx] !== undefined && answers[idx] !== 'sample' ? 1 : 0), 0);
+  const remaining = total - answeredCount;
+  const qmTotal = document.getElementById('qm-total');
+  const qmAnswered = document.getElementById('qm-answered');
+  const qmRemaining = document.getElementById('qm-remaining');
+  if (qmTotal) qmTotal.textContent = `Total: ${total}`;
+  if (qmAnswered) qmAnswered.textContent = `Answered: ${answeredCount}`;
+  if (qmRemaining) qmRemaining.textContent = `Remaining: ${remaining}`;
+
+  // Build tiles
+  grid.innerHTML = '';
+  let dispNum = 0;
+  nonSampleIndices.forEach(({q, idx}) => {
+    dispNum++;
+    const tile = document.createElement('button');
+    tile.type = 'button';
+    tile.className = 'qtile';
+    tile.textContent = dispNum;
+
+    // States
+    const isCurrent = idx === currentQuestionIndex;
+    const isAnswered = answers[idx] !== null && answers[idx] !== undefined && answers[idx] !== 'sample';
+    if (isAnswered) tile.classList.add('answered');
+    if (isCurrent) tile.classList.add('current');
+
+    // Lock rules: no jumping to Listening before allowed
+    const isListening = q.question_category === 'listening';
+    if (isListening && !isListeningStarted) {
+      tile.classList.add('locked');
+    } else {
+      tile.addEventListener('click', () => {
+        // Respect restrictions during transition
+        if (isTransitioningToListening) return;
+        if (isListening && !isListeningStarted) return;
+        currentQuestionIndex = idx;
+        displayQuestion(currentQuestionIndex);
+        closeQuestionMap();
+      });
+    }
+
+    if (isAnswered){
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      tile.appendChild(dot);
+    }
+    grid.appendChild(tile);
+  });
+
+  if (openIfClosed) {
+    modal.classList.remove('d-none');
+  }
+}
+
+// Expose map functions
+window.openQuestionMap = openQuestionMap;
+window.closeQuestionMap = closeQuestionMap;

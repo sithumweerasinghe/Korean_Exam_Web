@@ -532,58 +532,78 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                     <div id="exam-content" class="col-12  d-none bg-secondary-subtle overflow-hidden" style="height: calc(100vh - 155px);">
                         <!-- Paper Start -->
                         <div class="row ">
-                            <div class="d-flex justify-content-center " style="width: 78%">
+                            <div class="d-flex flex-column align-items-center" style="width: 100%">
+                                <!-- Top Status Bar -->
+                                <div class="exam-topbar d-flex align-items-center justify-content-between w-100 mb-2">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <div class="time-chip"><span class="label">Reading</span><span id="reading-remaining" class="value">04:59</span></div>
+                                        <div class="time-chip"><span class="label">Listening</span><span id="listening-remaining" class="value">04:59</span></div>
+                                        <div class="time-chip"><span class="label">Question</span><span id="listening-timer-single" class="value">00:00</span></div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="button" class="qmap-btn" onclick="openQuestionMap()"><i class="fa fa-th me-1"></i> <span class="btn-label">Question Map</span></button>
+                                        <button onclick="submitAnswers();" class="exam-button py-2 px-3">Submit Answers ></button>
+                                    </div>
+                                </div>
+
                                 <!-- Questions Container Start -->
-                                <div class="row align-items-center">
-                                    <div id="quiz-container" class="col-lg-12 position-relative">
-                                        <div id="question-container" class="bg-white card" style="width:700px; max-height: calc(100vh - 200px); overflow-y: auto; border: 1px solid #ddd;"></div>
+                                <div class="row align-items-center w-100 justify-content-center">
+                                    <div id="quiz-container" class="col-lg-12 position-relative d-flex justify-content-center">
+                                        <div class="question-wrapper position-relative">
+                                            <button type="button" class="mob-nav-btn mob-prev" aria-label="Previous question" onclick="(function(){var b=document.getElementById('prev-btn'); if(b && b.style.display!=='none' && !b.disabled){ b.click(); }})()">
+                                                <i class="fa fa-chevron-left"></i>
+                                            </button>
+                                            <div id="question-container" class="bg-white card" style="width:100%; max-width:700px; max-height: calc(100vh - 210px); overflow-y: auto; border: 1px solid #ddd;"></div>
+                                            <button type="button" class="mob-nav-btn mob-next" aria-label="Next question" onclick="(function(){var b=document.getElementById('next-btn'); if(b && !b.disabled){ b.click(); }})()">
+                                                <i class="fa fa-chevron-right"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Questions Container End -->
-                            </div>
-                            <div class="px-4 py-3 text-center overflow-auto" style="background: #e8ffed; width: 22%; height: calc(100vh - 155px); overflow-y: auto;">
-                                <button onclick="submitAnswers();" class="exam-button py-3 mb-3 px-3">Submit Answers ></button>
-                                <div class="row" id="answer-sheet">
-                                    <!-- Reading Start -->
-                                    <div class="col-6">
-                                        <div class="text-center text-white mb-2 p-2" style="background-color: #2ca347; border-radius:8px;">Reading</div>
-                                        <div class="d-flex align-items-center border rounded-2 border-dark mb-3">
-                                            <span class="bg-dark px-1 py-1 text-white rounded-2 me-2" style="font-size: 11px;">Remaining Time</span>
-                                            <span id="reading-remaining" class="fw-semibold me-1" style="font-size: 12px;">04:59</span>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3" style="height: 20px;">
-                                            <span class=" px-1 py-1 fw-semibold rounded-2 me-1" style="font-size: 12px;"></span>
-                                            <span class="fw-semibold" style="color:#2ca347; font-size: 15px;"></span>
-                                        </div>
-                                        <div class="row" id="reading-container"></div>
-                                    </div>
-                                    <!-- Reading End -->
 
-                                    <!-- Listening Start -->
-                                    <div class="col-6">
-                                        <div class="text-center text-white mb-2 bg-dark p-2" style="border-radius: 8px;">Listening</div>
-                                        <div class="d-flex align-items-center mb-3 border  rounded-2 border-success">
-                                            <span class=" px-1 py-1 text-white rounded-2 me-1" style="font-size: 11px; background-color: #2ca347">Remaining Time</span>
-                                            <span id="listening-remaining" class="fw-semibold me-2" style="font-size: 12px;">04:59</span>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3" style="height: 20px;">
-                                            <span class=" px-1 py-1 fw-semibold rounded-2 me-1" style="font-size: 12px;">Question Time: </span>
-                                            <span id="listening-timer-single" class="fw-semibold" style="color:#2ca347; font-size: 15px;">00:00</span>
-                                        </div>
-
-                                        <div class="row" id="listening-container"></div>
-                                    </div>
-                                    <!-- Listening End -->
+                                <!-- Bottom Navigation Bar -->
+                                <div class="exam-bottombar d-flex align-items-center justify-content-center gap-2 w-100 mt-2">
+                                    <button id="prev-btn" class="exam-button py-2 px-3 rounded-2"> < Previous</button>
+                                    <div class="fw-semibold" id="question-counter" style="font-size:13px; color:#2c3e50;">-- / --</div>
+                                    <button id="next-btn" class="exam-button py-2 px-3 rounded-2">Next ></button>
+                                    <button type="button" class="qmap-btn" onclick="openQuestionMap()"><i class="fa fa-th me-1"></i> <span class="btn-label">Map</span></button>
+                                    <button type="button" class="exam-button submit-mobile py-2 px-3" onclick="submitAnswers()"><i class="fa fa-paper-plane me-1"></i><span class="btn-label">Submit</span></button>
                                 </div>
-                                <div class="row mt-3 px-1 text-center">
-                                    <button id="prev-btn" class="exam-button py-3 px-2 mx-2 col-5 rounded-2">
-                                        < Previous</button>
-                                            <button id="next-btn" class="exam-button py-2 px-2 mx-2 col-5 rounded-2">Next ></button>
+
+                                <!-- Hidden containers to support existing renderers -->
+                                <div id="hidden-answer-sheet" class="d-none">
+                                    <div class="row" id="reading-container"></div>
+                                    <div class="row" id="listening-container"></div>
                                 </div>
                             </div>
                         </div>
                         <!-- Paper End -->
 
+                    </div>
+                    
+                    <!-- Question Map Modal -->
+                    <div id="questionMapModal" class="qm-backdrop d-none">
+                        <div class="qm-card">
+                            <div class="qm-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa fa-th"></i>
+                                    <span class="fw-bold">Question Map</span>
+                                </div>
+                                <button class="qm-close" onclick="closeQuestionMap()" aria-label="Close">×</button>
+                            </div>
+                            <div class="qm-meta">
+                                <span id="qm-total">Total: --</span>
+                                <span id="qm-answered">Answered: --</span>
+                                <span id="qm-remaining">Remaining: --</span>
+                            </div>
+                            <div class="qgrid" id="question-map-grid"></div>
+                            <div class="qm-legend">
+                                <span><span class="dot answered"></span> Answered</span>
+                                <span><span class="dot current"></span> Current</span>
+                                <span><span class="dot locked"></span> Locked</span>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </main>
@@ -1511,6 +1531,18 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             initializeControls();
             // Initialize headphone detection
             initHeadphoneDetection();
+            // Sidebar tab switching
+            (function initExamTabs(){
+                const tabs = document.querySelectorAll('.exam-tab');
+                tabs.forEach(tab => tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const target = tab.getAttribute('data-target');
+                    document.querySelectorAll('.exam-pane').forEach(p => p.classList.remove('show'));
+                    const pane = document.querySelector(target);
+                    if (pane) pane.classList.add('show');
+                }));
+            })();
             
             // Check which step we're on and handle face verification
             const urlParams = new URLSearchParams(window.location.search);
