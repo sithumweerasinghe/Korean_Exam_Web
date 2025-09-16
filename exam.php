@@ -94,6 +94,9 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             line-height: 1.4 !important;
         }
 
+        /* Global reading highlight when sample audio is playing */
+        .reading-active { color: #d9534f !important; font-weight: 600; }
+
         /* AV Wizard Modal */
         #avWizardModal {
             position: fixed;
@@ -1489,6 +1492,103 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
 
                                         <!-- Enter Ticket End -->
 
+                                        <!-- AV Brightness Step Start -->
+                                        <?php
+                                        if (isset($_GET["av_brightness"])) {
+                                        ?>
+                                            <div class="exam-card">
+                                                <div class="card-header-compact">
+                                                    <h5><i class="fa fa-sun-o me-2"></i>Brightness Adjustment</h5>
+                                                </div>
+                                                <div class="instruction-bar">
+                                                    <i class="fa fa-volume-up"></i>
+                                                    <span>Adjust screen brightness until this sample looks comfortable, then click Confirm.</span>
+                                                </div>
+                                                <div class="card-body-compact">
+                                                    <div class="d-flex flex-column align-items-center av-step">
+                                                        <div class="rounded border mb-3" style="width: 280px; height: 140px; background: linear-gradient(90deg, #000, #222, #444, #666, #888, #aaa, #ccc, #eee, #fff);"></div>
+                                                        <p id="avBrightnessText" class="text-muted mb-3" style="max-width:620px; text-align:center;">
+                                                            Make sure you can distinguish the dark shades on the left and the bright shades on the right without eye strain. Use the slider to fine tune brightness.
+                                                        </p>
+                                                        <div class="d-flex align-items-center w-100" style="max-width: 520px; gap:10px;">
+                                                            <i class="fa fa-moon-o text-success"></i>
+                                                            <input id="avBrightnessRangeStep" type="range" min="20" max="100" step="1" class="form-range flex-grow-1" />
+                                                            <i class="fa fa-sun-o text-success"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-center mt-3">
+                                                        <a href="exam?<?= str_replace('av_brightness', 'av_volume', $_SERVER['QUERY_STRING']) ?>" class="action-btn-compact" id="avBrightnessConfirm">
+                                                            Confirm<i class="fi fi-rr-arrow-small-right"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php
+                                        }
+                                        ?>
+                                        <!-- AV Brightness Step End -->
+
+                                        <!-- AV Volume Step Start -->
+                                        <?php
+                                        if (isset($_GET["av_volume"])) {
+                                        ?>
+                                            <div class="exam-card">
+                                                <div class="card-header-compact">
+                                                    <h5><i class="fa fa-volume-up me-2"></i>Volume Adjustment</h5>
+                                                </div>
+                                                <div class="instruction-bar">
+                                                    <i class="fa fa-volume-up"></i>
+                                                    <span id="avStepVolumeInstructions">Adjust the volume using the slider. Press Play to check and ensure you can hear clearly.</span>
+                                                </div>
+                                                <div class="card-body-compact">
+                                                    <div class="d-flex flex-column align-items-center av-step">
+                                                        <div class="d-flex align-items-center mb-3" style="gap:10px;">
+                                                            <button id="avStepPlayBtn" type="button" class="btn btn-success rounded-circle" style="width: 48px; height: 48px; display:flex; align-items:center; justify-content:center; font-weight:700;">▶</button>
+                                                            <audio id="avStepSampleAudio" src="assets/audio/question3.mp3"></audio>
+                                                        </div>
+                                                        <p id="avStepVolumeText" class="k-text mb-3 text-center" style="max-width: 720px;">
+                                                            이어폰을 태블릿 PC에 연결해 주세요.<br><span>음량 조절을 위해서 상단에 보이는 플레이 버튼을 눌러주세요.</span><br>시험에 앞서 단말기의 화면 밝기, 음량을 조정하실 수 있습니다.<br>아래의 음량 조절 바를 움직여 <strong>음량을 적정하게 조절</strong>해 주시기 바랍니다.
+                                                        </p>
+                                                        <div class="d-flex align-items-center w-100" style="max-width: 520px; gap:10px;">
+                                                            <i class="fa fa-volume-down text-success"></i>
+                                                            <input id="avStepVolumeRange" type="range" min="0" max="100" step="1" class="form-range flex-grow-1" />
+                                                            <i class="fa fa-volume-up text-success"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-center mt-3">
+                                                        <?php
+                                                            $currentQuery = $_SERVER['QUERY_STRING'];
+                                                            // remove av_volume and set instructions=true
+                                                            $newQuery = preg_replace('/(?:^|&)av_volume=[^&]*/', '', $currentQuery);
+                                                            $newQuery = preg_replace('/&&+/', '&', $newQuery);
+                                                            $newQuery = trim($newQuery, '&');
+                                                            if (strpos($newQuery, 'instructions=true') === false) {
+                                                                $newQuery .= ($newQuery ? '&' : '') . 'instructions=true';
+                                                            }
+                                                            // Build previous link to brightness step
+                                                            $prevQuery = preg_replace('/(?:^|&)av_volume=[^&]*/', '', $currentQuery);
+                                                            $prevQuery = preg_replace('/&&+/', '&', $prevQuery);
+                                                            $prevQuery = trim($prevQuery, '&');
+                                                            if (strpos($prevQuery, 'av_brightness=true') === false) {
+                                                                $prevQuery .= ($prevQuery ? '&' : '') . 'av_brightness=true';
+                                                            }
+                                                        ?>
+                                                        <div class="d-flex justify-content-center gap-2">
+                                                            <a href="exam?<?= $prevQuery ?>" class="btn btn-secondary">
+                                                                Previous
+                                                            </a>
+                                                            <a href="exam?<?= $newQuery ?>" class="action-btn-compact" id="avVolumeConfirm">
+                                                                Confirm<i class="fi fi-rr-arrow-small-right"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php
+                                        }
+                                        ?>
+                                        <!-- AV Volume Step End -->
+
                                         <!-- Notice Start -->
                                         <?php
                                         if (isset($_GET["notice"])) {
@@ -2201,124 +2301,183 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         }
 
         // AV Wizard helpers
-        function showAVSetupWizard(afterCompleteCallback) {
-            const modal = document.getElementById('avWizardModal');
-            if (!modal) return afterCompleteCallback?.();
-            modal.dataset.after = afterCompleteCallback ? '1' : '';
-            // Make modal overlay transparent so brightness effect is visible behind the popup
-            if (!modal.dataset.bg) modal.dataset.bg = modal.style.background || 'rgba(0,0,0,0.6)';
-            modal.style.background = 'transparent';
-            avGoToStep(1);
-            modal.style.display = 'flex';
-        }
+        // AV Wizard helpers (deprecated popup flow) — no-op
+        function showAVSetupWizard() {}
+        function hideAVSetupWizard() {}
+        function avGoToStep() {}
+        function completeAvWizard() {}
 
-        function hideAVSetupWizard() {
-            const modal = document.getElementById('avWizardModal');
-            if (modal) {
-                modal.style.display = 'none';
-                // Restore original overlay background
-                if (modal.dataset.bg) modal.style.background = modal.dataset.bg;
-            }
-            const audio = document.getElementById('avSampleAudio');
-            if (audio) { audio.pause(); }
-        }
-
-        function avGoToStep(step) {
-            const s1 = document.getElementById('avStep1');
-            const s2 = document.getElementById('avStep2');
-            const title = document.getElementById('avWizardTitle');
-            const prev = document.getElementById('avPrevBtn');
-            const next = document.getElementById('avNextBtn');
-            if (!s1 || !s2) return;
-            if (step === 1) {
-                s1.style.display = '';
-                s2.style.display = 'none';
-                title.textContent = '밝기 조절';
-                prev.style.display = 'none';
-                next.textContent = 'Next';
-                next.onclick = () => avGoToStep(2);
-            } else {
-                s1.style.display = 'none';
-                s2.style.display = '';
-                title.textContent = '음량 조절';
-                prev.style.display = '';
-                prev.onclick = () => avGoToStep(1);
-                next.textContent = 'Next';
-                next.onclick = () => completeAvWizard();
-            }
-        }
-
-        function completeAvWizard() {
-            hideAVSetupWizard();
-            // If we're on the sample page, go to notice regardless
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('sample')) {
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.delete('sample');
-                newUrl.searchParams.set('notice', 'true');
-                return window.location.href = newUrl.toString();
-            }
-
-            // Continue original flow based on selection
-            const selectedStep = sessionStorage.getItem('faceVerificationStep');
-            switch(selectedStep) {
-                case 'now':
-                    proceedToNotice();
-                    break;
-                case 'notice':
-                    proceedToInstructions();
-                    break;
-                case 'instructions': {
-                    const storedParams = sessionStorage.getItem('readyParams');
-                    if (storedParams) {
-                        const params = JSON.parse(storedParams);
-                        handleReadyClick(params.paperId, params.applicationNo, params.examId, params.sample);
-                        sessionStorage.removeItem('readyParams');
-                    } else {
-                        proceedToIdentificationCheck();
-                    }
-                    break; }
-                default:
-                    proceedToNotice();
-            }
-        }
-
-        // Wire modal sliders + play button after DOM ready of script block
+        // Wire AV step sliders + play button after DOM ready
         document.addEventListener('DOMContentLoaded', function() {
             const bHeader = document.getElementById('brightnessRange');
             const vHeader = document.getElementById('volumeRange');
-            const bModal = document.getElementById('brightnessRangeModal');
-            const vModal = document.getElementById('volumeRangeModal');
-            const playBtn = document.getElementById('avPlayBtn');
-            const audio = document.getElementById('avSampleAudio');
-
-            if (bModal) {
-                // initialize from header
-                if (bHeader) bModal.value = bHeader.value;
-                bModal.addEventListener('input', (e) => setBrightness(e.target.value));
-            }
-            if (vModal) {
-                if (vHeader) vModal.value = vHeader.value;
-                vModal.addEventListener('input', (e) => setVolume(e.target.value));
-            }
-            if (playBtn && audio) {
-                playBtn.addEventListener('click', async () => {
-                    if (audio.paused) {
-                        try { await audio.play(); playBtn.textContent = '⏸'; document.getElementById('avVolumeInstructions')?.classList.add('reading-active'); } catch(_) {}
-                    } else { audio.pause(); playBtn.textContent = '▶'; document.getElementById('avVolumeInstructions')?.classList.remove('reading-active'); }
+            const bStep = document.getElementById('avBrightnessRangeStep');
+            const vStep = document.getElementById('avStepVolumeRange');
+            const playBtn = document.getElementById('avStepPlayBtn');
+            const audio = document.getElementById('avStepSampleAudio');
+            const volText = document.getElementById('avStepVolumeText');
+            let highlightTimer = null;
+            let currentWordIndex = 0;
+            let speaking = false;
+            let paused = false;
+            let currentUtterance = null;
+            let wordStarts = [];
+            if (volText) {
+                // Convert text content into span-wrapped words while preserving spaces and line breaks
+                const fragments = [];
+                volText.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const parts = node.textContent.split(/(\s+)/);
+                        parts.forEach(p => {
+                            if (p === '') return;
+                            if (/\s+/.test(p)) fragments.push(p.replace(/\n/g, '<br>'));
+                            else fragments.push(`<span class=\"avw\">${p}</span>`);
+                        });
+                    } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'BR') {
+                        fragments.push('<br>');
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        // unwrap inner text of elements like <span>, <strong>
+                        const inner = node.textContent;
+                        const parts = inner.split(/(\s+)/);
+                        parts.forEach(p => {
+                            if (p === '') return;
+                            if (/\s+/.test(p)) fragments.push(p.replace(/\n/g, '<br>'));
+                            else fragments.push(`<span class=\"avw\">${p}</span>`);
+                        });
+                    }
                 });
-                audio.addEventListener('ended', () => { playBtn.textContent = '▶'; document.getElementById('avVolumeInstructions')?.classList.remove('reading-active'); });
+                volText.innerHTML = fragments.join('');
+
+                // Build word start indices over plain text for TTS boundary mapping
+                const plain = volText.textContent;
+                wordStarts = [];
+                let m; const re = /[^\s]+/g;
+                while ((m = re.exec(plain)) !== null) {
+                    wordStarts.push(m.index);
+                }
+            }
+
+            if (bStep) {
+                // initialize from header/localStorage
+                if (bHeader) bStep.value = bHeader.value;
+                else if (localStorage.getItem('examBrightness')) bStep.value = localStorage.getItem('examBrightness');
+                bStep.addEventListener('input', (e) => setBrightness(e.target.value));
+            }
+            if (vStep) {
+                if (vHeader) vStep.value = vHeader.value;
+                else if (localStorage.getItem('examVolume')) vStep.value = localStorage.getItem('examVolume');
+                vStep.addEventListener('input', (e) => setVolume(e.target.value));
+            }
+            function resetHighlight() {
+                currentWordIndex = 0;
+                document.querySelectorAll('#avStepVolumeText .avw').forEach(el => el.classList.remove('reading-active'));
+            }
+            function stopTimerHighlight() { if (highlightTimer) { clearInterval(highlightTimer); highlightTimer = null; } }
+            function startTimerHighlight() {
+                resetHighlight();
+                const wordEls = Array.from(document.querySelectorAll('#avStepVolumeText .avw'));
+                if (wordEls.length === 0) return;
+                const total = wordEls.length;
+                const duration = Math.max(4, Math.min(12, Math.ceil(total / 2))); // ~2 w/s, clamp 4–12s
+                const stepMs = Math.floor((duration * 1000) / total);
+                highlightTimer = setInterval(() => {
+                    if (currentWordIndex >= total) { stopTimerHighlight(); return; }
+                    if (currentWordIndex > 0) wordEls[currentWordIndex - 1].classList.remove('reading-active');
+                    wordEls[currentWordIndex].classList.add('reading-active');
+                    currentWordIndex++;
+                }, stepMs);
+            }
+
+            function speakWithHighlight(text, lang = 'ko-KR') {
+                if (!('speechSynthesis' in window)) return false;
+                try {
+                    // Cancel any ongoing speech
+                    window.speechSynthesis.cancel();
+                    resetHighlight();
+                    currentUtterance = new SpeechSynthesisUtterance(text);
+                    currentUtterance.lang = lang;
+                    currentUtterance.rate = 1.0;
+                    currentUtterance.pitch = 1.0;
+                    currentUtterance.volume = (typeof currentVolume === 'number' ? currentVolume : 50) / 100;
+                    // Prefer Korean voice if available
+                    const voices = window.speechSynthesis.getVoices();
+                    const ko = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ko'));
+                    if (ko) currentUtterance.voice = ko;
+
+                    const label = document.getElementById('avStepVolumeInstructions');
+                    currentUtterance.onstart = () => { speaking = true; paused = false; playBtn.textContent = '⏸'; label?.classList.add('reading-active'); };
+                    currentUtterance.onend = () => { speaking = false; paused = false; playBtn.textContent = '▶'; label?.classList.remove('reading-active'); resetHighlight(); };
+                    currentUtterance.onpause = () => { paused = true; };
+                    currentUtterance.onresume = () => { paused = false; };
+                    currentUtterance.onerror = () => { speaking = false; paused = false; playBtn.textContent = '▶'; label?.classList.remove('reading-active'); resetHighlight(); };
+
+                    // Map boundary charIndex -> word index and highlight
+                    let lastIdx = -1;
+                    currentUtterance.onboundary = (e) => {
+                        if (e.name !== 'word' && e.charIndex == null) return;
+                        const idx = e.charIndex;
+                        if (!Array.isArray(wordStarts) || wordStarts.length === 0) return;
+                        // Advance currentWordIndex to the word whose start <= idx
+                        while (currentWordIndex + 1 < wordStarts.length && wordStarts[currentWordIndex + 1] <= idx) {
+                            const prevEl = document.querySelectorAll('#avStepVolumeText .avw')[currentWordIndex];
+                            prevEl?.classList.remove('reading-active');
+                            currentWordIndex++;
+                        }
+                        if (currentWordIndex !== lastIdx) {
+                            const el = document.querySelectorAll('#avStepVolumeText .avw')[currentWordIndex];
+                            if (el) {
+                                document.querySelectorAll('#avStepVolumeText .avw').forEach(s => s.classList.remove('reading-active'));
+                                el.classList.add('reading-active');
+                                lastIdx = currentWordIndex;
+                            }
+                        }
+                    };
+
+                    window.speechSynthesis.speak(currentUtterance);
+                    return true;
+                } catch (_) { return false; }
+            }
+
+            if (playBtn) {
+                playBtn.addEventListener('click', async () => {
+                    const label = document.getElementById('avStepVolumeInstructions');
+                    // Prefer TTS when available
+                    if (!speaking) {
+                        const ok = volText ? speakWithHighlight(volText.textContent, 'ko-KR') : false;
+                        if (!ok && audio) {
+                            try { await audio.play(); playBtn.textContent = '⏸'; label?.classList.add('reading-active'); startTimerHighlight(); } catch(_) {}
+                        }
+                    } else if (speaking && !paused) {
+                        if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+                            window.speechSynthesis.pause(); paused = true; playBtn.textContent = '▶';
+                        } else if (!audio.paused) {
+                            audio.pause(); playBtn.textContent = '▶'; label?.classList.remove('reading-active');
+                        }
+                    } else if (speaking && paused) {
+                        if ('speechSynthesis' in window && window.speechSynthesis.paused) {
+                            window.speechSynthesis.resume(); paused = false; playBtn.textContent = '⏸';
+                        }
+                    }
+                });
+            }
+            if (audio) {
+                audio.addEventListener('ended', () => { playBtn.textContent = '▶'; document.getElementById('avStepVolumeInstructions')?.classList.remove('reading-active'); resetHighlight(); stopTimerHighlight(); });
+                audio.addEventListener('pause', () => { stopTimerHighlight(); });
             }
         });
 
-        // Enhanced face verification completion handler – now opens AV wizard first
+        // Enhanced face verification completion handler – now routes to AV steps
         window.proceedToNextStep = function() {
             console.log('🚀 Proceeding to next step after face verification');
             // Mark verification as completed
             sessionStorage.setItem('faceVerificationPassed', 'true');
             sessionStorage.setItem('faceVerificationPending', 'false');
-            // Show AV wizard before proceeding
-            showAVSetupWizard();
+            // Navigate to AV brightness step (skip notice)
+            const url = new URL(window.location.href);
+            url.searchParams.delete('sample');
+            url.searchParams.delete('notice');
+            url.searchParams.set('av_brightness', 'true');
+            window.location.href = url.toString();
         }
 
         // Handle notice confirmation with face verification check
@@ -2573,12 +2732,16 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             }
         }
 
-        // Function to proceed to next step after successful face verification (final)
+        // Function to proceed to next step after successful face verification (final override)
         window.proceedToNextStep = function() {
             console.log('🚀 Proceeding to next step after face verification');
             sessionStorage.setItem('faceVerificationPassed', 'true');
             sessionStorage.setItem('faceVerificationPending', 'false');
-            showAVSetupWizard();
+            const url = new URL(window.location.href);
+            url.searchParams.delete('sample');
+            url.searchParams.delete('notice');
+            url.searchParams.set('av_brightness', 'true');
+            window.location.href = url.toString();
         };
     </script>
     <script>
