@@ -93,6 +93,72 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             font-family: monospace !important;
             line-height: 1.4 !important;
         }
+
+        /* AV Wizard Modal */
+        #avWizardModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 11000;
+        }
+        #avWizardModal .av-dialog {
+            width: 92%;
+            max-width: 560px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        #avWizardModal .av-header {
+            background: #3b6aa1;
+            color: #fff;
+            padding: 10px 14px;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        #avWizardModal .av-body { padding: 16px 18px; }
+        #avWizardModal .av-footer {
+            padding: 12px 16px;
+            background: #f7f7f9;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 1px solid #e9ecef;
+        }
+        #avWizardModal .btn-nav {
+            min-width: 96px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #avWizardModal .btn-prev { background: #adb5bd; color:#fff; }
+        #avWizardModal .btn-next { background: #3b6aa1; color:#fff; }
+        #avWizardModal .btn-next:disabled { opacity: .6; cursor: not-allowed; }
+        #avWizardModal .sample-gradient {
+            width: 220px;
+            height: 120px;
+            background: linear-gradient(90deg, #000, #222, #444, #666, #888, #aaa, #ccc, #eee, #fff);
+            border: 2px solid #333;
+            border-radius: 6px;
+            margin: 8px auto 16px;
+        }
+        #avWizardModal .hint { color:#6c757d; font-size: 13px; }
+        #avWizardModal .range-row { display:flex; align-items:center; gap:10px; }
+        #avWizardModal .range-row i { color:#3b6aa1; }
+        #avWizardModal .control-range { flex: 1; }
+    #avWizardModal .k-text { font-size: 14px; line-height: 1.6; }
+    #avWizardModal .reading-active { color:#d9534f; font-weight:600; }
+        #avWizardModal .media { display:flex; flex-direction:column; align-items:center; gap:10px; }
+        #avWizardModal .play-btn {
+            background:#3b6aa1; color:#fff; border:none; border-radius:50%; width:46px; height:46px;
+            display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer;
+        }
         
         /* Permission toast styling */
         .permission-toast {
@@ -1218,28 +1284,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                         </div>
                                                     </div>
                                                     
-                                                    <div class="verification-options-compact">
-                                                        <h6><i class="fa fa-shield-alt"></i>Face Verification Options</h6>
-                                                        <p class="mb-2 text-muted" style="font-size: 11px;">Choose when to perform face verification:</p>
-                                                        <div class="verification-option">
-                                                            <label>
-                                                                <input type="radio" name="verification-step" value="now" checked>
-                                                                <span>Now (Recommended) - Verify before proceeding</span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="verification-option">
-                                                            <label>
-                                                                <input type="radio" name="verification-step" value="notice">
-                                                                <span>After Notice - Verify after reading exam rules</span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="verification-option">
-                                                            <label>
-                                                                <input type="radio" name="verification-step" value="instructions">
-                                                                <span>After Instructions - Verify just before exam starts</span>
-                                                            </label>
-                                                        </div>
-                                                    </div>
+                                                    <!-- Face Verification Options removed per request -->
                                                     
                                                     <div class="text-center">
                                                         <a href="javascript:void(0)" onclick="handleConfirmClick('<?= $profileImage ?>')" class="action-btn-compact">
@@ -1608,19 +1653,11 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             }
         }
 
-        // Handle confirm click with face verification step selection
+        // Handle confirm click (options removed): always verify now
         function handleConfirmClick(profileImageUrl) {
-            const selectedStep = document.querySelector('input[name="verification-step"]:checked').value;
-            sessionStorage.setItem('faceVerificationStep', selectedStep);
-            
-            if (selectedStep === 'now') {
-                // Start face verification immediately
-                startFaceVerification(profileImageUrl);
-            } else {
-                // Skip face verification for now and proceed to notice
-                sessionStorage.setItem('faceVerificationPending', 'true');
-                proceedToNotice();
-            }
+            sessionStorage.setItem('faceVerificationStep', 'now');
+            sessionStorage.setItem('faceVerificationPending', 'true');
+            startFaceVerification(profileImageUrl);
         }
 
         // Enhanced proceedToNotice function with verification step checking
@@ -1671,17 +1708,60 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             return false;
         }
 
-        // Enhanced face verification completion handler
-        window.proceedToNextStep = function() {
-            console.log('🚀 Proceeding to next step after face verification');
-            
-            // Mark verification as completed
-            sessionStorage.setItem('faceVerificationPassed', 'true');
-            sessionStorage.setItem('faceVerificationPending', 'false');
-            
+        // AV Wizard helpers
+        function showAVSetupWizard(afterCompleteCallback) {
+            const modal = document.getElementById('avWizardModal');
+            if (!modal) return afterCompleteCallback?.();
+            modal.dataset.after = afterCompleteCallback ? '1' : '';
+            avGoToStep(1);
+            modal.style.display = 'flex';
+        }
+
+        function hideAVSetupWizard() {
+            const modal = document.getElementById('avWizardModal');
+            if (modal) modal.style.display = 'none';
+            const audio = document.getElementById('avSampleAudio');
+            if (audio) { audio.pause(); }
+        }
+
+        function avGoToStep(step) {
+            const s1 = document.getElementById('avStep1');
+            const s2 = document.getElementById('avStep2');
+            const title = document.getElementById('avWizardTitle');
+            const prev = document.getElementById('avPrevBtn');
+            const next = document.getElementById('avNextBtn');
+            if (!s1 || !s2) return;
+            if (step === 1) {
+                s1.style.display = '';
+                s2.style.display = 'none';
+                title.textContent = '밝기 조절';
+                prev.style.display = 'none';
+                next.textContent = 'Next';
+                next.onclick = () => avGoToStep(2);
+            } else {
+                s1.style.display = 'none';
+                s2.style.display = '';
+                title.textContent = '음량 조절';
+                prev.style.display = '';
+                prev.onclick = () => avGoToStep(1);
+                next.textContent = 'Next';
+                next.onclick = () => completeAvWizard();
+            }
+        }
+
+        function completeAvWizard() {
+            hideAVSetupWizard();
+            // If we're on the sample page, go to notice regardless
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('sample')) {
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.delete('sample');
+                newUrl.searchParams.set('notice', 'true');
+                return window.location.href = newUrl.toString();
+            }
+
+            // Continue original flow based on selection
             const selectedStep = sessionStorage.getItem('faceVerificationStep');
-            
-            // Proceed based on where verification was completed
             switch(selectedStep) {
                 case 'now':
                     proceedToNotice();
@@ -1689,12 +1769,57 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                 case 'notice':
                     proceedToInstructions();
                     break;
-                case 'instructions':
-                    proceedToIdentificationCheck();
-                    break;
+                case 'instructions': {
+                    const storedParams = sessionStorage.getItem('readyParams');
+                    if (storedParams) {
+                        const params = JSON.parse(storedParams);
+                        handleReadyClick(params.paperId, params.applicationNo, params.examId, params.sample);
+                        sessionStorage.removeItem('readyParams');
+                    } else {
+                        proceedToIdentificationCheck();
+                    }
+                    break; }
                 default:
                     proceedToNotice();
             }
+        }
+
+        // Wire modal sliders + play button after DOM ready of script block
+        document.addEventListener('DOMContentLoaded', function() {
+            const bHeader = document.getElementById('brightnessRange');
+            const vHeader = document.getElementById('volumeRange');
+            const bModal = document.getElementById('brightnessRangeModal');
+            const vModal = document.getElementById('volumeRangeModal');
+            const playBtn = document.getElementById('avPlayBtn');
+            const audio = document.getElementById('avSampleAudio');
+
+            if (bModal) {
+                // initialize from header
+                if (bHeader) bModal.value = bHeader.value;
+                bModal.addEventListener('input', (e) => setBrightness(e.target.value));
+            }
+            if (vModal) {
+                if (vHeader) vModal.value = vHeader.value;
+                vModal.addEventListener('input', (e) => setVolume(e.target.value));
+            }
+            if (playBtn && audio) {
+                playBtn.addEventListener('click', async () => {
+                    if (audio.paused) {
+                        try { await audio.play(); playBtn.textContent = '⏸'; document.getElementById('avVolumeInstructions')?.classList.add('reading-active'); } catch(_) {}
+                    } else { audio.pause(); playBtn.textContent = '▶'; document.getElementById('avVolumeInstructions')?.classList.remove('reading-active'); }
+                });
+                audio.addEventListener('ended', () => { playBtn.textContent = '▶'; document.getElementById('avVolumeInstructions')?.classList.remove('reading-active'); });
+            }
+        });
+
+        // Enhanced face verification completion handler – now opens AV wizard first
+        window.proceedToNextStep = function() {
+            console.log('🚀 Proceeding to next step after face verification');
+            // Mark verification as completed
+            sessionStorage.setItem('faceVerificationPassed', 'true');
+            sessionStorage.setItem('faceVerificationPending', 'false');
+            // Show AV wizard before proceeding
+            showAVSetupWizard();
         }
 
         // Handle notice confirmation with face verification check
@@ -1719,39 +1844,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             handleReadyClick(paperId, applicationNo, examId, sample);
         }
 
-        // Enhanced proceedToNextStep to handle instructions completion
-        window.proceedToNextStep = function() {
-            console.log('🚀 Proceeding to next step after face verification');
-            
-            // Mark verification as completed
-            sessionStorage.setItem('faceVerificationPassed', 'true');
-            sessionStorage.setItem('faceVerificationPending', 'false');
-            
-            const selectedStep = sessionStorage.getItem('faceVerificationStep');
-            
-            // Proceed based on where verification was completed
-            switch(selectedStep) {
-                case 'now':
-                    proceedToNotice();
-                    break;
-                case 'notice':
-                    proceedToInstructions();
-                    break;
-                case 'instructions':
-                    // Get stored ready parameters and execute original ready logic
-                    const storedParams = sessionStorage.getItem('readyParams');
-                    if (storedParams) {
-                        const params = JSON.parse(storedParams);
-                        handleReadyClick(params.paperId, params.applicationNo, params.examId, params.sample);
-                        sessionStorage.removeItem('readyParams');
-                    } else {
-                        proceedToIdentificationCheck();
-                    }
-                    break;
-                default:
-                    proceedToNotice();
-            }
-        }
+        // Keep backward compatibility: in later block proceedToNextStep is already defined to show AV wizard
 
         function proceedToInstructions() {
             const currentUrl = new URL(window.location.href);
@@ -1780,13 +1873,15 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             brightnessOverlay.style.background = `rgba(0, 0, 0, ${opacity})`;
             
             // Update slider
-            document.getElementById('brightnessRange').value = currentBrightness;
+            const bHeader = document.getElementById('brightnessRange');
+            if (bHeader) bHeader.value = currentBrightness;
+            const bModal = document.getElementById('brightnessRangeModal');
+            if (bModal) bModal.value = currentBrightness;
             
             // Save to localStorage
             localStorage.setItem('examBrightness', currentBrightness);
             
-            // Show feedback
-            showBrightnessToast(`화면 밝기: ${currentBrightness}%`);
+            // notifications disabled
         }
         
         function adjustBrightness(change) {
@@ -1815,24 +1910,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             return overlay;
         }
         
-        function showBrightnessToast(message) {
-            if (typeof Toastify !== 'undefined') {
-                Toastify({
-                    text: message,
-                    duration: 1500,
-                    gravity: "top",
-                    position: "center",
-                    backgroundColor: "#2ca347",
-                    stopOnFocus: true,
-                    style: {
-                        fontSize: '14px',
-                        borderRadius: '8px',
-                        minWidth: '150px',
-                        textAlign: 'center'
-                    }
-                }).showToast();
-            }
-        }
+        function showBrightnessToast(message) { /* notifications disabled */ }
 
         // Volume control functions
         let currentVolume = 50;
@@ -1852,13 +1930,15 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             }
             
             // Update slider
-            document.getElementById('volumeRange').value = currentVolume;
+            const vHeader = document.getElementById('volumeRange');
+            if (vHeader) vHeader.value = currentVolume;
+            const vModal = document.getElementById('volumeRangeModal');
+            if (vModal) vModal.value = currentVolume;
             
             // Save to localStorage
             localStorage.setItem('examVolume', currentVolume);
             
-            // Show feedback
-            showVolumeToast(`음량: ${currentVolume}%`);
+            // notifications disabled
         }
         
         function adjustVolume(change) {
@@ -1866,24 +1946,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             setVolume(newVolume);
         }
         
-        function showVolumeToast(message) {
-            if (typeof Toastify !== 'undefined') {
-                Toastify({
-                    text: message,
-                    duration: 1500,
-                    gravity: "top",
-                    position: "center",
-                    backgroundColor: "#007bff",
-                    stopOnFocus: true,
-                    style: {
-                        fontSize: '14px',
-                        borderRadius: '8px',
-                        minWidth: '150px',
-                        textAlign: 'center'
-                    }
-                }).showToast();
-            }
-        }
+        function showVolumeToast(message) { /* notifications disabled */ }
 
         // Font size control functions
         let currentFontScale = 1;
@@ -1901,29 +1964,10 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             // Save to localStorage
             localStorage.setItem('examFontScale', currentFontScale);
             
-            // Show feedback
-            const percentage = Math.round(currentFontScale * 100);
-            showFontSizeToast(`글자 크기: ${percentage}%`);
+            // notifications disabled
         }
         
-        function showFontSizeToast(message) {
-            if (typeof Toastify !== 'undefined') {
-                Toastify({
-                    text: message,
-                    duration: 1500,
-                    gravity: "top",
-                    position: "center",
-                    backgroundColor: "#6f42c1",
-                    stopOnFocus: true,
-                    style: {
-                        fontSize: '14px',
-                        borderRadius: '8px',
-                        minWidth: '150px',
-                        textAlign: 'center'
-                    }
-                }).showToast();
-            }
-        }
+        function showFontSizeToast(message) { /* notifications disabled */ }
 
         // Initialize controls on page load
         function initializeControls() {
@@ -2007,15 +2051,6 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                 currentUrl.searchParams.delete('notice');
                 currentUrl.searchParams.set('sample', 'true');
                 
-                Toastify({
-                    text: "Face verification must be completed before proceeding to notice.",
-                    duration: 5000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#dc3545",
-                    stopOnFocus: true
-                }).showToast();
-                
                 setTimeout(() => {
                     window.location.href = currentUrl.toString();
                 }, 2000);
@@ -2029,34 +2064,12 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             }
         }
 
-        // Function to proceed to next step after successful face verification
+        // Function to proceed to next step after successful face verification (final)
         window.proceedToNextStep = function() {
             console.log('🚀 Proceeding to next step after face verification');
-            
-            // If we're on the sample page, proceed to notice
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('sample')) {
-                // Redirect to notice page
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.delete('sample');
-                newUrl.searchParams.set('notice', 'true');
-                
-                setTimeout(() => {
-                    window.location.href = newUrl.toString();
-                }, 1000);
-            } else {
-                // For other pages, just update the UI to show verification complete
-                const verificationStatus = document.querySelector('.face-verification-status');
-                if (verificationStatus) {
-                    verificationStatus.innerHTML = `
-                        <div class="alert alert-success">
-                            <i class="fa fa-check-circle me-2"></i>
-                            <strong class="text-success">Face Verification Completed</strong>
-                            <small class="d-block mt-1">Similarity: <span id="verificationScoreDisplay">${sessionStorage.getItem('faceVerificationScore') || '0'}%</span></small>
-                        </div>
-                    `;
-                }
-            }
+            sessionStorage.setItem('faceVerificationPassed', 'true');
+            sessionStorage.setItem('faceVerificationPending', 'false');
+            showAVSetupWizard();
         };
     </script>
     <script>
@@ -2262,6 +2275,44 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
 
         });
     </script>
+    <!-- AV Setup Wizard Modal -->
+    <div id="avWizardModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="av-dialog">
+            <div class="av-header" id="avWizardTitle">밝기 조절</div>
+            <div class="av-body">
+                <!-- Step 1: Brightness -->
+                <div id="avStep1">
+                    <div class="sample-gradient"></div>
+                    <p class="k-text mb-2">시험에 앞서 단말기의 화면 밝기, 음량 크기를 조정하실 수 있습니다.<br>주변 환경 및 선호도에 따라 <strong>최적의 밝기</strong>로 조정해 주세요.</p>
+                    <div class="range-row mt-3">
+                        <i class="fa fa-sun"></i>
+                        <input type="range" class="control-range" id="brightnessRangeModal" min="20" max="100" value="100">
+                        <i class="fa fa-sun"></i>
+                    </div>
+                </div>
+                <!-- Step 2: Volume -->
+                <div id="avStep2" style="display:none;">
+                    <div class="media">
+                        <button id="avPlayBtn" class="play-btn" type="button" aria-label="Play sample">▶</button>
+                        <audio id="avSampleAudio" preload="auto">
+                            <!-- TODO: User will replace with actual audio URL -->
+                            <source src="assets/audio/question3.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                    <p id="avVolumeInstructions" class="k-text mt-3">이어폰을 태블릿 PC에 연결해 주세요.<br><span>음량 조절을 위해서 상단에 보이는 플레이 버튼을 눌러주세요.</span><br>시험에 앞서 단말기의 화면 밝기, 음량을 조정하실 수 있습니다.<br>아래의 음량 조절 바를 움직여 <strong>음량을 적정하게 조절</strong>해 주시기 바랍니다.</p>
+                    <div class="range-row mt-3">
+                        <i class="fa fa-volume-down"></i>
+                        <input type="range" class="control-range" id="volumeRangeModal" min="0" max="100" value="50">
+                        <i class="fa fa-volume-up"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="av-footer">
+                <button class="btn-nav btn-prev" id="avPrevBtn" type="button" style="display:none;">Previous</button>
+                <button class="btn-nav btn-next" id="avNextBtn" type="button">Next</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
