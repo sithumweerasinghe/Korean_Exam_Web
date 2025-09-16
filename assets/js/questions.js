@@ -6,6 +6,80 @@ const answers = [];
 let currentAudio = null;
 let isAudioPlaying = false;
 
+// Helper functions for mobile audio handling
+function showAudioPlayButton(audio) {
+  // Remove existing play button if any
+  removeAudioPlayButton();
+  
+  const playButton = document.createElement('button');
+  playButton.id = 'audio-play-button';
+  playButton.className = 'btn btn-primary btn-lg mt-3';
+  playButton.innerHTML = '<i class="fa fa-play me-2"></i>Play Audio to Continue';
+  playButton.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 15px 25px;
+    font-size: 16px;
+  `;
+  
+  playButton.onclick = function() {
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        isAudioPlaying = true;
+        document.getElementById("next-btn").disabled = true;
+        removeAudioPlayButton();
+      }).catch(error => {
+        console.error('Manual audio play failed:', error);
+        showAudioError();
+      });
+    }
+  };
+  
+  document.body.appendChild(playButton);
+}
+
+function removeAudioPlayButton() {
+  const playButton = document.getElementById('audio-play-button');
+  if (playButton) {
+    playButton.remove();
+  }
+}
+
+function showAudioError() {
+  if (typeof Toastify !== 'undefined') {
+    Toastify({
+      text: "Audio playback failed. You can proceed to the next question.",
+      duration: 5000,
+      gravity: "top",
+      position: "center",
+      backgroundColor: "#dc3545",
+      stopOnFocus: true
+    }).showToast();
+  }
+  
+  // Allow proceeding even if audio fails
+  document.getElementById("next-btn").disabled = false;
+}
+
+// Function to update volume for all audio elements
+function updateAllAudioVolume(volume) {
+  const audioElements = document.querySelectorAll('audio');
+  audioElements.forEach(audio => {
+    audio.volume = volume / 100;
+  });
+  
+  // Update current playing audio
+  if (currentAudio) {
+    currentAudio.volume = volume / 100;
+  }
+}
+
 let totalReadingTime = 0;
 let totalListeningTime = 0;
 let readingTimer;
@@ -92,12 +166,37 @@ function displayQuestion(index) {
   // Play audio if available
   if (question.audio) {
     currentAudio = new Audio(question.audio);
-    currentAudio.play();
-    isAudioPlaying = true;
-    document.getElementById("next-btn").disabled = true;
+    
+    // Apply current volume setting
+    const savedVolume = localStorage.getItem('examVolume') || '50';
+    currentAudio.volume = parseInt(savedVolume) / 100;
+    
+    // Add mobile-friendly play handling
+    const playPromise = currentAudio.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        console.log('Audio started successfully');
+        isAudioPlaying = true;
+        document.getElementById("next-btn").disabled = true;
+      }).catch(error => {
+        console.warn('Audio autoplay failed:', error);
+        showAudioPlayButton(currentAudio);
+      });
+    }
+    
     currentAudio.onended = () => {
       isAudioPlaying = false;
       document.getElementById("next-btn").disabled = false;
+      removeAudioPlayButton();
+    };
+    
+    // Handle audio errors
+    currentAudio.onerror = (error) => {
+      console.error('Audio playback error:', error);
+      isAudioPlaying = false;
+      document.getElementById("next-btn").disabled = false;
+      showAudioError();
     };
   }
 

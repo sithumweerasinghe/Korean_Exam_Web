@@ -68,7 +68,7 @@ class FaceVerification {
     createVerificationModal() {
         const modalHTML = `
             <div class="modal fade" id="faceVerificationModal" tabindex="-1" aria-labelledby="faceVerificationModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-                <div class="modal-dialog modal-fullscreen-sm-down modal-lg modal-dialog-centered">
+                <div class="modal-dialog modal-fullscreen-md-down modal-xl modal-dialog-centered">
                     <div class="modal-content" style="border-radius: 12px;">
                         <div class="modal-header text-white" style="background-color: #2ca347;">
                             <h5 class="modal-title fw-bold" id="faceVerificationModalLabel">

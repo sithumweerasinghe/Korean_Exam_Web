@@ -158,55 +158,842 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         /* Mobile responsive adjustments */
         @media (max-width: 767px) {
             .square-frame {
-                width: 180px !important;
-                height: 180px !important;
+                width: 140px !important;
+                height: 140px !important;
             }
             
             .camera-btn {
                 width: 100%;
-                margin-bottom: 10px;
+                margin-bottom: 8px;
+                padding: 10px 15px;
+                font-size: 14px;
             }
             
             .camera-instructions {
-                font-size: 14px;
+                font-size: 12px;
+                padding: 10px;
+                margin-bottom: 15px;
             }
             
             .verification-instruction {
-                font-size: 14px;
+                font-size: 13px;
             }
             
             .profile-title, .camera-title {
-                font-size: 14px;
+                font-size: 13px;
+                margin-bottom: 8px !important;
             }
             
             .face-guide-circle {
-                width: 100px;
-                height: 100px;
+                width: 80px;
+                height: 80px;
+            }
+            
+            .verification-badge, .verification-status {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 12px !important;
+                top: -3px !important;
+                right: -3px !important;
+            }
+            
+            #faceVerificationModal .modal-body .p-2 {
+                padding: 8px !important;
+            }
+            
+            #faceVerificationModal .bg-white.p-2 {
+                padding: 12px !important;
+            }
+            
+            #faceVerificationModal .row.g-2 {
+                --bs-gutter-x: 0.5rem;
+                --bs-gutter-y: 0.5rem;
             }
         }
         
         @media (max-width: 576px) {
             .square-frame {
-                width: 150px !important;
-                height: 150px !important;
+                width: 120px !important;
+                height: 120px !important;
             }
             
             .verification-badge, .verification-status {
-                width: 30px !important;
-                height: 30px !important;
-                font-size: 14px !important;
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 10px !important;
+            }
+            
+            .camera-instructions {
+                font-size: 11px;
+                padding: 8px;
+            }
+            
+            .verification-instruction {
+                font-size: 12px;
+            }
+            
+            .profile-title, .camera-title {
+                font-size: 12px;
+            }
+            
+            #faceVerificationModal .modal-header .modal-title {
+                font-size: 14px;
+            }
+            
+            #faceVerificationModal .btn {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            
+            .alert.alert-info {
+                padding: 8px;
+                margin-bottom: 10px;
             }
         }
         
+        /* Landscape mobile adjustments */
+        @media (max-width: 767px) and (orientation: landscape) {
+            #faceVerificationModal .modal-dialog {
+                max-height: 95vh;
+            }
+            
+            #faceVerificationModal .modal-content {
+                max-height: 95vh;
+                overflow-y: auto;
+            }
+            
+            .square-frame {
+                width: 100px !important;
+                height: 100px !important;
+            }
+            
+            .camera-instructions {
+                display: none;
+            }
+            
+            .verification-instruction {
+                font-size: 11px;
+            }
+        }
+        
+        /* Compact Header Design */
+        .exam-header {
+            background: linear-gradient(135deg, #2ca347 0%, #1e7e34 100%);
+            color: white;
+            border-bottom: 3px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-top {
+            background: rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .exam-brand .brand-icon {
+            width: 35px;
+            height: 35px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .exam-brand h6 {
+            color: white;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        
+        .exam-brand small {
+            color: rgba(255,255,255,0.8);
+            font-size: 10px;
+        }
+        
+        .info-badge {
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            padding: 4px 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .badge-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-value {
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            margin-left: 4px;
+        }
+        
+        .header-controls {
+            background: rgba(0,0,0,0.1);
+            min-height: 40px;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2px 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .control-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.9);
+            margin: 0 4px 0 2px;
+            min-width: 16px;
+        }
+        
+        .control-btn.compact {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            margin: 0 2px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .control-btn.compact:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .control-range {
+            width: 60px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 0 4px;
+        }
+        
+        .control-range::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #2ca347;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .control-range::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #2ca347;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Compact Card Design */
+        .exam-card {
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin: 15px auto;
+            max-width: 700px;
+        }
+        
+        .card-header-compact {
+            background: linear-gradient(135deg, #2ca347 0%, #1e7e34 100%);
+            color: white;
+            padding: 12px 20px;
+            border-bottom: none;
+            position: relative;
+        }
+        
+        .card-header-compact::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+        
+        .card-header-compact h5 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+        
+        .instruction-bar {
+            background: #343a40;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+        
+        .instruction-bar i {
+            font-size: 16px;
+            margin-right: 8px;
+            color: #ffc107;
+        }
+        
+        .card-body-compact {
+            padding: 20px;
+        }
+
+        /* Profile Section Compact */
+        .profile-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .profile-image-compact {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 3px solid #2ca347;
+            box-shadow: 0 4px 12px rgba(44,163,71,0.3);
+        }
+        
+        .profile-details {
+            flex: 1;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 12px;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 90px;
+        }
+        
+        .detail-value {
+            color: #212529;
+            text-align: right;
+            flex: 1;
+        }
+
+        /* Face Verification Options Compact */
+        .verification-options-compact {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #2196f3;
+        }
+        
+        .verification-options-compact h6 {
+            color: #1976d2;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .verification-options-compact h6 i {
+            margin-right: 8px;
+        }
+        
+        .verification-option {
+            background: white;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border: 1px solid #e3f2fd;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .verification-option:hover {
+            border-color: #2196f3;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.2);
+        }
+        
+        .verification-option label {
+            cursor: pointer;
+            margin: 0;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .verification-option input[type="radio"] {
+            margin-right: 8px;
+            transform: scale(1.1);
+        }
+        
+        .verification-option input[type="radio"]:checked + span {
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        /* Action Button Compact */
+        .action-btn-compact {
+            background: linear-gradient(135deg, #2ca347 0%, #1e7e34 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(44,163,71,0.3);
+            letter-spacing: 0.5px;
+        }
+        
+        .action-btn-compact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(44,163,71,0.4);
+            color: white;
+        }
+        
+        .action-btn-compact i {
+            margin-left: 6px;
+            font-size: 12px;
+        }
+
+        /* List Compact */
+        .list-compact {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .list-compact li {
+            display: flex;
+            align-items: flex-start;
+            padding: 8px 0;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .list-compact li i {
+            color: #2ca347;
+            margin-right: 8px;
+            margin-top: 2px;
+            font-size: 8px;
+        }
+
+        /* Mobile responsiveness for compact design */
+        @media (max-width: 768px) {
+            .exam-header {
+                font-size: 12px;
+            }
+            
+            .header-top {
+                padding: 8px 12px !important;
+            }
+            
+            .brand-text h6 {
+                font-size: 12px;
+            }
+            
+            .brand-text small {
+                font-size: 9px;
+            }
+            
+            .control-group {
+                margin-right: 8px !important;
+                padding: 1px 4px;
+            }
+            
+            .control-range {
+                width: 40px;
+            }
+            
+            .control-btn.compact {
+                width: 18px;
+                height: 18px;
+                font-size: 9px;
+            }
+            
+            .exam-card {
+                margin: 10px;
+                max-width: calc(100% - 20px);
+            }
+            
+            .card-body-compact {
+                padding: 15px;
+            }
+            
+            .profile-image-compact {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .profile-section {
+                padding: 12px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header-controls {
+                flex-wrap: wrap;
+                padding: 4px 12px !important;
+            }
+            
+            .control-group {
+                margin: 2px 4px 2px 0 !important;
+            }
+            
+            .control-range {
+                width: 30px;
+            }
+            
+            .exam-card {
+                border-radius: 12px;
+            }
+            
+            .verification-options-compact {
+                padding: 12px;
+            }
+        }
+
         /* Touch-friendly buttons */
-        .camera-btn {
+        .camera-btn, .brightness-btn, .volume-btn, .exam-button {
             min-height: 50px;
             font-size: 16px;
             transition: all 0.2s ease;
+            cursor: pointer;
         }
         
-        .camera-btn:active {
+        .camera-btn:active, .brightness-btn:active, .volume-btn:active, .exam-button:active {
             transform: scale(0.98);
+        }
+        
+        /* Brightness and volume controls */
+        .brightness-btn, .volume-btn {
+            border: none;
+            min-width: 35px;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .brightness-btn:hover, .volume-btn:hover {
+            background-color: #333 !important;
+        }
+        
+        /* Control labels */
+        .brightness-label, .volume-label {
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        /* Range sliders */
+        .form-range {
+            height: 8px;
+            background: linear-gradient(to right, #ddd, #2ca347);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .form-range::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #2ca347;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .form-range::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #2ca347;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        /* Mobile responsive controls */
+        @media (max-width: 992px) {
+            .brightness-label, .volume-label {
+                font-size: 11px;
+            }
+            
+            .form-range {
+                width: 100px !important;
+            }
+            
+            .brightness-btn, .volume-btn {
+                min-width: 30px;
+                min-height: 30px;
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .brightness-label, .volume-label {
+                display: none;
+            }
+            
+            .form-range {
+                width: 80px !important;
+            }
+            
+            .me-3 {
+                margin-right: 0.5rem !important;
+            }
+            
+            .mx-2 {
+                margin-left: 0.25rem !important;
+                margin-right: 0.25rem !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .col-12.d-flex.justify-content-end {
+                flex-direction: column;
+                align-items: center !important;
+            }
+            
+            .me-3.py-2.d-flex.align-items-center.flex-wrap {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .form-range {
+                width: 60px !important;
+            }
+            
+            .brightness-btn, .volume-btn {
+                min-width: 25px;
+                min-height: 25px;
+                width: 25px;
+                height: 25px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Face verification options styling */
+        .face-verification-options {
+            margin: 15px 0;
+        }
+        
+        .face-verification-options .alert-info {
+            border-radius: 12px;
+            border: 2px solid #bee5eb;
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        }
+        
+        .face-verification-options label {
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+        
+        .face-verification-options label:hover {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        
+        .face-verification-options input[type="radio"] {
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+        
+        .face-verification-options input[type="radio"]:checked + span {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        /* Enhanced mobile responsiveness */
+        @media (max-width: 992px) {
+            .card.shadow.mt-4, .card.shadow.col-8 {
+                width: 95% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+            
+            .face-verification-options {
+                margin: 10px 0;
+            }
+            
+            .face-verification-options .d-flex.flex-column.gap-2 {
+                gap: 0.5rem !important;
+            }
+            
+            .face-verification-options label {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Header adjustments */
+            .row.shadow-sm {
+                height: auto !important;
+                min-height: 100px;
+            }
+            
+            .col-12.py-1.border-bottom.px-4 {
+                padding: 8px 12px !important;
+            }
+            
+            .fs-5.text-black.fw-medium {
+                font-size: 0.9rem !important;
+                position: static !important;
+                transform: none !important;
+                margin-top: 5px;
+            }
+            
+            /* Card content adjustments */
+            .bg-white.p-4, .bg-white.p-5 {
+                padding: 15px !important;
+            }
+            
+            .row.align-items-center .col-4 {
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            
+            .row.align-items-center .col-8 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            /* Profile image adjustments */
+            .rounded-circle.shadow {
+                width: 100px !important;
+                height: 100px !important;
+            }
+            
+            /* Face verification options mobile */
+            .face-verification-options .alert {
+                margin-bottom: 10px;
+                padding: 12px;
+            }
+            
+            .face-verification-options h6 {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            
+            .face-verification-options p {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .face-verification-options label {
+                font-size: 12px;
+                padding: 5px 8px;
+                display: block;
+                margin-bottom: 5px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            /* Very small screens */
+            .card.shadow.mt-4, .card.shadow.col-8 {
+                width: 98% !important;
+                margin: 10px auto !important;
+            }
+            
+            .p-3.text-white.text-center {
+                padding: 10px !important;
+                font-size: 16px !important;
+            }
+            
+            .face-verification-options .alert {
+                padding: 8px;
+            }
+            
+            .face-verification-options .d-flex.align-items-center {
+                align-items: flex-start !important;
+            }
+            
+            .ed-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+            
+            /* List styling */
+            .list-unstyled li {
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+            
+            .bi-circle-fill {
+                font-size: 8px !important;
+            }
+        }
+
+        /* Portrait orientation handling */
+        @media (max-width: 767px) and (orientation: portrait) {
+            .face-verification-options {
+                margin: 5px 0;
+            }
+            
+            .face-verification-options .d-flex.flex-column {
+                gap: 0.25rem !important;
+            }
+            
+            .ed-hero__btn {
+                margin: 10px 0 !important;
+            }
+        }
+
+        /* Screen brightness overlay effect */
+        body.brightness-overlay::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            pointer-events: none;
+            z-index: 9999;
+            transition: background 0.3s ease;
         }
         
         /* Status badges */
@@ -305,38 +1092,58 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                     <input type="hidden" id="csrf_token" value="<?= isset($_SESSION['csrf_token']) ? $_SESSION['csrf_token'] : ''; ?>">
 
                     <!-- Header Start -->
-                    <div class="row shadow-sm" style="height: 120px;">
-                        <div class="col-12 py-1 border-bottom px-4 d-flex align-items-center position-relative" style="background:  #e8ffed; ">
-                            <h5 class="mb-0">EPS-TOPIK</h5>
-                            <span class="fs-5 text-black fw-medium position-absolute start-50 translate-middle-x">Test of proficiency in Korean</span>
-                            <div class="border rounded-2 px-2 py-2 d-flex align-items-center ms-auto" style="box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2);">
-                                <div class="d-flex align-items-center me-3">
-                                    <span class="bg-dark px-2 py-1 text-white rounded-2 me-2" style="font-size: 11px;">Application No</span>
-                                    <span class="fw-semibold" style="font-size: 12px;"><?= $application_no ?></span>
+                    <div class="exam-header shadow-sm">
+                        <div class="header-top d-flex align-items-center justify-content-between px-3 py-2">
+                            <div class="exam-brand d-flex align-items-center">
+                                <div class="brand-icon">
+                                    <i class="fa fa-graduation-cap"></i>
                                 </div>
-                                <!-- <div class="d-flex align-items-center pe-2">
-                                    <span class="bg-dark px-2 py-1 text-white rounded-2 me-2" style="font-size: 11px;">Seat No</span>
-                                    <span class="fw-semibold" style="font-size: 12px;">17</span>
-                                </div> -->
+                                <div class="brand-text ms-2">
+                                    <h6 class="mb-0 fw-bold">EPS-TOPIK</h6>
+                                    <small class="text-muted">Test of proficiency in Korean</small>
+                                </div>
+                            </div>
+                            
+                            <div class="exam-info d-flex align-items-center">
+                                <div class="info-badge me-2">
+                                    <span class="badge-label">App No</span>
+                                    <span class="badge-value"><?= $application_no ?></span>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-12 d-flex justify-content-end align-items-center" style="background:  #e8ffed">
-                            <div class="me-3 py-2 d-flex align-items-center">
-                                <button class="exam-button py-1 px-3 rounded-4 me-2">A+</button>
-                                <button class="exam-button rounded-4 py-1 px-3 me-3">A-</button>
-                                <span class="me-2">음량조절:</span>
-                                <div class="d-flex align-items-center">
-                                    <button class="bg-dark text-white rounded-circle" style="width: 25px; height: 25px" onclick="adjustVolume(-1)">-</button>
-                                    <input type="range" class="form-range " id="customRange1" style="width: 150px;">
-                                    <button class="rounded-circle text-white bg-dark" style="width: 25px; height: 25px" onclick="adjustVolume(1)">+</button>
-                                </div>
+                        
+                        <div class="header-controls d-flex align-items-center justify-content-end px-3 py-1">
+                            <!-- Font Size Controls -->
+                            <div class="control-group me-2">
+                                <button class="control-btn compact" id="font-increase" title="Increase font size">A+</button>
+                                <button class="control-btn compact" id="font-decrease" title="Decrease font size">A-</button>
+                            </div>
+                            
+                            <!-- Screen Brightness Control -->
+                            <div class="control-group me-2">
+                                <label class="control-label">
+                                    <i class="fa fa-sun"></i>
+                                </label>
+                                <button class="control-btn compact" onclick="adjustBrightness(-10)">-</button>
+                                <input type="range" class="control-range" id="brightnessRange" min="20" max="100" value="100" onchange="setBrightness(this.value)">
+                                <button class="control-btn compact" onclick="adjustBrightness(10)">+</button>
+                            </div>
+                            
+                            <!-- Volume Control -->
+                            <div class="control-group">
+                                <label class="control-label">
+                                    <i class="fa fa-volume-up"></i>
+                                </label>
+                                <button class="control-btn compact" onclick="adjustVolume(-10)">-</button>
+                                <input type="range" class="control-range" id="volumeRange" min="0" max="100" value="50" onchange="setVolume(this.value)">
+                                <button class="control-btn compact" onclick="adjustVolume(10)">+</button>
                             </div>
                         </div>
                     </div>
                     <!-- Header End -->
 
-                    <div class="col-12 d-flex align-items-center justify-content-center" id="main-content" style="height: calc(100vh - 155px); overflow-y: scroll; overflow-x: hidden;">
-                        <div class="row">
+                    <div class="col-12 d-flex align-items-center justify-content-center" id="main-content" style="height: calc(100vh - 90px); overflow-y: auto; overflow-x: hidden; padding: 10px;">
+                        <div class="container-fluid">
                             <?php
                             if (!isset($_GET['start_exam'])) {
                             ?>
@@ -346,47 +1153,68 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                         <?php
                                         if ((isset($_GET["paper_id"]) && isset($_GET["sample"]) && count($_GET) === 2)) {
                                         ?>
-                                            <div class="card shadow mt-4" style="border-radius: 12px;  width: 100%; max-height:  calc(120vh - 300px); overflow-y: auto;">
-                                                <div class="p-3 text-white text-center" style="background-color: #2ca347; font-weight: 600; font-size: 19px;">
-                                                    Information Check of Applicant
+                                            <div class="exam-card">
+                                                <div class="card-header-compact">
+                                                    <h5><i class="fa fa-user-check me-2"></i>Information Check of Applicant</h5>
                                                 </div>
-                                                <div class="p-3 text-white bg-dark text-center d-flex justify-content-center align-items-center">
-                                                    <i class="fa fa-volume-up me-3 fs-2 text-white "></i>Check your application and if there is no problem, click the confirm button.
+                                                <div class="instruction-bar">
+                                                    <i class="fa fa-volume-up"></i>
+                                                    <span>Check your application and if there is no problem, click the confirm button.</span>
                                                 </div>
-                                                <div class="bg-white p-4">
-                                                    <div class="row align-items-center">
-                                                        <div class="col-4 text-center">
-                                                            <img
-                                                                src="<?= $profileImage ?>"
-                                                                alt="Profile Image"
-                                                                class="rounded-circle shadow"
-                                                                style="width: 140px; height: 140px; object-fit: cover;">
-                                                        </div>
-                                                        <div class="col-8">
-                                                            <div class="row">
-                                                                <div class="col-6 p-2 border text-end fw-bold">Test Venus</div>
-                                                                <div class="col-6 p-2 border">Online</div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-6 p-2 border text-end fw-bold">Test Room</div>
-                                                                <div class="col-6 p-2 border">Not available</div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-6 p-2 border text-end fw-bold">Application No</div>
-                                                                <div class="col-6 p-2 border"><?= $application_no ?></div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-6 p-2 border text-end fw-bold">Candidate Name</div>
-                                                                <div class="col-6 p-2 border"><?= $fullName ?: 'Not Available' ?></div>
+                                                <div class="card-body-compact">
+                                                    <div class="profile-section">
+                                                        <div class="d-flex align-items-center">
+                                                            <img src="<?= $profileImage ?>" alt="Profile Image" class="profile-image-compact me-3">
+                                                            <div class="profile-details">
+                                                                <div class="detail-row">
+                                                                    <span class="detail-label">Test Venus</span>
+                                                                    <span class="detail-value">Online</span>
+                                                                </div>
+                                                                <div class="detail-row">
+                                                                    <span class="detail-label">Test Room</span>
+                                                                    <span class="detail-value">Not available</span>
+                                                                </div>
+                                                                <div class="detail-row">
+                                                                    <span class="detail-label">Application No</span>
+                                                                    <span class="detail-value"><?= $application_no ?></span>
+                                                                </div>
+                                                                <div class="detail-row">
+                                                                    <span class="detail-label">Candidate Name</span>
+                                                                    <span class="detail-value"><?= $fullName ?: 'Not Available' ?></span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    
+                                                    <div class="verification-options-compact">
+                                                        <h6><i class="fa fa-shield-alt"></i>Face Verification Options</h6>
+                                                        <p class="mb-2 text-muted" style="font-size: 11px;">Choose when to perform face verification:</p>
+                                                        <div class="verification-option">
+                                                            <label>
+                                                                <input type="radio" name="verification-step" value="now" checked>
+                                                                <span>Now (Recommended) - Verify before proceeding</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="verification-option">
+                                                            <label>
+                                                                <input type="radio" name="verification-step" value="notice">
+                                                                <span>After Notice - Verify after reading exam rules</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="verification-option">
+                                                            <label>
+                                                                <input type="radio" name="verification-step" value="instructions">
+                                                                <span>After Instructions - Verify just before exam starts</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="text-center">
+                                                        <a href="javascript:void(0)" onclick="handleConfirmClick('<?= $profileImage ?>')" class="action-btn-compact">
+                                                            Confirm<i class="fi fi-rr-arrow-small-right"></i>
+                                                        </a>
+                                                    </div>
                                                 </div>
-                                            </div>
-
-                                            <div class="ed-hero__btn text-center mb-1 mt-3">
-                                                <a href="javascript:void(0)" onclick="startFaceVerification('<?= $profileImage ?>')" class="ed-btn">Confirm<i
-                                                        class="fi fi-rr-arrow-small-right"></i></a>
                                             </div>
                                         <?php
                                         }
@@ -398,24 +1226,23 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                         <?php
                                         if (isset($_GET["notice"])) {
                                         ?>
-                                            <div class="card shadow  col-8 " style="border-radius: 12px;  width: 80%; overflow-y: auto; margin-top: 200px;">
-                                                <div class="p-3 text-white text-center" style="background-color: #2ca347; font-weight: 600; font-size: 19px;">
-                                                    Notice of Applicant
+                                            <div class="exam-card">
+                                                <div class="card-header-compact">
+                                                    <h5><i class="fa fa-bell me-2"></i>Notice of Applicant</h5>
                                                 </div>
-                                                <div class="p-3 text-white bg-dark text-center d-flex justify-content-center align-items-center">
-                                                    <i class="fa fa-volume-up me-3 fs-2 text-white "></i>After being fully aware of applicant notice below, click the [Confirm] button
+                                                <div class="instruction-bar">
+                                                    <i class="fa fa-volume-up"></i>
+                                                    <span>After being fully aware of applicant notice below, click the [Confirm] button</span>
                                                 </div>
                                                 <!-- Face Verification Status -->
-                                                <div class="bg-light p-3 border-bottom">
+                                                <div class="bg-light p-2 border-bottom">
                                                     <div class="d-flex align-items-center">
-                                                        <i class="fa fa-shield-alt text-success me-3 fs-4"></i>
-                                                        <div>
-                                                            <strong class="text-success">Face Verification Completed</strong>
-                                                            <br><small class="text-muted">Identity verified successfully with <span id="verificationScoreDisplay">--</span>% similarity</small>
+                                                        <i class="fa fa-shield-alt text-success me-2"></i>
+                                                        <div class="flex-grow-1">
+                                                            <strong class="text-success" style="font-size: 13px;">Face Verification Completed</strong>
+                                                            <br><small class="text-muted" style="font-size: 11px;">Identity verified successfully with <span id="verificationScoreDisplay">--</span>% similarity</small>
                                                         </div>
-                                                        <div class="ms-auto">
-                                                            <span class="badge bg-success">✓ Verified</span>
-                                                        </div>
+                                                        <span class="badge bg-success">✓ Verified</span>
                                                     </div>
                                                 </div>
                                                 <div class="bg-white p-5" style="overflow-y: auto;">
@@ -450,7 +1277,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                 </div>
                                             </div>
                                             <div class="ed-hero__btn text-center mb-1 mt-3">
-                                                <a href="exam?<?= str_replace('notice', 'instructions', $_SERVER['QUERY_STRING']) ?>" class="ed-btn">Confirm<i
+                                                <a href="exam?<?= str_replace('notice', 'instructions', $_SERVER['QUERY_STRING']) ?>" class="ed-btn" onclick="return handleNoticeConfirm()">Confirm<i
                                                         class="fi fi-rr-arrow-small-right"></i></a>
                                             </div>
                                         <?php
@@ -492,7 +1319,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                 </div>
                                             </div>
                                             <div class="ed-hero__btn text-center mb-1 mt-3">
-                                                <a onclick="handleReadyClick('<?= htmlspecialchars($_GET['paper_id'], ENT_QUOTES) ?>', 
+                                                <a onclick="handleInstructionsReady('<?= htmlspecialchars($_GET['paper_id'], ENT_QUOTES) ?>', 
                              '<?= htmlspecialchars($application_no, ENT_QUOTES) ?>', 
                              '<?= htmlspecialchars($_GET['exam_id'] ?? '', ENT_QUOTES) ?>',
                              '<?= htmlspecialchars($_GET['sample'] ?? 'true', ENT_QUOTES) ?>');" class="ed-btn">Ready<i
@@ -654,12 +1481,390 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             showFaceVerification(profileImageUrl);
         }
 
+        // Handle confirm click with face verification step selection
+        function handleConfirmClick(profileImageUrl) {
+            const selectedStep = document.querySelector('input[name="verification-step"]:checked').value;
+            sessionStorage.setItem('faceVerificationStep', selectedStep);
+            
+            if (selectedStep === 'now') {
+                // Start face verification immediately
+                startFaceVerification(profileImageUrl);
+            } else {
+                // Skip face verification for now and proceed to notice
+                sessionStorage.setItem('faceVerificationPending', 'true');
+                proceedToNotice();
+            }
+        }
+
+        // Enhanced proceedToNotice function with verification step checking
+        function proceedToNotice() {
+            const currentUrl = new URL(window.location.href);
+            const params = new URLSearchParams(currentUrl.search);
+            
+            // Replace current parameter with notice
+            params.delete('sample');
+            params.set('notice', 'true');
+            
+            const newUrl = `${currentUrl.pathname}?${params.toString()}`;
+            window.location.href = newUrl;
+        }
+
+        // Function to check if face verification should be triggered at current step
+        function checkFaceVerificationAtStep(step) {
+            const selectedStep = sessionStorage.getItem('faceVerificationStep');
+            const verificationPassed = sessionStorage.getItem('faceVerificationPassed') === 'true';
+            const verificationPending = sessionStorage.getItem('faceVerificationPending') === 'true';
+            
+            if (selectedStep === step && !verificationPassed && verificationPending) {
+                const profileImage = '<?= $profileImage ?>';
+                
+                // Show modal asking user to complete verification
+                if (typeof Toastify !== 'undefined') {
+                    Toastify({
+                        text: "Face verification is required at this step. Click OK to proceed.",
+                        duration: 5000,
+                        gravity: "top",
+                        position: "center",
+                        backgroundColor: "#ff9500",
+                        stopOnFocus: true,
+                        onClick: function() {
+                            startFaceVerification(profileImage);
+                        }
+                    }).showToast();
+                }
+                
+                // Auto-start face verification after a short delay
+                setTimeout(() => {
+                    startFaceVerification(profileImage);
+                }, 2000);
+                
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Enhanced face verification completion handler
+        window.proceedToNextStep = function() {
+            console.log('🚀 Proceeding to next step after face verification');
+            
+            // Mark verification as completed
+            sessionStorage.setItem('faceVerificationPassed', 'true');
+            sessionStorage.setItem('faceVerificationPending', 'false');
+            
+            const selectedStep = sessionStorage.getItem('faceVerificationStep');
+            
+            // Proceed based on where verification was completed
+            switch(selectedStep) {
+                case 'now':
+                    proceedToNotice();
+                    break;
+                case 'notice':
+                    proceedToInstructions();
+                    break;
+                case 'instructions':
+                    proceedToIdentificationCheck();
+                    break;
+                default:
+                    proceedToNotice();
+            }
+        }
+
+        // Handle notice confirmation with face verification check
+        function handleNoticeConfirm() {
+            if (checkFaceVerificationAtStep('notice')) {
+                return false; // Prevent default navigation
+            }
+            return true; // Allow default navigation
+        }
+
+        // Handle instructions ready with face verification check
+        function handleInstructionsReady(paperId, applicationNo, examId, sample) {
+            if (checkFaceVerificationAtStep('instructions')) {
+                // Store the original ready parameters for after verification
+                sessionStorage.setItem('readyParams', JSON.stringify({
+                    paperId, applicationNo, examId, sample
+                }));
+                return false; // Prevent original ready action
+            }
+            
+            // If no verification needed, proceed with original ready logic
+            handleReadyClick(paperId, applicationNo, examId, sample);
+        }
+
+        // Enhanced proceedToNextStep to handle instructions completion
+        window.proceedToNextStep = function() {
+            console.log('🚀 Proceeding to next step after face verification');
+            
+            // Mark verification as completed
+            sessionStorage.setItem('faceVerificationPassed', 'true');
+            sessionStorage.setItem('faceVerificationPending', 'false');
+            
+            const selectedStep = sessionStorage.getItem('faceVerificationStep');
+            
+            // Proceed based on where verification was completed
+            switch(selectedStep) {
+                case 'now':
+                    proceedToNotice();
+                    break;
+                case 'notice':
+                    proceedToInstructions();
+                    break;
+                case 'instructions':
+                    // Get stored ready parameters and execute original ready logic
+                    const storedParams = sessionStorage.getItem('readyParams');
+                    if (storedParams) {
+                        const params = JSON.parse(storedParams);
+                        handleReadyClick(params.paperId, params.applicationNo, params.examId, params.sample);
+                        sessionStorage.removeItem('readyParams');
+                    } else {
+                        proceedToIdentificationCheck();
+                    }
+                    break;
+                default:
+                    proceedToNotice();
+            }
+        }
+
+        function proceedToInstructions() {
+            const currentUrl = new URL(window.location.href);
+            const params = new URLSearchParams(currentUrl.search);
+            
+            params.delete('notice');
+            params.set('instructions', 'true');
+            
+            const newUrl = `${currentUrl.pathname}?${params.toString()}`;
+            window.location.href = newUrl;
+        }
+
+        function proceedToIdentificationCheck() {
+            // Show identification check modal
+            document.getElementById('prepare-content').classList.remove('d-none');
+            document.getElementById('main-content').style.display = 'none';
+        }
+
+        // Brightness control functions
+        let currentBrightness = 100;
+        
+        function setBrightness(value) {
+            currentBrightness = parseInt(value);
+            const brightnessOverlay = getOrCreateBrightnessOverlay();
+            const opacity = (100 - currentBrightness) / 100 * 0.8; // Max 80% opacity
+            brightnessOverlay.style.background = `rgba(0, 0, 0, ${opacity})`;
+            
+            // Update slider
+            document.getElementById('brightnessRange').value = currentBrightness;
+            
+            // Save to localStorage
+            localStorage.setItem('examBrightness', currentBrightness);
+            
+            // Show feedback
+            showBrightnessToast(`화면 밝기: ${currentBrightness}%`);
+        }
+        
+        function adjustBrightness(change) {
+            const newBrightness = Math.max(20, Math.min(100, currentBrightness + change));
+            setBrightness(newBrightness);
+        }
+        
+        function getOrCreateBrightnessOverlay() {
+            let overlay = document.getElementById('brightness-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'brightness-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0);
+                    pointer-events: none;
+                    z-index: 9998;
+                    transition: background 0.3s ease;
+                `;
+                document.body.appendChild(overlay);
+            }
+            return overlay;
+        }
+        
+        function showBrightnessToast(message) {
+            if (typeof Toastify !== 'undefined') {
+                Toastify({
+                    text: message,
+                    duration: 1500,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: "#2ca347",
+                    stopOnFocus: true,
+                    style: {
+                        fontSize: '14px',
+                        borderRadius: '8px',
+                        minWidth: '150px',
+                        textAlign: 'center'
+                    }
+                }).showToast();
+            }
+        }
+
+        // Volume control functions
+        let currentVolume = 50;
+        
+        function setVolume(value) {
+            currentVolume = parseInt(value);
+            
+            // Update all audio elements
+            const audioElements = document.querySelectorAll('audio');
+            audioElements.forEach(audio => {
+                audio.volume = currentVolume / 100;
+            });
+            
+            // Update current playing audio from questions.js
+            if (typeof updateAllAudioVolume === 'function') {
+                updateAllAudioVolume(currentVolume);
+            }
+            
+            // Update slider
+            document.getElementById('volumeRange').value = currentVolume;
+            
+            // Save to localStorage
+            localStorage.setItem('examVolume', currentVolume);
+            
+            // Show feedback
+            showVolumeToast(`음량: ${currentVolume}%`);
+        }
+        
+        function adjustVolume(change) {
+            const newVolume = Math.max(0, Math.min(100, currentVolume + change));
+            setVolume(newVolume);
+        }
+        
+        function showVolumeToast(message) {
+            if (typeof Toastify !== 'undefined') {
+                Toastify({
+                    text: message,
+                    duration: 1500,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: "#007bff",
+                    stopOnFocus: true,
+                    style: {
+                        fontSize: '14px',
+                        borderRadius: '8px',
+                        minWidth: '150px',
+                        textAlign: 'center'
+                    }
+                }).showToast();
+            }
+        }
+
+        // Font size control functions
+        let currentFontScale = 1;
+        
+        function adjustFontSize(increase = true) {
+            const change = increase ? 0.1 : -0.1;
+            currentFontScale = Math.max(0.8, Math.min(1.4, currentFontScale + change));
+            
+            // Apply font size to content areas
+            const contentElements = document.querySelectorAll('#question-container, .card, .list-unstyled, .form-range');
+            contentElements.forEach(element => {
+                element.style.fontSize = `${currentFontScale}rem`;
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('examFontScale', currentFontScale);
+            
+            // Show feedback
+            const percentage = Math.round(currentFontScale * 100);
+            showFontSizeToast(`글자 크기: ${percentage}%`);
+        }
+        
+        function showFontSizeToast(message) {
+            if (typeof Toastify !== 'undefined') {
+                Toastify({
+                    text: message,
+                    duration: 1500,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: "#6f42c1",
+                    stopOnFocus: true,
+                    style: {
+                        fontSize: '14px',
+                        borderRadius: '8px',
+                        minWidth: '150px',
+                        textAlign: 'center'
+                    }
+                }).showToast();
+            }
+        }
+
+        // Initialize controls on page load
+        function initializeControls() {
+            // Load saved brightness
+            const savedBrightness = localStorage.getItem('examBrightness');
+            if (savedBrightness) {
+                setBrightness(parseInt(savedBrightness));
+            }
+            
+            // Load saved volume
+            const savedVolume = localStorage.getItem('examVolume');
+            if (savedVolume) {
+                setVolume(parseInt(savedVolume));
+            }
+            
+            // Load saved font scale
+            const savedFontScale = localStorage.getItem('examFontScale');
+            if (savedFontScale) {
+                currentFontScale = parseFloat(savedFontScale);
+                adjustFontSize(true); // Apply the saved scale
+                adjustFontSize(false); // Trigger the adjustment
+            }
+            
+            // Bind font size controls
+            document.getElementById('font-increase')?.addEventListener('click', () => adjustFontSize(true));
+            document.getElementById('font-decrease')?.addEventListener('click', () => adjustFontSize(false));
+            
+            // Bind keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey) {
+                    switch(e.key) {
+                        case '=': // Ctrl + = for brightness up
+                        case '+':
+                            e.preventDefault();
+                            adjustBrightness(10);
+                            break;
+                        case '-': // Ctrl + - for brightness down
+                            e.preventDefault();
+                            adjustBrightness(-10);
+                            break;
+                        case 'ArrowUp': // Ctrl + Arrow Up for volume up
+                            e.preventDefault();
+                            adjustVolume(10);
+                            break;
+                        case 'ArrowDown': // Ctrl + Arrow Down for volume down
+                            e.preventDefault();
+                            adjustVolume(-10);
+                            break;
+                    }
+                }
+            });
+        }
+
         // Check face verification status on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // If we're on the notice page, check verification status
+            // Initialize controls
+            initializeControls();
+            
+            // Check which step we're on and handle face verification
             const urlParams = new URLSearchParams(window.location.search);
+            
             if (urlParams.has('notice')) {
                 checkFaceVerificationStatus();
+                // Check if face verification should be triggered at notice step
+                setTimeout(() => checkFaceVerificationAtStep('notice'), 1000);
+            } else if (urlParams.has('instructions')) {
+                // Check if face verification should be triggered at instructions step
+                setTimeout(() => checkFaceVerificationAtStep('instructions'), 1000);
             }
         });
 
