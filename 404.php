@@ -1,3 +1,4 @@
+<?php include("includes/lang/lang-check.php"); ?>
 <!DOCTYPE html>
 <html class="no-js" lang="ZXX">
 
@@ -61,7 +62,7 @@
                                             Seems like you've landed on a page which has been archived or removed, let's take you back home?
                                         </p>
                                         <div class="ed-error__btn">
-                                            <a href="https://topiksir.com/" class="ed-btn">Go to Homepage<i class="fi fi-rr-arrow-small-right"></i></a>
+                                            <a href="https://topiksir.com/" class="ed-btn"><?= $translations['go_to_homepage']; ?><i class="fi fi-rr-arrow-small-right"></i></a>
                                         </div>
                                     </div>
                                 </div>

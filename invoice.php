@@ -1,5 +1,5 @@
 <?php
-session_start();
+include("includes/lang/lang-check.php");
 if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
     header("Location: /index?showModal=1");
     exit();

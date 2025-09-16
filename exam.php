@@ -1275,8 +1275,8 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             }
         }
     </style>
+    <link rel="stylesheet" href="assets/css/exam-styles.css" />
 </head>
-
 
 <body class="element-wrapper ">
     <!-- Orientation Overlay for Mobile Portrait Mode -->
@@ -1477,7 +1477,22 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                         </div>
                                                     </div>
                                                     
-                                                    <!-- Face Verification Options removed per request -->
+                                                    <div class="verification-options-compact">
+                                                        <h6><i class="fa fa-shield-alt"></i>Face Verification Options</h6>
+                                                        <p class="mb-2 text-muted" style="font-size: 11px;">Choose when to perform face verification:</p>
+                                                        <div class="verification-option">
+                                                            <label>
+                                                                <input type="radio" name="verification-step" value="now" checked>
+                                                                <span>Now (Recommended) - Verify before proceeding</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="verification-option">
+                                                            <label>
+                                                                <input type="radio" name="verification-step" value="notice">
+                                                                <span>After Notice - Verify after reading exam rules</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                     
                                                     <div class="text-center">
                                                         <a href="javascript:void(0)" onclick="handleConfirmClick('<?= $profileImage ?>')" class="action-btn-compact">
@@ -2245,11 +2260,19 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             });
         }
 
-        // Handle confirm click (options removed): always verify now
+        // Handle confirm click with face verification step selection
         function handleConfirmClick(profileImageUrl) {
-            sessionStorage.setItem('faceVerificationStep', 'now');
-            sessionStorage.setItem('faceVerificationPending', 'true');
-            startFaceVerification(profileImageUrl);
+            const selectedStep = document.querySelector('input[name="verification-step"]:checked').value;
+            sessionStorage.setItem('faceVerificationStep', selectedStep);
+            
+            if (selectedStep === 'now') {
+                // Start face verification immediately
+                startFaceVerification(profileImageUrl);
+            } else {
+                // Skip face verification for now and proceed to notice
+                sessionStorage.setItem('faceVerificationPending', 'true');
+                proceedToNotice();
+            }
         }
 
         // Enhanced proceedToNotice function with verification step checking
@@ -2494,7 +2517,6 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             handleReadyClick(paperId, applicationNo, examId, sample);
         }
 
-        // Keep backward compatibility: in later block proceedToNextStep is already defined to show AV wizard
 
         function proceedToInstructions() {
             const currentUrl = new URL(window.location.href);
@@ -2523,15 +2545,10 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             brightnessOverlay.style.background = `rgba(0, 0, 0, ${opacity})`;
             
             // Update slider
-            const bHeader = document.getElementById('brightnessRange');
-            if (bHeader) bHeader.value = currentBrightness;
-            const bModal = document.getElementById('brightnessRangeModal');
-            if (bModal) bModal.value = currentBrightness;
+            document.getElementById('brightnessRange').value = currentBrightness;
             
             // Save to localStorage
             localStorage.setItem('examBrightness', currentBrightness);
-            
-            // notifications disabled
         }
         
         function adjustBrightness(change) {
@@ -2552,18 +2569,14 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                     bottom: 0;
                     background: rgba(0, 0, 0, 0);
                     pointer-events: none;
-                    z-index: 999999; /* Above all modals so popup dims too */
+                    z-index: 9998;
                     transition: background 0.3s ease;
                 `;
                 document.body.appendChild(overlay);
             }
-            // Ensure z-index stays above modals even if overlay existed already
-            overlay.style.zIndex = '999999';
             return overlay;
         }
         
-        function showBrightnessToast(message) { /* notifications disabled */ }
-
         // Volume control functions
         let currentVolume = 50;
         
@@ -2582,15 +2595,34 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             }
             
             // Update slider
-            const vHeader = document.getElementById('volumeRange');
-            if (vHeader) vHeader.value = currentVolume;
-            const vModal = document.getElementById('volumeRangeModal');
-            if (vModal) vModal.value = currentVolume;
+            document.getElementById('volumeRange').value = currentVolume;
+            
+            // Update volume icon and test sound button
+            updateVolumeIcon();
             
             // Save to localStorage
             localStorage.setItem('examVolume', currentVolume);
             
-            // notifications disabled
+            // Show notification only for manual adjustments
+            if (showNotification) {
+                showVolumeToast(`음량: ${currentVolume}%`);
+            }
+        }
+        
+        function updateVolumeIcon() {
+            const volumeIcon = document.getElementById('volumeIcon');
+            const testSoundBtn = document.getElementById('testSoundBtn');
+            
+            if (currentVolume === 0) {
+                volumeIcon.className = 'fa fa-volume-off';
+                if (testSoundBtn) testSoundBtn.style.display = 'none';
+            } else if (currentVolume < 30) {
+                volumeIcon.className = 'fa fa-volume-down';
+                if (testSoundBtn) testSoundBtn.style.display = 'inline-block';
+            } else {
+                volumeIcon.className = 'fa fa-volume-up';
+                if (testSoundBtn) testSoundBtn.style.display = 'inline-block';
+            }
         }
         
         function adjustVolume(change) {
@@ -2611,8 +2643,19 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             showVolumeToast(`테스트 소리 재생 (음량: ${currentVolume}%)`);
         }
         
-        function showVolumeToast(message) { /* notifications disabled */ }
-
+        function showVolumeToast(message) {
+            if (typeof Toastify !== 'undefined') {
+                Toastify({
+                    text: message,
+                    duration: 2000,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: "#17a2b8",
+                    stopOnFocus: true
+                }).showToast();
+            }
+        }
+        
         // Font size control functions
         let currentFontScale = 1;
         
@@ -2628,12 +2671,8 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             
             // Save to localStorage
             localStorage.setItem('examFontScale', currentFontScale);
-            
-            // notifications disabled
         }
         
-        function showFontSizeToast(message) { /* notifications disabled */ }
-
         // Initialize controls on page load
         function initializeControls() {
             // Load saved brightness
@@ -2718,6 +2757,15 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                 const currentUrl = new URL(window.location.href);
                 currentUrl.searchParams.delete('notice');
                 currentUrl.searchParams.set('sample', 'true');
+                
+                Toastify({
+                    text: "Face verification must be completed before proceeding to notice.",
+                    duration: 5000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                    stopOnFocus: true
+                }).showToast();
                 
                 setTimeout(() => {
                     window.location.href = currentUrl.toString();
@@ -2947,44 +2995,6 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
 
         });
     </script>
-    <!-- AV Setup Wizard Modal -->
-    <div id="avWizardModal" role="dialog" aria-modal="true" aria-hidden="true">
-        <div class="av-dialog">
-            <div class="av-header" id="avWizardTitle">밝기 조절</div>
-            <div class="av-body">
-                <!-- Step 1: Brightness -->
-                <div id="avStep1">
-                    <div class="sample-gradient"></div>
-                    <p class="k-text mb-2">시험에 앞서 단말기의 화면 밝기, 음량 크기를 조정하실 수 있습니다.<br>주변 환경 및 선호도에 따라 <strong>최적의 밝기</strong>로 조정해 주세요.</p>
-                    <div class="range-row mt-3">
-                        <i class="fa fa-sun"></i>
-                        <input type="range" class="control-range" id="brightnessRangeModal" min="20" max="100" value="100">
-                        <i class="fa fa-sun"></i>
-                    </div>
-                </div>
-                <!-- Step 2: Volume -->
-                <div id="avStep2" style="display:none;">
-                    <div class="media">
-                        <button id="avPlayBtn" class="play-btn" type="button" aria-label="Play sample">▶</button>
-                        <audio id="avSampleAudio" preload="auto">
-                            <!-- TODO: User will replace with actual audio URL -->
-                            <source src="assets/audio/question3.mp3" type="audio/mpeg">
-                        </audio>
-                    </div>
-                    <p id="avVolumeInstructions" class="k-text mt-3">이어폰을 태블릿 PC에 연결해 주세요.<br><span>음량 조절을 위해서 상단에 보이는 플레이 버튼을 눌러주세요.</span><br>시험에 앞서 단말기의 화면 밝기, 음량을 조정하실 수 있습니다.<br>아래의 음량 조절 바를 움직여 <strong>음량을 적정하게 조절</strong>해 주시기 바랍니다.</p>
-                    <div class="range-row mt-3">
-                        <i class="fa fa-volume-down"></i>
-                        <input type="range" class="control-range" id="volumeRangeModal" min="0" max="100" value="50">
-                        <i class="fa fa-volume-up"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="av-footer">
-                <button class="btn-nav btn-prev" id="avPrevBtn" type="button" style="display:none;">Previous</button>
-                <button class="btn-nav btn-next" id="avNextBtn" type="button">Next</button>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>
