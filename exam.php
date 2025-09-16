@@ -1225,31 +1225,38 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                 } catch (_) { return false; }
             }
 
-            if (playBtn) {
+            if (playBtn && audio) {
+                let isAudioPlaying = false;
+                // ensure audio respects current volume
+                audio.volume = (typeof currentVolume === 'number' ? currentVolume : 50) / 100;
                 playBtn.addEventListener('click', async () => {
                     const label = document.getElementById('avStepVolumeInstructions');
-                    // Prefer TTS when available
-                    if (!speaking) {
-                        const ok = volText ? speakWithHighlight(volText.textContent, 'ko-KR') : false;
-                        if (!ok && audio) {
-                            try { await audio.play(); playBtn.textContent = '⏸'; label?.classList.add('reading-active'); startTimerHighlight(); } catch(_) {}
+                    try {
+                        if (audio.paused || audio.ended || !isAudioPlaying) {
+                            if (audio.ended) audio.currentTime = 0;
+                            audio.volume = (typeof currentVolume === 'number' ? currentVolume : 50) / 100;
+                            await audio.play();
+                            isAudioPlaying = true;
+                            playBtn.textContent = '⏸';
+                            label?.classList.add('reading-active');
+                            startTimerHighlight();
+                        } else {
+                            audio.pause();
+                            isAudioPlaying = false;
+                            playBtn.textContent = '▶';
+                            label?.classList.remove('reading-active');
+                            stopTimerHighlight();
                         }
-                    } else if (speaking && !paused) {
-                        if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
-                            window.speechSynthesis.pause(); paused = true; playBtn.textContent = '▶';
-                        } else if (!audio.paused) {
-                            audio.pause(); playBtn.textContent = '▶'; label?.classList.remove('reading-active');
-                        }
-                    } else if (speaking && paused) {
-                        if ('speechSynthesis' in window && window.speechSynthesis.paused) {
-                            window.speechSynthesis.resume(); paused = false; playBtn.textContent = '⏸';
-                        }
-                    }
+                    } catch (_) { /* ignore */ }
                 });
-            }
-            if (audio) {
-                audio.addEventListener('ended', () => { playBtn.textContent = '▶'; document.getElementById('avStepVolumeInstructions')?.classList.remove('reading-active'); resetHighlight(); stopTimerHighlight(); });
-                audio.addEventListener('pause', () => { stopTimerHighlight(); });
+                audio.addEventListener('ended', () => {
+                    isAudioPlaying = false;
+                    playBtn.textContent = '▶';
+                    document.getElementById('avStepVolumeInstructions')?.classList.remove('reading-active');
+                    resetHighlight();
+                    stopTimerHighlight();
+                });
+                audio.addEventListener('pause', () => { isAudioPlaying = false; stopTimerHighlight(); });
             }
         });
 
@@ -1358,8 +1365,11 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                 updateAllAudioVolume(currentVolume);
             }
             
-            // Update slider
-            document.getElementById('volumeRange').value = currentVolume;
+            // Update sliders (header + step)
+            const headerSlider = document.getElementById('volumeRange');
+            if (headerSlider) headerSlider.value = currentVolume;
+            const stepSlider = document.getElementById('avStepVolumeRange');
+            if (stepSlider) stepSlider.value = currentVolume;
             
             // Update volume icon and test sound button
             updateVolumeIcon();
@@ -1465,6 +1475,9 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             // Bind font size controls
             document.getElementById('font-increase')?.addEventListener('click', () => adjustFontSize(true));
             document.getElementById('font-decrease')?.addEventListener('click', () => adjustFontSize(false));
+            
+            // Live header volume updates while dragging
+            document.getElementById('volumeRange')?.addEventListener('input', (e) => setVolume(e.target.value, false));
             
             // Bind keyboard shortcuts
             document.addEventListener('keydown', function(e) {
