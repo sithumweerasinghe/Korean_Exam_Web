@@ -159,6 +159,22 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             background:#3b6aa1; color:#fff; border:none; border-radius:50%; width:46px; height:46px;
             display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer;
         }
+        /* Rich, high-contrast sliders for the wizard */
+        #avWizardModal input[type="range"] { height: 12px; -webkit-appearance: none; appearance: none; background: transparent; }
+        #avWizardModal input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background:#fff; border: 3px solid #3b6aa1; box-shadow: 0 2px 6px rgba(0,0,0,.25); margin-top: -5px; }
+        #avWizardModal input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background:#fff; border: 3px solid #3b6aa1; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+        #avWizardModal input[type="range"]::-webkit-slider-runnable-track { height: 8px; border-radius: 999px; background: #ced4da; }
+        #avWizardModal input[type="range"]::-moz-range-track { height: 8px; border-radius: 999px; background: #ced4da; }
+        /* Brightness: dark→light gradient track with yellow thumb ring */
+        #brightnessRangeModal::-webkit-slider-runnable-track { background: linear-gradient(90deg, #222 0%, #eee 100%); }
+        #brightnessRangeModal::-moz-range-track { background: linear-gradient(90deg, #222 0%, #eee 100%); }
+        #brightnessRangeModal::-webkit-slider-thumb { border-color: #f4c430; }
+        #brightnessRangeModal::-moz-range-thumb { border-color: #f4c430; }
+        /* Volume: light blue→brand blue gradient track with blue thumb ring */
+        #volumeRangeModal::-webkit-slider-runnable-track { background: linear-gradient(90deg, #b3e5fc 0%, #0d6efd 100%); }
+        #volumeRangeModal::-moz-range-track { background: linear-gradient(90deg, #b3e5fc 0%, #0d6efd 100%); }
+        #volumeRangeModal::-webkit-slider-thumb { border-color: #0d6efd; }
+        #volumeRangeModal::-moz-range-thumb { border-color: #0d6efd; }
         
         /* Permission toast styling */
         .permission-toast {
@@ -441,35 +457,53 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         }
         
         .control-range {
-            width: 60px;
-            height: 4px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 2px;
+            width: 90px;
+            height: 16px; /* provide room for thumb */
+            background: transparent; /* track paints via pseudo elements */
+            border-radius: 999px;
             outline: none;
             -webkit-appearance: none;
+            appearance: none;
             margin: 0 4px;
+            vertical-align: middle;
+            border: 0;
+            padding: 0; /* avoid vertical offsets */
         }
         
         .control-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
             appearance: none;
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             background: white;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid #2ca347;
             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            margin-top: -4px; /* center on 6px track */
         }
         
         .control-range::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             background: white;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid #2ca347;
             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
+        /* Generic track (header overrides color below) */
+        .control-range::-webkit-slider-runnable-track { height: 6px; background: rgba(255,255,255,0.6); border-radius: 999px; }
+        .control-range::-moz-range-track { height: 6px; background: rgba(255,255,255,0.6); border-radius: 999px; }
+        /* Make header slider track slightly bolder for clarity */
+        .exam-header .control-range::-webkit-slider-runnable-track { height: 6px; background: rgba(255,255,255,0.8); border-radius: 999px; }
+        .exam-header .control-range::-moz-range-track { height: 6px; background: rgba(255,255,255,0.8); border-radius: 999px; }
+
+    /* Ensure header controls align neatly */
+    .header-controls .control-group { display: inline-flex; align-items: center; gap: 6px; }
+    .header-controls .control-label { display: inline-flex; align-items: center; }
+    .header-controls .control-label i { display: inline-block; line-height: 1; font-size: 14px; }
+    .header-controls .control-btn.compact { height: 22px; line-height: 22px; }
 
         /* Compact Card Design */
         .exam-card {
@@ -2171,13 +2205,20 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             const modal = document.getElementById('avWizardModal');
             if (!modal) return afterCompleteCallback?.();
             modal.dataset.after = afterCompleteCallback ? '1' : '';
+            // Make modal overlay transparent so brightness effect is visible behind the popup
+            if (!modal.dataset.bg) modal.dataset.bg = modal.style.background || 'rgba(0,0,0,0.6)';
+            modal.style.background = 'transparent';
             avGoToStep(1);
             modal.style.display = 'flex';
         }
 
         function hideAVSetupWizard() {
             const modal = document.getElementById('avWizardModal');
-            if (modal) modal.style.display = 'none';
+            if (modal) {
+                modal.style.display = 'none';
+                // Restore original overlay background
+                if (modal.dataset.bg) modal.style.background = modal.dataset.bg;
+            }
             const audio = document.getElementById('avSampleAudio');
             if (audio) { audio.pause(); }
         }
@@ -2352,11 +2393,13 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                     bottom: 0;
                     background: rgba(0, 0, 0, 0);
                     pointer-events: none;
-                    z-index: 9998;
+                    z-index: 999999; /* Above all modals so popup dims too */
                     transition: background 0.3s ease;
                 `;
                 document.body.appendChild(overlay);
             }
+            // Ensure z-index stays above modals even if overlay existed already
+            overlay.style.zIndex = '999999';
             return overlay;
         }
         
