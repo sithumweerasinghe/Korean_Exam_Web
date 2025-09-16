@@ -97,6 +97,10 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         /* Global reading highlight when sample audio is playing */
         .reading-active { color: #d9534f !important; font-weight: 600; }
 
+        /* Align arrow icon inside action buttons */
+        .action-btn-compact { display: inline-flex; align-items: center; gap: 6px; }
+        .action-btn-compact i { line-height: 1; position: relative; top: 0; }
+
         /* AV Wizard Modal */
         #avWizardModal {
             position: fixed;
@@ -1477,22 +1481,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                         </div>
                                                     </div>
                                                     
-                                                    <div class="verification-options-compact">
-                                                        <h6><i class="fa fa-shield-alt"></i>Face Verification Options</h6>
-                                                        <p class="mb-2 text-muted" style="font-size: 11px;">Choose when to perform face verification:</p>
-                                                        <div class="verification-option">
-                                                            <label>
-                                                                <input type="radio" name="verification-step" value="now" checked>
-                                                                <span>Now (Recommended) - Verify before proceeding</span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="verification-option">
-                                                            <label>
-                                                                <input type="radio" name="verification-step" value="notice">
-                                                                <span>After Notice - Verify after reading exam rules</span>
-                                                            </label>
-                                                        </div>
-                                                    </div>
+                                                    <!-- Face Verification Options removed as per requirements -->
                                                     
                                                     <div class="text-center">
                                                         <a href="javascript:void(0)" onclick="handleConfirmClick('<?= $profileImage ?>')" class="action-btn-compact">
@@ -1532,9 +1521,27 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                                         </div>
                                                     </div>
                                                     <div class="text-center mt-3">
-                                                        <a href="exam?<?= str_replace('av_brightness', 'av_volume', $_SERVER['QUERY_STRING']) ?>" class="action-btn-compact" id="avBrightnessConfirm">
-                                                            Confirm<i class="fi fi-rr-arrow-small-right"></i>
-                                                        </a>
+                                                        <?php
+                                                            $currentQuery = $_SERVER['QUERY_STRING'];
+                                                            // Next: remove av_brightness and set av_volume=true
+                                                            $nextQuery = preg_replace('/(?:^|&)av_brightness=[^&]*/', '', $currentQuery);
+                                                            $nextQuery = preg_replace('/&&+/', '&', $nextQuery);
+                                                            $nextQuery = trim($nextQuery, '&');
+                                                            if (strpos($nextQuery, 'av_volume=true') === false) {
+                                                                $nextQuery .= ($nextQuery ? '&' : '') . 'av_volume=true';
+                                                            }
+                                                            // Previous: go back to sample (face id) page
+                                                            $prevQueryB = preg_replace('/(?:^|&)(av_brightness|av_volume|notice|instructions)=[^&]*/', '', $currentQuery);
+                                                            $prevQueryB = preg_replace('/&&+/', '&', $prevQueryB);
+                                                            $prevQueryB = trim($prevQueryB, '&');
+                                                            if (strpos($prevQueryB, 'sample=true') === false) {
+                                                                $prevQueryB .= ($prevQueryB ? '&' : '') . 'sample=true';
+                                                            }
+                                                        ?>
+                                                        <div class="d-flex justify-content-center gap-2">
+                                                            <a href="exam?<?= $prevQueryB ?>" class="btn btn-secondary">Previous</a>
+                                                            <a href="exam?<?= $nextQuery ?>" class="action-btn-compact" id="avBrightnessConfirm">Confirm<i class="fi fi-rr-arrow-small-right"></i></a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2260,19 +2267,13 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             });
         }
 
-        // Handle confirm click with face verification step selection
+        // Handle confirm click (options removed) — always verify now
         function handleConfirmClick(profileImageUrl) {
-            const selectedStep = document.querySelector('input[name="verification-step"]:checked').value;
-            sessionStorage.setItem('faceVerificationStep', selectedStep);
-            
-            if (selectedStep === 'now') {
-                // Start face verification immediately
-                startFaceVerification(profileImageUrl);
-            } else {
-                // Skip face verification for now and proceed to notice
+            try {
+                sessionStorage.setItem('faceVerificationStep', 'now');
                 sessionStorage.setItem('faceVerificationPending', 'true');
-                proceedToNotice();
-            }
+            } catch (e) {}
+            startFaceVerification(profileImageUrl);
         }
 
         // Enhanced proceedToNotice function with verification step checking
