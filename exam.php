@@ -1087,6 +1087,8 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             border-radius: 20px;
             padding: 2px 8px;
             border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            position: relative;
         }
         .headphone-label {
             font-size: 12px;
@@ -1102,6 +1104,111 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         .status-connected { background: #28a745; }
         .status-disconnected { background: #dc3545; }
         .status-unknown { background: #ffc107; }
+        
+        /* Audio Device Selector */
+        .audio-device-selector {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 280px;
+            z-index: 1000;
+            color: #333;
+        }
+        
+        .device-selector-header {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .device-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .device-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .device-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .device-item.active {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            font-weight: 500;
+        }
+        
+        .device-item.loading {
+            color: #666;
+            cursor: default;
+        }
+        
+        .device-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Audio Test Section */
+        .audio-test-section {
+            border-top: 1px solid #ddd;
+            background: #f8f9fa;
+        }
+        
+        .test-section-header {
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .test-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .test-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .test-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .test-content {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+        
+        .mic-status {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+        
+        .mic-status #micLabel {
+            color: #666;
+        }
         
         /* Fullscreen mobile styles */
         @media (max-width: 767px) and (orientation: landscape) {
@@ -1190,7 +1297,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                     <i class="fa fa-graduation-cap"></i>
                                 </div>
                                 <div class="brand-text ms-2">
-                                    <h6 class="mb-0 fw-bold">EPS-TOPIK</h6>
+                                    <h6 class="mb-0 fw-bold">EPS-TOPIK UBT</h6>
                                     <small class="text-muted">Test of proficiency in Korean</small>
                                 </div>
                             </div>
@@ -1214,6 +1321,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                             <div class="control-group me-2">
                                 <label class="control-label">
                                     <i class="fa fa-sun"></i>
+                                    <span style="font-size: 10px; margin-left: 3px;">밝기</span>
                                 </label>
                                 <button class="control-btn compact" onclick="adjustBrightness(-10)">-</button>
                                 <input type="range" class="control-range" id="brightnessRange" min="20" max="100" value="100" onchange="setBrightness(this.value)">
@@ -1223,18 +1331,66 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                             <!-- Volume Control -->
                             <div class="control-group me-2">
                                 <label class="control-label">
-                                    <i class="fa fa-volume-up"></i>
+                                    <i id="volumeIcon" class="fa fa-volume-up"></i>
+                                    <span style="font-size: 10px; margin-left: 3px;">음량</span>
                                 </label>
                                 <button class="control-btn compact" onclick="adjustVolume(-10)">-</button>
-                                <input type="range" class="control-range" id="volumeRange" min="0" max="100" value="50" onchange="setVolume(this.value)">
+                                <input type="range" class="control-range" id="volumeRange" min="0" max="100" value="50" onchange="setVolume(this.value, true)">
                                 <button class="control-btn compact" onclick="adjustVolume(10)">+</button>
+                                <button id="testSoundBtn" class="control-btn compact" onclick="playTestSound()" style="margin-left: 5px; display: none;" title="테스트 소리">
+                                    <i class="fa fa-play"></i>
+                                </button>
                             </div>
 
                             <!-- Headphone Indicator -->
-                            <div class="headphone-indicator" id="headphoneIndicator" title="Headphone status">
-                                <i class="fa fa-headphones"></i>
-                                <span class="headphone-label" id="headphoneLabel">Checking…</span>
+                            <div class="headphone-indicator" id="headphoneIndicator" title="오디오 출력 장치 상태">
+                                <i class="fa fa-headphones" id="headphoneIcon"></i>
+                                <span class="headphone-label" id="headphoneLabel">확인 중…</span>
                                 <span class="status-dot status-unknown" id="headphoneDot"></span>
+                                <i class="fa fa-caret-down ms-1" style="font-size: 12px; cursor: pointer;" onclick="toggleDeviceSelector()"></i>
+                            </div>
+                            
+                            <!-- Audio Device Selector Dropdown -->
+                            <div class="audio-device-selector d-none" id="deviceSelector">
+                                <div class="device-selector-header">
+                                    <i class="fa fa-volume-up me-2"></i>
+                                    <span>오디오 출력 장치</span>
+                                </div>
+                                <div class="device-list" id="deviceList">
+                                    <div class="device-item loading">
+                                        <i class="fa fa-spinner fa-spin me-2"></i>
+                                        장치를 검색 중...
+                                    </div>
+                                </div>
+                                
+                                <!-- Audio Test Section -->
+                                <div class="audio-test-section">
+                                    <div class="test-section-header">
+                                        <i class="fa fa-headphones me-2"></i>
+                                        <span>오디오 테스트</span>
+                                    </div>
+                                    
+                                    <!-- Microphone Test -->
+                                    <div class="test-item" onclick="testMicrophone()">
+                                        <div class="test-content">
+                                            <i class="fa fa-microphone me-2"></i>
+                                            <span>마이크 확인</span>
+                                            <div class="mic-status" id="micStatus">
+                                                <span class="status-dot status-unknown" id="micDot"></span>
+                                                <span id="micLabel">테스트하지 않음</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Sound Test -->
+                                    <div class="test-item" onclick="testSound()">
+                                        <div class="test-content">
+                                            <i class="fa fa-play me-2"></i>
+                                            <span>음향 테스트</span>
+                                            <small class="text-muted d-block">한국어 안내 메시지 재생</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1558,18 +1714,20 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             showFaceVerification(profileImageUrl);
         }
 
-        // Headphone detection
+        // Headphone detection with Korean labels
         async function detectHeadphones() {
             const labelEl = document.getElementById('headphoneLabel');
             const dotEl = document.getElementById('headphoneDot');
+            const iconEl = document.getElementById('headphoneIcon');
             const containerEl = document.getElementById('headphoneIndicator');
-            if (!labelEl || !dotEl) return;
+            if (!labelEl || !dotEl || !iconEl) return;
 
             try {
                 if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-                    labelEl.textContent = 'Unknown';
+                    labelEl.textContent = '알 수 없음';
                     dotEl.className = 'status-dot status-unknown';
-                    if (containerEl) containerEl.title = 'Headphone status: Unknown';
+                    iconEl.className = 'fa fa-question-circle';
+                    if (containerEl) containerEl.title = '오디오 장치 상태: 알 수 없음';
                     return;
                 }
 
@@ -1598,36 +1756,339 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                 const isHeadphone = !!name && headphoneRegex.test(name);
                 const isSpeakers = !!name && speakersRegex.test(name);
 
-                // As a fallback, if only one output device and it's default with no label, status unknown
+                // Update UI based on device type
                 if (audioOutputs.length === 0) {
-                    labelEl.textContent = 'No output';
+                    labelEl.textContent = '출력 없음';
                     dotEl.className = 'status-dot status-disconnected';
-                    if (containerEl) containerEl.title = 'No audio output device detected';
+                    iconEl.className = 'fa fa-times-circle';
+                    if (containerEl) containerEl.title = '오디오 출력 장치가 감지되지 않음';
                 } else if (isHeadphone) {
-                    labelEl.textContent = 'Headphones';
+                    labelEl.textContent = '헤드폰 연결됨';
                     dotEl.className = 'status-dot status-connected';
-                    if (containerEl) containerEl.title = name ? `Default output: ${name}` : 'Headphones detected';
+                    iconEl.className = 'fa fa-headphones';
+                    if (containerEl) containerEl.title = name ? `기본 출력: ${name}` : '헤드폰이 감지됨';
                 } else {
                     // Not headphones: prefer classifying as Speakers if label suggests, else Unknown/Output
                     if (labelsAvailable && isSpeakers) {
-                        labelEl.textContent = 'Speakers';
+                        labelEl.textContent = '스피커';
                         dotEl.className = 'status-dot status-disconnected';
-                        if (containerEl) containerEl.title = name ? `Default output: ${name}` : 'Output: Speakers';
+                        iconEl.className = 'fa fa-volume-up';
+                        if (containerEl) containerEl.title = name ? `기본 출력: ${name}` : '출력: 스피커';
                     } else if (labelsAvailable && name) {
-                        labelEl.textContent = 'Output';
+                        labelEl.textContent = '출력 장치';
                         dotEl.className = 'status-dot status-disconnected';
-                        if (containerEl) containerEl.title = `Default output: ${name}`;
+                        iconEl.className = 'fa fa-volume-up';
+                        if (containerEl) containerEl.title = `기본 출력: ${name}`;
                     } else {
-                        labelEl.textContent = 'Unknown';
+                        labelEl.textContent = '알 수 없음';
                         dotEl.className = 'status-dot status-unknown';
-                        if (containerEl) containerEl.title = 'Unknown output. Click to re-check (may request mic permission).';
+                        iconEl.className = 'fa fa-question-circle';
+                        if (containerEl) containerEl.title = '알 수 없는 출력. 클릭하여 다시 확인 (마이크 권한 요청 가능)';
                     }
                 }
+                
+                // Update device list
+                updateDeviceList(audioOutputs, actualDefault);
+                
             } catch (err) {
                 console.warn('Headphone detection error:', err);
-                labelEl.textContent = 'Unknown';
+                labelEl.textContent = '알 수 없음';
                 dotEl.className = 'status-dot status-unknown';
-                if (containerEl) containerEl.title = 'Headphone status: Unknown';
+                iconEl.className = 'fa fa-question-circle';
+                if (containerEl) containerEl.title = '오디오 장치 상태: 알 수 없음';
+            }
+        }
+
+        // Update device list in dropdown
+        function updateDeviceList(audioOutputs, currentDefault) {
+            const deviceList = document.getElementById('deviceList');
+            if (!deviceList) return;
+
+            if (audioOutputs.length === 0) {
+                deviceList.innerHTML = `
+                    <div class="device-item">
+                        <i class="fa fa-exclamation-triangle me-2 text-warning"></i>
+                        사용 가능한 출력 장치가 없습니다
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            audioOutputs.forEach(device => {
+                const isDefault = device.deviceId === currentDefault?.deviceId || 
+                                  (device.deviceId === 'default' && !currentDefault);
+                const deviceName = device.label || `장치 ${device.deviceId.substring(0, 8)}...`;
+                const icon = getDeviceIcon(deviceName);
+                
+                html += `
+                    <div class="device-item ${isDefault ? 'active' : ''}" 
+                         onclick="selectAudioDevice('${device.deviceId}', '${deviceName.replace(/'/g, '\\\'')}')"
+                         data-device-id="${device.deviceId}">
+                        <i class="fa ${icon} me-2"></i>
+                        <span>${deviceName}</span>
+                        ${isDefault ? '<i class="fa fa-check ms-auto text-success"></i>' : ''}
+                    </div>
+                `;
+            });
+
+            deviceList.innerHTML = html;
+        }
+
+        // Get appropriate icon for device type
+        function getDeviceIcon(deviceName) {
+            const name = deviceName.toLowerCase();
+            if (name.includes('headphone') || name.includes('headset') || 
+                name.includes('earbud') || name.includes('airpod') || 
+                name.includes('bluetooth')) {
+                return 'fa-headphones';
+            } else if (name.includes('speaker') || name.includes('monitor') || 
+                       name.includes('hdmi') || name.includes('display')) {
+                return 'fa-volume-up';
+            }
+            return 'fa-volume-up';
+        }
+
+        // Toggle device selector dropdown
+        function toggleDeviceSelector() {
+            const selector = document.getElementById('deviceSelector');
+            if (selector.classList.contains('d-none')) {
+                selector.classList.remove('d-none');
+                // Refresh device list when opening
+                detectHeadphones();
+            } else {
+                selector.classList.add('d-none');
+            }
+        }
+
+        // Select audio device
+        async function selectAudioDevice(deviceId, deviceName) {
+            try {
+                // Note: There's no direct way to set the default audio output device via JavaScript
+                // This function would typically integrate with a browser extension or native app
+                console.log('Selected device:', deviceId, deviceName);
+                
+                // Show notification about device selection
+                if (typeof Toastify !== 'undefined') {
+                    Toastify({
+                        text: `선택된 오디오 장치: ${deviceName}`,
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#28a745"
+                    }).showToast();
+                }
+
+                // Try to use the device if possible (limited browser support)
+                if ('setSinkId' in HTMLAudioElement.prototype) {
+                    // This would work for audio elements, but not for system-wide audio
+                    const audioElements = document.querySelectorAll('audio');
+                    audioElements.forEach(audio => {
+                        if (audio.setSinkId) {
+                            audio.setSinkId(deviceId).catch(err => 
+                                console.warn('Failed to set sink ID:', err)
+                            );
+                        }
+                    });
+                }
+
+                // Close the selector
+                toggleDeviceSelector();
+                
+                // Refresh detection to update UI
+                setTimeout(() => detectHeadphones(), 500);
+                
+            } catch (error) {
+                console.error('Error selecting audio device:', error);
+                if (typeof Toastify !== 'undefined') {
+                    Toastify({
+                        text: "오디오 장치 변경 중 오류가 발생했습니다",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#dc3545"
+                    }).showToast();
+                }
+            }
+        }
+
+        // Test microphone functionality
+        async function testMicrophone() {
+            const micDot = document.getElementById('micDot');
+            const micLabel = document.getElementById('micLabel');
+            
+            if (!micDot || !micLabel) return;
+            
+            try {
+                // Update UI to show testing
+                micDot.className = 'status-dot status-unknown';
+                micLabel.textContent = '테스트 중...';
+                
+                // Request microphone access
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: true 
+                });
+                
+                // Test if microphone is working by checking audio levels
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+                const analyser = audioContext.createAnalyser();
+                
+                source.connect(analyser);
+                analyser.fftSize = 256;
+                
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                let testDuration = 0;
+                const maxTestTime = 3000; // 3 seconds
+                let hasSound = false;
+                
+                const checkAudio = () => {
+                    analyser.getByteFrequencyData(dataArray);
+                    
+                    // Check for audio input (simple volume detection)
+                    const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+                    
+                    if (average > 10) { // Threshold for detecting sound
+                        hasSound = true;
+                    }
+                    
+                    testDuration += 100;
+                    
+                    if (testDuration < maxTestTime && !hasSound) {
+                        setTimeout(checkAudio, 100);
+                    } else {
+                        // Stop the stream
+                        stream.getTracks().forEach(track => track.stop());
+                        audioContext.close();
+                        
+                        // Update UI based on results
+                        if (hasSound) {
+                            micDot.className = 'status-dot status-connected';
+                            micLabel.textContent = '작동 중';
+                            showNotification('마이크가 정상적으로 작동합니다', 'success');
+                        } else {
+                            micDot.className = 'status-dot status-disconnected';
+                            micLabel.textContent = '음성 감지 안됨';
+                            showNotification('마이크에서 음성이 감지되지 않습니다. 말씀해 주세요.', 'warning');
+                        }
+                    }
+                };
+                
+                // Start testing after a short delay
+                setTimeout(checkAudio, 500);
+                
+                showNotification('마이크 테스트 중입니다. 말씀해 주세요.', 'info');
+                
+            } catch (error) {
+                console.error('Microphone test error:', error);
+                micDot.className = 'status-dot status-disconnected';
+                micLabel.textContent = '접근 거부됨';
+                
+                if (error.name === 'NotAllowedError') {
+                    showNotification('마이크 접근이 거부되었습니다. 브라우저 설정을 확인해 주세요.', 'error');
+                } else {
+                    showNotification('마이크 테스트 중 오류가 발생했습니다.', 'error');
+                }
+            }
+        }
+
+        // Test sound functionality with Korean message
+        function testSound() {
+            try {
+                // Korean test message
+                const koreanMessage = "안녕하세요. EPS-TOPIK 시험의 음향 테스트입니다. 이 메시지가 명확하게 들리면 음향이 정상적으로 작동하고 있습니다. 시험 중에는 헤드폰을 착용하시기 바랍니다.";
+                
+                // Check if speech synthesis is supported
+                if ('speechSynthesis' in window) {
+                    // Cancel any ongoing speech
+                    speechSynthesis.cancel();
+                    
+                    const utterance = new SpeechSynthesisUtterance(koreanMessage);
+                    
+                    // Set Korean language
+                    utterance.lang = 'ko-KR';
+                    utterance.rate = 0.9; // Slightly slower for clarity
+                    utterance.pitch = 1.0;
+                    utterance.volume = 1.0;
+                    
+                    // Set up event handlers
+                    utterance.onstart = () => {
+                        showNotification('음향 테스트가 시작되었습니다.', 'info');
+                    };
+                    
+                    utterance.onend = () => {
+                        showNotification('음향 테스트가 완료되었습니다.', 'success');
+                    };
+                    
+                    utterance.onerror = (event) => {
+                        console.error('Speech synthesis error:', event);
+                        showNotification('음성 재생 중 오류가 발생했습니다.', 'error');
+                    };
+                    
+                    // Speak the message
+                    speechSynthesis.speak(utterance);
+                    
+                } else {
+                    // Fallback: show text message
+                    showNotification('브라우저에서 음성 재생을 지원하지 않습니다.', 'warning');
+                    
+                    // Create a simple beep sound as fallback
+                    createBeepSound();
+                }
+                
+            } catch (error) {
+                console.error('Sound test error:', error);
+                showNotification('음향 테스트 중 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        // Create a simple beep sound as fallback
+        function createBeepSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+                
+                showNotification('테스트 음성이 재생되었습니다.', 'info');
+                
+            } catch (error) {
+                console.error('Beep sound error:', error);
+                showNotification('오디오를 재생할 수 없습니다.', 'error');
+            }
+        }
+
+        // Helper function for notifications
+        function showNotification(message, type = 'info') {
+            if (typeof Toastify !== 'undefined') {
+                const colors = {
+                    'success': '#28a745',
+                    'error': '#dc3545',
+                    'warning': '#ffc107',
+                    'info': '#17a2b8'
+                };
+                
+                Toastify({
+                    text: message,
+                    duration: 4000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: colors[type] || colors['info'],
+                    stopOnFocus: true
+                }).showToast();
             }
         }
 
@@ -1638,19 +2099,16 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                     detectHeadphones();
                 });
             }
-            const containerEl = document.getElementById('headphoneIndicator');
-            if (containerEl) {
-                containerEl.addEventListener('click', async () => {
-                    // Try to reveal device labels only on user interaction
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        stream.getTracks().forEach(t => t.stop());
-                    } catch (_) {
-                        // ignore
-                    }
-                    detectHeadphones();
-                });
-            }
+            
+            // Close device selector when clicking outside
+            document.addEventListener('click', (e) => {
+                const selector = document.getElementById('deviceSelector');
+                const indicator = document.getElementById('headphoneIndicator');
+                if (selector && !selector.classList.contains('d-none') && 
+                    !indicator.contains(e.target) && !selector.contains(e.target)) {
+                    selector.classList.add('d-none');
+                }
+            });
         }
 
         // Handle confirm click (options removed): always verify now
@@ -1830,17 +2288,9 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             return true; // Allow default navigation
         }
 
-        // Handle instructions ready with face verification check
+        // Handle instructions ready - no longer needs face verification check
         function handleInstructionsReady(paperId, applicationNo, examId, sample) {
-            if (checkFaceVerificationAtStep('instructions')) {
-                // Store the original ready parameters for after verification
-                sessionStorage.setItem('readyParams', JSON.stringify({
-                    paperId, applicationNo, examId, sample
-                }));
-                return false; // Prevent original ready action
-            }
-            
-            // If no verification needed, proceed with original ready logic
+            // Proceed with original ready logic since face verification is no longer done at this step
             handleReadyClick(paperId, applicationNo, examId, sample);
         }
 
@@ -1915,7 +2365,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         // Volume control functions
         let currentVolume = 50;
         
-        function setVolume(value) {
+        function setVolume(value, showNotification = false) {
             currentVolume = parseInt(value);
             
             // Update all audio elements
@@ -1943,7 +2393,20 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         
         function adjustVolume(change) {
             const newVolume = Math.max(0, Math.min(100, currentVolume + change));
-            setVolume(newVolume);
+            setVolume(newVolume, true); // Show notification for manual adjustments
+        }
+        
+        function playTestSound() {
+            // Create a test audio element with a short beep sound
+            const testAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSyBzvLYiTYEKILL8dqDMwUzgM3z2IoOhZiUnpqeNAUkbLny1YgaGClftN3wkDcDO3G39N2BQAR0u/PYhlcMAOOp7vCjPgM5drrz1X8LHDa21vLZdysELXy89dWCAikPdNH+3YcTBl1k1eTPj1oXCj++y/Hib0EAJY/U8daFjAUzf9HyVJ11aA==');
+            testAudio.volume = currentVolume / 100;
+            testAudio.play().catch(e => {
+                // Fallback for browsers that don't support data URI audio
+                showVolumeToast('테스트 소리를 재생할 수 없습니다');
+            });
+            
+            // Show feedback
+            showVolumeToast(`테스트 소리 재생 (음량: ${currentVolume}%)`);
         }
         
         function showVolumeToast(message) { /* notifications disabled */ }
@@ -1977,10 +2440,13 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                 setBrightness(parseInt(savedBrightness));
             }
             
-            // Load saved volume
+            // Load saved volume (no notification on page load)
             const savedVolume = localStorage.getItem('examVolume');
             if (savedVolume) {
-                setVolume(parseInt(savedVolume));
+                setVolume(parseInt(savedVolume), false); // false = no notification
+            } else {
+                // Set default volume and update icon
+                updateVolumeIcon();
             }
             
             // Load saved font scale
