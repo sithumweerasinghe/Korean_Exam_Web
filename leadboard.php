@@ -71,8 +71,23 @@ include("includes/lang/lang-check.php");
         $examDetails = $examTimetableService->getExamDetails($_GET["exam_id"]);
     }
 
+    // Ensure $examResults is an array to prevent errors
+    if (!is_array($examResults)) {
+        $examResults = [];
+    }
+
     $topResults = array_slice($examResults, 0, 3); // First 3
     $remainingResults = array_slice($examResults, 3);
+
+    // Ensure $examDetails is valid to prevent errors
+    if (!is_array($examDetails) || empty($examDetails)) {
+        $examDetails = [
+            "start_time" => "00:00:00",
+            "end_time" => "00:00:00", 
+            "exam_date" => "No Date",
+            "paper_name" => "No Paper"
+        ];
+    }
 
     $start = new DateTime($examDetails["start_time"]);
     $end = new DateTime($examDetails["end_time"]);
@@ -100,14 +115,15 @@ include("includes/lang/lang-check.php");
                                 </div>
                             </div>
                             <div class="p-4">
-                                <?php foreach ($topResults as $index => $topResult): ?>
-                                    <?php if ($index == 0): ?>
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-12 d-flex justify-content-center align-items-center">
-                                                <div class="d-flex flex-column justify-content-center align-items-center">
-                                                    <img src="assets/images/rankings/1stPlace.png" width="100px" alt="1st Place Badge">
-                                                    <span>1st Place</span>
-                                                    <span><?= htmlspecialchars($topResult["admission_no"]); ?></span>
+                                <?php if (!empty($topResults) && is_array($topResults)): ?>
+                                    <?php foreach ($topResults as $index => $topResult): ?>
+                                        <?php if ($index == 0): ?>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-12 d-flex justify-content-center align-items-center">
+                                                    <div class="d-flex flex-column justify-content-center align-items-center">
+                                                        <img src="assets/images/rankings/1stPlace.png" width="100px" alt="1st Place Badge">
+                                                        <span>1st Place</span>
+                                                        <span><?= htmlspecialchars($topResult["admission_no"]); ?></span>
                                                     <span><?= htmlspecialchars($topResult["email"]); ?></span>
                                                 </div>
                                             </div>
@@ -131,6 +147,13 @@ include("includes/lang/lang-check.php");
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="row">
+                                        <div class="col-12 text-center">
+                                            <p>No top results available</p>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
                             </div>
 
                             <div class="col-md-12">
@@ -144,14 +167,20 @@ include("includes/lang/lang-check.php");
                                         </tr>
                                     </thead>
                                     <tbody id="tableBody">
-                                        <?php foreach ($results as $result): ?>
+                                        <?php if (!empty($remainingResults) && is_array($remainingResults)): ?>
+                                            <?php foreach ($remainingResults as $result): ?>
+                                                <tr>
+                                                    <td><?= htmlspecialchars($result["exam_number"]); ?></td>
+                                                    <td><?= htmlspecialchars($result["date"]); ?></td>
+                                                    <td><?= htmlspecialchars($result["question_paper"]); ?></td>
+                                                    <td><?= htmlspecialchars($result["marks"]); ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
                                             <tr>
-                                                <td><?= htmlspecialchars($result["exam_number"]); ?></td>
-                                                <td><?= htmlspecialchars($result["date"]); ?></td>
-                                                <td><?= htmlspecialchars($result["question_paper"]); ?></td>
-                                                <td><?= htmlspecialchars($result["marks"]); ?></td>
+                                                <td colspan="4" class="text-center">No results available</td>
                                             </tr>
-                                        <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
