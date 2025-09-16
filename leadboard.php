@@ -314,7 +314,7 @@ include("includes/lang/lang-check.php");
                     const tbody = document.querySelector('#resultsTable tbody');
                     const row = document.createElement('tr');
                     row.id = 'noResultsRow';
-                    row.innerHTML = `<td colspan="100%" class="text-center">No results</td>`;
+                    row.innerHTML = '<td colspan="100%" class="text-center">No results</td>';
                     tbody.appendChild(row);
                 }
             } else {
