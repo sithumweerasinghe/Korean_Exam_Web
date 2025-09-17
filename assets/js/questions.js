@@ -6,6 +6,11 @@ const answers = [];
 let currentAudio = null;
 let isAudioPlaying = false;
 
+// Guard to avoid binding next/prev handlers multiple times
+let navHandlersBound = false;
+// Short re-entry lock to prevent double navigation
+let navLock = false;
+
 // Helper functions for mobile audio handling
 function showAudioPlayButton(audio) {
   // Remove existing play button if any
@@ -419,21 +424,33 @@ function formatTime(seconds) {
 
 // Initialize event listeners when DOM is ready or when buttons are available
 function initializeQuestionButtons() {
+  if (navHandlersBound) return; // already bound
   const nextBtn = document.getElementById("next-btn");
   if (nextBtn) {
     nextBtn.addEventListener("click", async () => {
-      saveAnswer();
-      nextQuestion();
+      if (navLock) return; navLock = true;
+      try {
+        saveAnswer();
+        nextQuestion();
+      } finally {
+        setTimeout(() => { navLock = false; }, 150);
+      }
     });
   }
 
   const prevBtn = document.getElementById("prev-btn");
   if (prevBtn) {
     prevBtn.addEventListener("click", () => {
-      saveAnswer();
-      previousQuestion();
+      if (navLock) return; navLock = true;
+      try {
+        saveAnswer();
+        previousQuestion();
+      } finally {
+        setTimeout(() => { navLock = false; }, 150);
+      }
     });
   }
+  navHandlersBound = true;
 }
 
 // Try to initialize when DOM is ready

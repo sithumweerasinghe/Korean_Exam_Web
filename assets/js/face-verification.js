@@ -112,15 +112,12 @@ class FaceVerification {
                                             </video>
                                             <canvas id="captureCanvas" style="display: none;"></canvas>
                                             
-                                            <!-- Camera Overlay for Guidance -->
-                                            <div class="camera-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center pointer-events-none">
-                                                <div class="face-guide-circle"></div>
-                                            </div>
+                                            <!-- Camera Overlay for Guidance removed per requirements -->
                                             
                                             <!-- Verification Status Overlay -->
                                             <div id="verificationStatus" class="position-absolute verification-status rounded-circle d-flex align-items-center justify-content-center" 
                                                  style="top: -5px; right: -5px; width: 20px; height: 20px; display: none; font-size: 10px;">
-                                                <i class="fa fa-spinner fa-spin text-warning" id="loadingIcon"></i>
+                                                
                                                 <i class="fa fa-check text-white d-none" id="successIcon"></i>
                                                 <i class="fa fa-times text-white d-none" id="failIcon"></i>
                                             </div>

@@ -660,9 +660,10 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
     <script src="assets/plugins/js/active.js"></script>
     <script src="assets/js/questions.js"></script>
     <script src="assets/js/clientScript.js"></script>
-    <script src="assets/js/face-verification.js"></script>
+    <script src="assets/js/face-verification.js?v=<?php echo time(); ?>"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
+        const IS_LOGGED_IN = <?php echo json_encode(!empty($userId)); ?>;
         // Global function to start face verification
         function startFaceVerification(profileImageUrl) {
             showFaceVerification(profileImageUrl);
@@ -1065,13 +1066,20 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             });
         }
 
-        // Handle confirm click (options removed) — always verify now
+        // Handle confirm click — if logged in run verification, else skip to brightness
         function handleConfirmClick(profileImageUrl) {
             try {
                 sessionStorage.setItem('faceVerificationStep', 'now');
                 sessionStorage.setItem('faceVerificationPending', 'true');
             } catch (e) {}
-            startFaceVerification(profileImageUrl);
+            if (IS_LOGGED_IN) {
+                startFaceVerification(profileImageUrl);
+            } else {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('sample');
+                url.searchParams.set('av_brightness', 'true');
+                window.location.href = url.toString();
+            }
         }
 
         // Enhanced proceedToNotice function with verification step checking
@@ -1089,6 +1097,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
 
         // Function to check if face verification should be triggered at current step
         function checkFaceVerificationAtStep(step) {
+            if (!IS_LOGGED_IN) return false;
             const selectedStep = sessionStorage.getItem('faceVerificationStep');
             const verificationPassed = sessionStorage.getItem('faceVerificationPassed') === 'true';
             const verificationPending = sessionStorage.getItem('faceVerificationPending') === 'true';
@@ -1563,12 +1572,14 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             const urlParams = new URLSearchParams(window.location.search);
             
             if (urlParams.has('notice')) {
-                checkFaceVerificationStatus();
+                if (IS_LOGGED_IN) {
+                    checkFaceVerificationStatus();
+                }
                 // Check if face verification should be triggered at notice step
-                setTimeout(() => checkFaceVerificationAtStep('notice'), 1000);
+                if (IS_LOGGED_IN) setTimeout(() => checkFaceVerificationAtStep('notice'), 1000);
             } else if (urlParams.has('instructions')) {
                 // Check if face verification should be triggered at instructions step
-                setTimeout(() => checkFaceVerificationAtStep('instructions'), 1000);
+                if (IS_LOGGED_IN) setTimeout(() => checkFaceVerificationAtStep('instructions'), 1000);
             }
         });
 
