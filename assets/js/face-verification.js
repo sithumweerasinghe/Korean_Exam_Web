@@ -68,47 +68,47 @@ class FaceVerification {
     createVerificationModal() {
         const modalHTML = `
             <div class="modal fade" id="faceVerificationModal" tabindex="-1" aria-labelledby="faceVerificationModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-                <div class="modal-dialog modal-fullscreen-md-down modal-xl modal-dialog-centered">
-                    <div class="modal-content" style="border-radius: 12px;">
-                        <div class="modal-header text-white" style="background-color: #2ca347;">
-                            <h5 class="modal-title fw-bold" id="faceVerificationModalLabel">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content" style="border-radius: 8px;">
+                        <div class="modal-header text-white py-2" style="background-color: #2ca347;">
+                            <h6 class="modal-title fw-bold mb-0" id="faceVerificationModalLabel">
                                 <i class="fa fa-camera me-2"></i>Face Verification
-                            </h5>
+                            </h6>
                         </div>
-                        <div class="modal-body p-0">
+                        <div class="modal-body p-2">
                             <!-- Instructions -->
-                            <div class="p-3 text-white bg-dark text-center d-flex justify-content-center align-items-center">
-                                <i class="fa fa-volume-up me-3 fs-4 text-white"></i>
-                                <span class="verification-instruction">Position your face in the square frame for verification.</span>
+                            <div class="p-2 text-white bg-dark text-center" style="font-size: 13px;">
+                                <i class="fa fa-volume-up me-2"></i>
+                                <span class="verification-instruction">Position your face in the frame</span>
                             </div>
                             
                             <!-- Camera and Profile Comparison -->
-                            <div class="bg-white p-3 p-md-4">
-                                <div class="row align-items-center g-3">
+                            <div class="bg-white p-2">
+                                <div class="row align-items-center g-2">
                                     <!-- Profile Image -->
-                                    <div class="col-12 col-md-6 text-center">
-                                        <h6 class="fw-bold mb-3 profile-title">📸 Your Profile Photo</h6>
+                                    <div class="col-6 text-center">
+                                        <h6 class="fw-bold mb-2" style="font-size: 12px;">📸 Profile Photo</h6>
                                         <div class="position-relative d-inline-block">
                                             <img id="profileImageRef" src="" alt="Profile Image" 
-                                                 class="profile-image square-frame shadow-lg border border-3 border-success" 
-                                                 style="width: 200px; height: 200px; object-fit: cover;">
+                                                 class="profile-image square-frame shadow border border-2 border-success" 
+                                                 style="width: 120px; height: 120px; object-fit: cover;">
                                             <div class="position-absolute verification-badge bg-success text-white rounded-circle d-flex align-items-center justify-content-center" 
-                                                 style="top: -10px; right: -10px; width: 35px; height: 35px; font-size: 16px;">
+                                                 style="top: -5px; right: -5px; width: 20px; height: 20px; font-size: 10px;">
                                                 <i class="fa fa-check"></i>
                                             </div>
                                         </div>
-                                        <div class="mt-2">
-                                            <span class="badge bg-success px-3 py-2">✓ Reference Image</span>
+                                        <div class="mt-1">
+                                            <span class="badge bg-success px-2 py-1" style="font-size: 10px;">✓ Reference</span>
                                         </div>
                                     </div>
                                     
                                     <!-- Camera Feed -->
-                                    <div class="col-12 col-md-6 text-center">
-                                        <h6 class="fw-bold mb-3 camera-title">🎥 Live Camera Feed</h6>
+                                    <div class="col-6 text-center">
+                                        <h6 class="fw-bold mb-2" style="font-size: 12px;">🎥 Live Camera</h6>
                                         <div class="position-relative d-inline-block camera-container">
                                             <video id="cameraVideo" autoplay muted playsinline
-                                                   class="camera-video square-frame shadow-lg border border-3 border-primary" 
-                                                   style="width: 200px; height: 200px; object-fit: cover; transform: scaleX(-1);">
+                                                   class="camera-video square-frame shadow border border-2 border-primary" 
+                                                   style="width: 120px; height: 120px; object-fit: cover; transform: scaleX(-1);">
                                             </video>
                                             <canvas id="captureCanvas" style="display: none;"></canvas>
                                             
@@ -119,7 +119,7 @@ class FaceVerification {
                                             
                                             <!-- Verification Status Overlay -->
                                             <div id="verificationStatus" class="position-absolute verification-status rounded-circle d-flex align-items-center justify-content-center" 
-                                                 style="top: -10px; right: -10px; width: 35px; height: 35px; display: none; font-size: 16px;">
+                                                 style="top: -5px; right: -5px; width: 20px; height: 20px; display: none; font-size: 10px;">
                                                 <i class="fa fa-spinner fa-spin text-warning" id="loadingIcon"></i>
                                                 <i class="fa fa-check text-white d-none" id="successIcon"></i>
                                                 <i class="fa fa-times text-white d-none" id="failIcon"></i>
@@ -127,68 +127,66 @@ class FaceVerification {
                                         </div>
                                         
                                         <!-- Camera Status -->
-                                        <div class="mt-2" id="cameraStatus">
-                                            <span class="badge bg-secondary px-3 py-2">📷 Camera Not Started</span>
+                                        <div class="mt-1" id="cameraStatus">
+                                            <span class="badge bg-secondary px-2 py-1" style="font-size: 10px;">📷 Not Started</span>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <!-- Camera Controls -->
-                                <div class="mt-4 text-center">
-                                    <div class="alert alert-info mx-auto camera-instructions" style="max-width: 500px;">
-                                        <i class="fa fa-info-circle me-2"></i>
-                                        <strong>Step 1:</strong> Click "Enable Camera" and allow access when prompted<br>
-                                        <strong>Step 2:</strong> Position your face in the square frame<br>
-                                        <strong>Step 3:</strong> Start live verification
+                                <div class="mt-2 text-center">
+                                    <div class="alert alert-info mx-auto p-2" style="max-width: 350px; font-size: 11px;">
+                                        <i class="fa fa-info-circle me-1"></i>
+                                        <strong>1:</strong> Enable Camera → <strong>2:</strong> Position face → <strong>3:</strong> Start verification
                                     </div>
                                     
-                                    <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center align-items-center">
-                                        <button id="startCameraBtn" class="btn btn-success btn-lg camera-btn" 
+                                    <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                        <button id="startCameraBtn" class="btn btn-success btn-sm camera-btn" 
                                                 onclick="window.faceVerification.requestCameraImmediately()">
-                                            <i class="fa fa-camera me-2"></i>Enable Camera Access
+                                            <i class="fa fa-camera me-1"></i>Enable Camera
                                         </button>
-                                        <button id="captureBtn" class="btn btn-primary btn-lg camera-btn" disabled>
-                                            <i class="fa fa-play me-2"></i>Start Live Verification
+                                        <button id="captureBtn" class="btn btn-primary btn-sm camera-btn" disabled>
+                                            <i class="fa fa-play me-1"></i>Start Verification
                                         </button>
-                                        <button id="recheckBtn" class="btn btn-warning btn-lg camera-btn d-none">
-                                            <i class="fa fa-refresh me-2"></i>Restart
+                                        <button id="recheckBtn" class="btn btn-warning btn-sm camera-btn d-none">
+                                            <i class="fa fa-refresh me-1"></i>Restart
                                         </button>
                                     </div>
                                 </div>
                                 
                                 <!-- Live Verification Status -->
-                                <div class="mt-4" id="liveStatus">
+                                <div class="mt-2" id="liveStatus">
                                     <div class="text-center">
-                                        <div class="row g-2 align-items-center">
-                                            <div class="col-12 col-sm-4">
-                                                <small class="text-muted d-block">Live Similarity Score:</small>
-                                                <strong class="fs-5 text-primary" id="realTimeSimilarity">0%</strong>
+                                        <div class="row g-1 align-items-center" style="font-size: 11px;">
+                                            <div class="col-4">
+                                                <small class="text-muted d-block">Similarity:</small>
+                                                <strong class="text-primary" id="realTimeSimilarity">0%</strong>
                                             </div>
-                                            <div class="col-12 col-sm-4">
-                                                <div class="progress" style="height: 8px;">
+                                            <div class="col-4">
+                                                <div class="progress" style="height: 6px;">
                                                     <div id="liveProgressBar" class="progress-bar bg-secondary" role="progressbar" style="width: 0%"></div>
                                                 </div>
                                             </div>
-                                            <div class="col-12 col-sm-4">
-                                                <small class="text-muted">Required: <strong>80%+</strong></small>
+                                            <div class="col-4">
+                                                <small class="text-muted">Need: <strong>80%+</strong></small>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <!-- Verification Results -->
-                                <div id="verificationResults" class="mt-4 d-none">
-                                    <div class="alert" role="alert">
+                                <div id="verificationResults" class="mt-2 d-none">
+                                    <div class="alert p-2" role="alert">
                                         <div class="d-flex align-items-center">
-                                            <div class="me-3 fs-3">
+                                            <div class="me-2">
                                                 <i class="fa fa-shield"></i>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <h6 class="mb-1 fw-bold" id="resultTitle"></h6>
-                                                <div id="resultMessage"></div>
-                                                <div class="mt-2">
-                                                    <strong>Final Similarity Score: <span id="similarityScore">0</span>%</strong>
-                                                    <div class="progress mt-1" style="height: 8px;">
+                                                <h6 class="mb-1 fw-bold" style="font-size: 12px;" id="resultTitle"></h6>
+                                                <div id="resultMessage" style="font-size: 11px;"></div>
+                                                <div class="mt-1">
+                                                    <strong style="font-size: 11px;">Score: <span id="similarityScore">0</span>%</strong>
+                                                    <div class="progress mt-1" style="height: 6px;">
                                                         <div id="similarityBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
                                                     </div>
                                                 </div>
@@ -198,9 +196,9 @@ class FaceVerification {
                                 </div>
                                 
                                 <!-- Navigation Buttons -->
-                                <div class="text-center mt-4">
-                                    <button id="proceedBtn" class="btn btn-success btn-lg d-none" onclick="proceedToNotice()">
-                                        <i class="fa fa-arrow-right me-2"></i>Proceed to Exam
+                                <div class="text-center mt-2">
+                                    <button id="proceedBtn" class="btn btn-success btn-sm d-none" onclick="proceedToNotice()">
+                                        <i class="fa fa-arrow-right me-1"></i>Proceed to Exam
                                     </button>
                                 </div>
                             </div>
