@@ -74,6 +74,9 @@ class FaceVerification {
                             <h6 class="modal-title fw-bold mb-0" id="faceVerificationModalLabel">
                                 <i class="fa fa-camera me-2"></i>Face Verification
                             </h6>
+                            <button type="button" id="fvCloseBtn" class="btn btn-sm text-white ms-auto" title="Cancel" aria-label="Cancel" style="line-height:1;">
+                                <i class="fa fa-times"></i>
+                            </button>
                         </div>
                         <div class="modal-body p-2">
                             <!-- Instructions -->
@@ -215,6 +218,7 @@ class FaceVerification {
             const startCameraBtn = document.getElementById('startCameraBtn');
             const captureBtn = document.getElementById('captureBtn');
             const recheckBtn = document.getElementById('recheckBtn');
+            const closeBtn = document.getElementById('fvCloseBtn');
 
             if (startCameraBtn) {
                 console.log('✅ Binding events to startCameraBtn');
@@ -255,6 +259,17 @@ class FaceVerification {
             }
             if (recheckBtn) {
                 recheckBtn.addEventListener('click', () => this.recheck());
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    try { sessionStorage.setItem('faceVerificationPending', 'false'); } catch(_) {}
+                    this.stopCamera();
+                    const modalEl = document.getElementById('faceVerificationModal');
+                    const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    bsModal.hide();
+                });
             }
         };
 
