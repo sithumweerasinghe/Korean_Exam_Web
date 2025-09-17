@@ -170,12 +170,284 @@
     .qtile{ height:32px; font-size:11px; }
 }
 
-/* ---- New Top/Bottom Bars (no sidebar layout) ---- */
-.exam-topbar{ background:rgba(232,255,237,0.9); backdrop-filter:saturate(120%) blur(6px); border:1px solid #cde9d5; border-radius:10px; padding:8px 12px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+/* ---- New Top/Bottom Bars (original design) ---- */
+.exam-topbar{ 
+    background:rgba(232,255,237,0.9); 
+    backdrop-filter:saturate(120%) blur(6px); 
+    border:1px solid #cde9d5; 
+    border-radius:10px; 
+    padding:8px 12px; 
+    box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+
 .time-chip{ display:inline-flex; align-items:center; gap:6px; border:1px solid #cbd5dc; border-radius:20px; padding:4px 8px; background:#fff; font-size:12px; }
 .time-chip .label{ background:#2ca347; color:#fff; border-radius:12px; padding:2px 6px; font-weight:600; }
 .time-chip .value{ font-weight:700; color:#2c3e50; }
-.exam-bottombar{ background:rgba(232,255,237,0.9); backdrop-filter:saturate(120%) blur(6px); border:1px solid #cde9d5; border-radius:10px; padding:6px 10px; position:sticky; bottom:0; box-shadow:0 -4px 12px rgba(0,0,0,0.05); }
+
+.exam-bottombar{ 
+    background:rgba(232,255,237,0.95); 
+    backdrop-filter:saturate(120%) blur(8px); 
+    border:1px solid #cde9d5; 
+    border-radius:12px; 
+    padding:8px 12px; 
+    position:sticky; 
+    bottom:10px; 
+    box-shadow:0 -6px 20px rgba(0,0,0,0.08); 
+    margin:0 auto; 
+    max-width:800px; 
+    z-index:100;
+}
+
+/* Exam content with normal spacing */
+#exam-content {
+    background: linear-gradient(135deg, #f8fcf9 0%, #f0f8f2 100%) !important;
+    min-height: calc(100vh - 90px) !important;
+    padding: 0 !important;
+}
+
+/* Desktop specific styling for bottom bar */
+@media (min-width: 769px) {
+    /* Exam content desktop styling */
+    #exam-content {
+        background: linear-gradient(135deg, #f8fcf9 0%, #f0f8f2 100%) !important;
+        min-height: calc(100vh - 90px) !important;
+        padding: 0 !important;
+    }
+    
+    #exam-content .d-flex.flex-column {
+        background: transparent;
+        padding: 15px !important;
+    }
+    
+    /* Question container desktop styling - Compact layout */
+    #question-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        border: 1px solid #e8f5ea;
+        transition: all 0.3s ease;
+        width: 100% !important;
+        max-width: 800px !important;
+        min-height: 300px;
+        max-height: calc(100vh - 180px);
+        height: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: relative;
+        padding-bottom: 3cm;
+    }
+    
+    /* Two-column layout for desktop questions */
+    .question-desktop-layout {
+        display: flex;
+        min-height: 300px;
+        height: auto;
+        gap: 0;
+        overflow: hidden;
+    }
+    
+    /* Left side - Image/Media content */
+    .question-media-side {
+        flex: 0 0 40%;
+        background: #f8fcf9;
+        border-right: 2px solid #e8f5ea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        position: relative;
+        overflow-y: auto;
+        max-height: calc(100vh - 220px);
+    }
+    
+    .question-media-side img {
+        max-width: 100%;
+        max-height: 90%;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .question-media-side audio {
+        width: 100%;
+        border-radius: 8px;
+    }
+    
+    .question-media-side video {
+        max-width: 100%;
+        max-height: 90%;
+        border-radius: 12px;
+    }
+    
+    /* Right side - Question text and answers */
+    .question-content-side {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        max-height: calc(100vh - 220px);
+    }
+    
+    .question-text-area {
+        flex: 1;
+        margin-bottom: 20px;
+    }
+    
+    .question-text-area h5,
+    .question-text-area h6 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+    
+    .question-text-area p {
+        color: #4a5568;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+    
+    /* Answer options styling */
+    .question-answers-area {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .answer-option {
+        background: #ffffff;
+        border: 2px solid #e8f5ea;
+        border-radius: 12px;
+        padding: 15px 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        min-height: 60px;
+    }
+    
+    .answer-option:hover {
+        border-color: #2ca347;
+        background: #f8fcf9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(44,163,71,0.15);
+    }
+    
+    .answer-option.selected {
+        border-color: #2ca347;
+        background: linear-gradient(135deg, #e8ffed 0%, #d4f5dc 100%);
+        box-shadow: 0 4px 15px rgba(44,163,71,0.2);
+    }
+    
+    .answer-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 15px;
+        accent-color: #2ca347;
+    }
+    
+    .answer-option label {
+        flex: 1;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    /* Fallback for single column when no media */
+    .question-single-column {
+        padding: 25px;
+        max-width: 700px;
+        margin: 0 auto;
+        overflow-y: auto;
+        max-height: calc(100vh - 220px);
+    }
+    
+    /* Custom scrollbar styling */
+    #question-container::-webkit-scrollbar,
+    .question-media-side::-webkit-scrollbar,
+    .question-content-side::-webkit-scrollbar,
+    .question-single-column::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #question-container::-webkit-scrollbar-track,
+    .question-media-side::-webkit-scrollbar-track,
+    .question-content-side::-webkit-scrollbar-track,
+    .question-single-column::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    #question-container::-webkit-scrollbar-thumb,
+    .question-media-side::-webkit-scrollbar-thumb,
+    .question-content-side::-webkit-scrollbar-thumb,
+    .question-single-column::-webkit-scrollbar-thumb {
+        background: #2ca347;
+        border-radius: 3px;
+    }
+    
+    #question-container::-webkit-scrollbar-thumb:hover,
+    .question-media-side::-webkit-scrollbar-thumb:hover,
+    .question-content-side::-webkit-scrollbar-thumb:hover,
+    .question-single-column::-webkit-scrollbar-thumb:hover {
+        background: #238a3b;
+    }
+    
+    #question-container:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        transform: translateY(-2px);
+    }
+    
+    .exam-bottombar {
+        background: linear-gradient(135deg, rgba(232,255,237,0.98) 0%, rgba(220,248,230,0.95) 100%);
+        border: 2px solid #b8e6c7;
+        border-radius: 15px;
+        padding: 10px 16px;
+        margin: 10px auto;
+        box-shadow: 0 -8px 25px rgba(44,195,71,0.15), 0 4px 15px rgba(0,0,0,0.1);
+        backdrop-filter: saturate(180%) blur(12px);
+        transition: all 0.3s ease;
+    }
+    
+    .exam-bottombar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 -10px 30px rgba(44,195,71,0.2), 0 6px 20px rgba(0,0,0,0.12);
+    }
+    
+    .exam-bottombar .exam-button {
+        background: linear-gradient(135deg, #2ca347 0%, #238a3b 100%);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(44,163,71,0.25);
+    }
+    
+    .exam-bottombar .exam-button:hover {
+        background: linear-gradient(135deg, #238a3b 0%, #1e7530 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(44,163,71,0.35);
+    }
+    
+    .exam-bottombar .exam-button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(44,163,71,0.3);
+    }
+    
+    #question-counter {
+        background: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 1px solid #b8e6c7;
+        color: #2c3e50;
+        font-weight: 700;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+}
 
 /* Slightly tighter top bar */
 .exam-topbar{ padding:6px 10px; }
@@ -193,8 +465,43 @@
 .submit-mobile{ display:none; }
 
 @media (max-width: 768px){
+    /* Mobile layout - disable desktop layouts */
+    .question-desktop-layout {
+        display: block !important;
+    }
+    
+    .question-media-side,
+    .question-content-side {
+        flex: none !important;
+        width: 100% !important;
+        padding: 15px !important;
+        border: none !important;
+    }
+    
+    .question-media-side {
+        text-align: center;
+        background: transparent !important;
+        margin-bottom: 15px;
+    }
+    
+    .question-media-side img {
+        max-width: 100% !important;
+        max-height: 250px !important;
+    }
+    
+    .answer-option {
+        padding: 12px 15px !important;
+        min-height: auto !important;
+        font-size: 14px;
+    }
+    
+    /* Ensure mobile quiz-card layout works */
+    .quiz-card {
+        padding: 15px !important;
+    }
+    
     /* Make question card fill width and reduce chrome */
-    #question-container{ width:100% !important; max-height: calc(100vh - 170px) !important; }
+    #question-container{ width:100% !important; }
     /* Ensure wrapper fills width */
     #quiz-container, #quiz-container .question-wrapper{ width:100% !important; max-width:100% !important; }
     .exam-topbar, .exam-bottombar{ padding:6px 8px; border-radius:8px; }
@@ -235,6 +542,67 @@
     #question-container canvas,
     #question-container iframe{ max-width:100% !important; height:auto; }
     #question-container audio{ width:100%; }
+    
+    /* Enhanced responsive design for question container - maintain desktop layout */
+    .question-desktop-layout {
+        flex-direction: row !important;
+        gap: 15px;
+        padding: 15px;
+        width: auto;
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .question-media-side {
+        width: 40% !important;
+        max-width: 40% !important;
+        flex-shrink: 0;
+        padding-right: 10px;
+    }
+    
+    .question-content-side {
+        width: 60% !important;
+        max-width: 60% !important;
+        flex: 1;
+        padding-left: 10px;
+    }
+    
+    .question-media-side img {
+        width: 100% !important;
+        height: auto !important;
+        border-radius: 8px;
+        object-fit: contain;
+    }
+    
+    /* Enhanced clickable image design for mobile */
+    .clickable-image {
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .clickable-image:hover {
+        border-color: #2ca347;
+        box-shadow: 0 6px 20px rgba(44,163,71,0.2);
+    }
+    
+    /* Answer options responsive design */
+    .answer-option {
+        margin-bottom: 12px !important;
+        padding: 15px !important;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        transition: all 0.2s ease;
+    }
+    
+    .answer-option.selected {
+        border-color: #2ca347;
+        background: rgba(44,163,71,0.1);
+    }
+    
+    .answer-option:hover {
+        border-color: #2ca347;
+        background: rgba(44,163,71,0.05);
+    }
 }
 
 @media (max-width: 420px){
@@ -255,6 +623,82 @@
     #question-container li,
     #question-container label,
     #question-container .form-check-label{ font-size:0.9rem; }
+    
+    /* Enhanced mobile touch targets */
+    .clickable-image {
+        min-height: 60px;
+        min-width: 60px;
+        padding: 5px;
+        border-radius: 8px;
+    }
+    
+    .answer-option {
+        min-height: 55px !important;
+        padding: 18px 15px !important;
+        margin-bottom: 15px !important;
+        font-size: 0.95rem;
+    }
+    
+    .answer-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+    }
+    
+    .answer-option label {
+        cursor: pointer;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    /* Ensure image answers have proper touch targets */
+    .answer-option img {
+        min-width: 80px;
+        min-height: 60px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+    
+    /* Better spacing for question layout - maintain desktop style */
+    .question-desktop-layout {
+        flex-direction: row !important;
+        gap: 10px !important;
+        padding: 12px;
+        width: auto;
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .question-media-side {
+        width: 35% !important;
+        max-width: 35% !important;
+        flex-shrink: 0;
+        padding-right: 8px;
+    }
+    
+    .question-content-side {
+        width: 65% !important;
+        max-width: 65% !important;
+        flex: 1;
+        padding-left: 8px;
+    }
+    
+    .question-media-side img {
+        width: 100% !important;
+        height: auto !important;
+        border-radius: 6px;
+        object-fit: contain;
+    }
+    
+    .question-text-area {
+        margin-bottom: 20px;
+    }
+    
+    .question-answers-area {
+        margin-top: 20px;
+    }
 }
 
     /* Keep Map visible in docked topbar, hide only its text label */
@@ -266,7 +710,7 @@
 
 @media (max-width: 767px) and (orientation: landscape){
     .btn-label{ display:none; }
-    #question-container{ height: calc(100vh - 200px) !important; }
+    /* #question-container{ height: calc(100vh - 200px) !important; } */
     .exam-topbar{ padding:4px 8px; }
     .exam-bottombar{ padding:4px 8px; }
     .time-chip{ gap:4px; font-size:10px; }
@@ -287,6 +731,43 @@
     .qtile .dot{ width:6px; height:6px; right:4px; top:4px; }
     /* Hide legend to save space */
     .qm-legend{ display:none; }
+    
+    /* Maintain two-column layout even on tiny screens */
+    .question-desktop-layout {
+        flex-direction: row !important;
+        gap: 6px !important;
+        padding: 8px;
+        width: auto;
+    }
+    
+    .question-media-side {
+        width: 30% !important;
+        max-width: 30% !important;
+        padding-right: 4px;
+    }
+    
+    .question-content-side {
+        width: 70% !important;
+        max-width: 70% !important;
+        padding-left: 4px;
+    }
+    
+    .question-media-side img {
+        border-radius: 4px;
+    }
+    
+    .answer-option {
+        padding: 12px 8px !important;
+        margin-bottom: 8px !important;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+    
+    .answer-option input[type="radio"] {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
 }
 
 @media (max-width: 340px){
@@ -294,4 +775,351 @@
     .qtile{ height:28px; font-size:10px; }
     .mob-nav-btn{ width:32px; height:32px; }
     .mob-nav-btn i{ font-size:13px; }
+    
+    /* Ultra-compact two-column layout */
+    .question-desktop-layout {
+        flex-direction: row !important;
+        gap: 4px !important;
+        padding: 6px;
+        width: auto;
+    }
+    
+    .question-media-side {
+        width: 28% !important;
+        max-width: 28% !important;
+        padding-right: 3px;
+    }
+    
+    .question-content-side {
+        width: 72% !important;
+        max-width: 72% !important;
+        padding-left: 3px;
+    }
+    
+    .answer-option {
+        padding: 10px 6px !important;
+        margin-bottom: 6px !important;
+        font-size: 0.8rem;
+        border-radius: 4px;
+    }
+    
+    .answer-option input[type="radio"] {
+        width: 14px;
+        height: 14px;
+        margin-right: 6px;
+    }
+}
+
+/* Tablet responsive design (481px to 1024px) */
+@media (min-width: 481px) and (max-width: 1024px) {
+    /* Question container optimizations for tablets */
+    #question-container {
+        max-width: 90vw;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .question-desktop-layout {
+        flex-direction: row !important;
+        gap: 20px;
+        padding: 18px;
+        width: auto;
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .question-media-side {
+        width: 40% !important;
+        max-width: 40% !important;
+        flex-shrink: 0;
+        padding-right: 12px;
+    }
+    
+    .question-content-side {
+        width: 60% !important;
+        max-width: 60% !important;
+        flex: 1;
+        padding-left: 12px;
+    }
+    
+    /* Better touch targets for tablets */
+    .clickable-image {
+        padding: 8px;
+        border-radius: 10px;
+    }
+    
+    .answer-option {
+        padding: 20px !important;
+        margin-bottom: 15px !important;
+        font-size: 1rem;
+        border-radius: 12px;
+    }
+    
+    .answer-option input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 15px;
+    }
+    
+    /* Image modal controls for tablets */
+    .zoom-btn, .close-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+/* Image Modal Styles */
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+}
+
+.image-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.image-modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.image-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #2ca347 0%, #238a3b 100%);
+    color: white;
+}
+
+.image-modal-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.image-modal-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.zoom-btn, .close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zoom-btn:hover, .close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.close-btn {
+    background: rgba(231, 76, 60, 0.8);
+}
+
+.close-btn:hover {
+    background: rgba(231, 76, 60, 1);
+}
+
+.image-modal-body {
+    padding: 0;
+    max-height: calc(90vh - 70px);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+}
+
+.image-modal-body img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+    cursor: move;
+    user-select: none;
+}
+
+/* Custom scrollbar for modal body */
+.image-modal-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.image-modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.image-modal-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.image-modal-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Clickable image cursor */
+.clickable-image {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clickable-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile responsive for image modal */
+@media (max-width: 768px) {
+    .image-modal-content {
+        max-width: 98vw;
+        max-height: 98vh;
+        margin: 10px;
+        border-radius: 8px;
+    }
+    
+    .image-modal-header {
+        padding: 10px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .image-modal-title {
+        font-size: 14px;
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .image-modal-controls {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .zoom-btn, .close-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .zoom-btn i, .close-btn i {
+        font-size: 14px;
+    }
+    
+    .image-modal-body {
+        max-height: calc(98vh - 70px);
+        padding: 10px;
+    }
+    
+    .image-modal-body img {
+        border-radius: 4px;
+        max-width: calc(100vw - 40px);
+        max-height: calc(98vh - 90px);
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    .image-modal-content {
+        max-width: 100vw;
+        max-height: 100vh;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .image-modal-header {
+        padding: 8px 10px;
+    }
+    
+    .image-modal-title {
+        font-size: 13px;
+    }
+    
+    .zoom-btn, .close-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+    }
+    
+    .image-modal-controls {
+        gap: 4px;
+    }
+    
+    .image-modal-body {
+        max-height: calc(100vh - 60px);
+        padding: 5px;
+    }
+    
+    .image-modal-body img {
+        max-width: calc(100vw - 20px);
+        max-height: calc(100vh - 80px);
+    }
+}
+
+/* Portrait orientation specific adjustments */
+@media (max-width: 768px) and (orientation: portrait) {
+    .image-modal-body {
+        padding: 15px 10px;
+    }
+    
+    .image-modal-body img {
+        max-height: calc(100vh - 120px);
+    }
+}
+
+/* Landscape orientation for mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .image-modal-content {
+        max-height: 95vh;
+    }
+    
+    .image-modal-body {
+        max-height: calc(95vh - 60px);
+    }
+    
+    .image-modal-body img {
+        max-height: calc(95vh - 80px);
+    }
 }

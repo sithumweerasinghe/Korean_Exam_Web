@@ -529,10 +529,10 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                         </div>
                     </div>
 
-                    <div id="exam-content" class="col-12  d-none bg-secondary-subtle overflow-hidden" style="height: calc(100vh - 155px);">
+                    <div id="exam-content" class="col-12 d-none overflow-hidden" style="height: calc(100vh - 90px); background: linear-gradient(135deg, #f8fcf9 0%, #f0f8f2 100%);">
                         <!-- Paper Start -->
-                        <div class="row ">
-                            <div class="d-flex flex-column align-items-center" style="width: 100%">
+                        <div class="row">
+                            <div class="d-flex flex-column align-items-center" style="width: 100%; padding: 10px;">
                                 <!-- Top Status Bar -->
                                 <div class="exam-topbar d-flex align-items-center justify-content-between w-100 mb-2">
                                     <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -553,7 +553,12 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                                             <button type="button" class="mob-nav-btn mob-prev" aria-label="Previous question" onclick="(function(){var b=document.getElementById('prev-btn'); if(b && b.style.display!=='none' && !b.disabled){ b.click(); }})()">
                                                 <i class="fa fa-chevron-left"></i>
                                             </button>
-                                            <div id="question-container" class="bg-white card" style="width:100%; max-width:700px; max-height: calc(100vh - 210px); overflow-y: auto; border: 1px solid #ddd;"></div>
+                                            <div id="question-container" class="bg-white card" style="width:100%; max-width:1200px; min-height: calc(100vh - 240px); overflow-y: auto; border: 1px solid #ddd;">
+                                                <!-- Dynamic content will be inserted here with either desktop or mobile layout -->
+                                                <div id="question-content-dynamic">
+                                                    <!-- This will be populated by JavaScript with appropriate layout -->
+                                                </div>
+                                            </div>
                                             <button type="button" class="mob-nav-btn mob-next" aria-label="Next question" onclick="(function(){var b=document.getElementById('next-btn'); if(b && !b.disabled){ b.click(); }})()">
                                                 <i class="fa fa-chevron-right"></i>
                                             </button>
@@ -622,8 +627,8 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                     </div>
                 </section>
             </main>
-            <!-- Footer -->
-            <div class="py-3 " style="background-color: #e8ffed;  height: 35px; bottom: 0;">
+            <!-- Footer (hidden on desktop for exam page) -->
+            <div class="py-3 d-md-none" style="background-color: #e8ffed; height: 35px; bottom: 0;">
             </div>
         </div>
     </div>
@@ -1830,6 +1835,33 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
 
         });
     </script>
+
+    <!-- Image Modal for Zoom View -->
+    <div id="imageModal" class="image-modal" style="display: none;">
+        <div class="image-modal-overlay" onclick="closeImageModal()"></div>
+        <div class="image-modal-content">
+            <div class="image-modal-header">
+                <span class="image-modal-title">Question Image</span>
+                <div class="image-modal-controls">
+                    <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">
+                        <i class="fa fa-search-plus"></i>
+                    </button>
+                    <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">
+                        <i class="fa fa-search-minus"></i>
+                    </button>
+                    <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">
+                        <i class="fa fa-refresh"></i>
+                    </button>
+                    <button class="close-btn" onclick="closeImageModal()" title="Close">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="image-modal-body">
+                <img id="modalImage" src="" alt="Question Image" />
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
