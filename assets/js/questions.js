@@ -1,3 +1,25 @@
+/*
+ * TESTING MODE: ALL TIMER FUNCTIONALITY AND NAVIGATION RESTRICTIONS DISABLED
+ * ============================================================================
+ * The following timer functions have been commented out for testing purposes:
+ * - setupTimer() - Individual question timers
+ * - startSectionTimers() - Reading/Listening section timers
+ * - startListeningTimer() - Listening section timer
+ * - stopTimers() - Timer cleanup function
+ * - showListeningInstructions() instruction timer
+ * - Time tracking in endQuiz()
+ * 
+ * The following navigation restrictions have been disabled:
+ * - nextQuestion() reading completion check
+ * - Question map listening question locks
+ * - Category navigation access restrictions
+ * - "Complete reading before listening" enforcement
+ * 
+ * This allows testing the exam functionality without time constraints
+ * and with free navigation between all questions.
+ * To re-enable timers and restrictions, uncomment the marked sections.
+ */
+
 let questions = [];
 let currentQuestionIndex = 0;
 let timer;
@@ -91,11 +113,11 @@ let readingTimer;
 let listeningTimer;
 let readingTimeLeft;
 let listeningTimeLeft;
-
-let paperId = ''
-let examId = ''
-
-let readingQuestions;
+// DISABLED FOR TESTING - Time tracking variables set to 0
+let readingTimeSpent = 0; // Was tracking reading time
+let listeningTimeSpent = 0; // Was tracking listening time  
+let totalTimeSpent = 0; // Was tracking total time
+let examStartTime = Date.now(); // Keep for compatibility but not used
 
 let isListeningStarted = false;
 let isTransitioningToListening = false;
@@ -146,7 +168,8 @@ function loadQuestions(questions_array, isSample, isExam, paper_id, exam_id) {
     console.log('Question displayed');
 
     console.log('Starting timers...');
-    startSectionTimers();
+    // DISABLED FOR TESTING - Section timers start commented out
+    // startSectionTimers();
     
     console.log('Initializing question buttons...');
     initializeQuestionButtons();
@@ -359,7 +382,8 @@ function displayQuestion(index) {
   }
 
   if (question.question_category === "listening") {
-    startListeningTimer();
+    // DISABLED FOR TESTING - Listening timer start commented out
+    // startListeningTimer();
     updateMobileNavState();
   }
 
@@ -401,6 +425,24 @@ function displayQuestion(index) {
   }
 
   document.getElementById("prev-btn").style.display = index > 0 ? "inline-block" : "none";
+  
+  // Check if this is the last question (excluding sample questions)
+  const nonSampleQuestions = questions.filter(q => !q.questionIsSample);
+  const currentNonSampleIndex = questions.slice(0, index + 1).filter(q => !q.questionIsSample).length;
+  const isLastQuestion = currentNonSampleIndex >= nonSampleQuestions.length;
+  
+  // Show/hide next button and submit button based on last question
+  const nextBtn = document.getElementById("next-btn");
+  const submitBtns = document.querySelectorAll('.submit-answers-btn, [onclick*="submitAnswers"]');
+  
+  if (isLastQuestion) {
+    if (nextBtn) nextBtn.style.display = "none";
+    submitBtns.forEach(btn => btn.style.display = "inline-block");
+  } else {
+    if (nextBtn) nextBtn.style.display = "inline-block";
+    submitBtns.forEach(btn => btn.style.display = "none");
+  }
+  
   updateMobileNavState();
 
   // Update question counter (exclude samples)
@@ -414,9 +456,11 @@ function displayQuestion(index) {
   });
 
   if (question.question_category === "listening") {
-    setupTimer(Number(question.timeLimit));
+    // DISABLED FOR TESTING - Individual question timer commented out
+    // setupTimer(Number(question.timeLimit));
   } else if (timer) {
-    clearInterval(timer); // Stop any running timers for non-listening questions
+    // DISABLED FOR TESTING - Timer clearing commented out
+    // clearInterval(timer); // Stop any running timers for non-listening questions
   }
   
   // Setup audio controls for desktop layout
@@ -520,6 +564,8 @@ function renderCategory(category, questions, startNumber) {
     clickDiv.addEventListener("click", () => {
       const questionIndex = questions.indexOf(question);
       if (questionIndex !== -1) {
+        // DISABLED FOR TESTING - Access restrictions commented out
+        /*
         if (isListeningStarted) {
           showToast("warning", "Questions cannot be accessed after starting Listening.");
           return;
@@ -539,6 +585,11 @@ function renderCategory(category, questions, startNumber) {
           currentQuestionIndex = questionIndex;
           displayQuestion(questionIndex);
         }
+        */
+        
+        // TESTING MODE - Allow navigation to any question
+        currentQuestionIndex = questionIndex;
+        displayQuestion(questionIndex);
       }
     });
   });
@@ -556,6 +607,8 @@ function subtractTime(readingTimeLeft, questionTimeLimit) {
 }
 
 function startSectionTimers() {
+  // DISABLED FOR TESTING - Section timer functionality commented out
+  /*
   // Clear previous timers if they exist
   if (readingTimer) clearInterval(readingTimer);
   if (listeningTimer) clearInterval(listeningTimer);
@@ -566,6 +619,7 @@ function startSectionTimers() {
     let totalSeconds = minutes * 60 + seconds;
     if (totalSeconds > 0) {
       readingTimeLeft = subtractTime(readingTimeLeft, 1);
+      readingTimeSpent++; // Track time spent
       $("#reading-remaining").html(readingTimeLeft);
     } else {
       clearInterval(readingTimer);
@@ -573,9 +627,12 @@ function startSectionTimers() {
       showListeningInstructions()
     }
   }, 1000);
+  */
 }
 
 function startListeningTimer() {
+  // DISABLED FOR TESTING - Listening timer functionality commented out
+  /*
   if (!isListeningStarted) {
     isListeningStarted = true;
     // $("#next-btn").prop("disabled", true);
@@ -592,15 +649,19 @@ function startListeningTimer() {
       let totalSeconds = minutes * 60 + seconds;
       if (totalSeconds > 0) {
         listeningTimeLeft = subtractTime(listeningTimeLeft, 1);
+        listeningTimeSpent++; // Track time spent
         $("#listening-remaining").html(listeningTimeLeft);
       } else {
         clearInterval(listeningTimer);
       }
     }, 1000);
   }
+  */
 }
 
 function setupTimer(duration) {
+  // DISABLED FOR TESTING - Timer functionality commented out
+  /*
   timeLeft = duration;
   const timerDisplay = document.getElementById("listening-timer-single");
   timerDisplay.innerHTML = formatTime(timeLeft);
@@ -615,6 +676,7 @@ function setupTimer(duration) {
       nextQuestion();
     }
   }, 1000);
+  */
 }
 
 function formatTime(seconds) {
@@ -684,6 +746,8 @@ function saveAnswer() {
 function nextQuestion() {
   saveAnswer();
 
+  // DISABLED FOR TESTING - Reading section completion check commented out
+  /*
   if (
     !isTransitioningToListening &&
     currentQuestionIndex === readingQuestions.length - 1
@@ -691,7 +755,7 @@ function nextQuestion() {
     showToast("info", "You must complete the reading section before visiting the listening section.")
     return;
   }
-
+  */
 
   if (currentQuestionIndex < questions.length - 1) {
     currentQuestionIndex++;
@@ -712,7 +776,8 @@ function showListeningInstructions() {
   isTransitioningToListening = true;
 
   // Pause timers and buttons
-  stopTimers();
+  // DISABLED FOR TESTING - Timer stopping commented out
+  // stopTimers();
   document.getElementById("next-btn").disabled = true;
   document.getElementById("prev-btn").disabled = true;
 
@@ -721,10 +786,12 @@ function showListeningInstructions() {
     <div class="card quiz-card p-5">
       <h5>Instructions for Listening Section</h5>
       <p>Please read the instructions carefully before proceeding to the listening section.</p>
-      <div id="listening-instruction-timer" style="font-size: 1.5rem; font-weight: bold; color: #2ca347;">01:00</div>
+      <div id="listening-instruction-timer" style="font-size: 1.5rem; font-weight: bold; color: #2ca347;">Ready to Start</div>
     </div>
   `;
 
+  // DISABLED FOR TESTING - Instruction timer commented out
+  /*
   let instructionTime = 60; // 1 minute
   const instructionTimerDisplay = document.getElementById(
     "listening-instruction-timer"
@@ -745,71 +812,279 @@ function showListeningInstructions() {
       displayQuestion(currentQuestionIndex);
 
       // Start Listening timer
-      startListeningTimer();
+      // DISABLED FOR TESTING - Listening timer start commented out
+      // startListeningTimer();
     }
   }, 1000);
+  */
+  
+  // DISABLED FOR TESTING - Auto-proceed to listening section immediately
+  setTimeout(() => {
+    isTransitioningToListening = false;
+    // Re-enable buttons and display the first listening question
+    document.getElementById("next-btn").disabled = false;
+    document.getElementById("prev-btn").disabled = true; // Disable previous for first listening question
+    currentQuestionIndex = readingQuestions.length; // First listening question index
+    displayQuestion(currentQuestionIndex);
+  }, 1000); // Small delay for user experience
 }
 
 
 function calculateResults() {
   let totalMarks = 0;
   let correctAnswers = 0;
+  let wrongAnswers = 0;
+  let unanswered = 0;
+  let totalPossibleMarks = 0;
+  let readingCorrect = 0;
+  let listeningCorrect = 0;
+  let readingTotal = 0;
+  let listeningTotal = 0;
 
-  answers
-    .forEach((selectedIndex, index) => {
-      if (selectedIndex !== null) {
-        const question = questions[index];
-        const options = JSON.parse(question.options)
+  answers.forEach((selectedIndex, index) => {
+    const question = questions[index];
+    if (question.questionIsSample) return; // Skip sample questions
+    
+    // FIX: question.options is already an object, no need to parse
+    const options = question.options;
+    totalPossibleMarks += parseInt(question.marks);
+    
+    // Count by category
+    if (question.question_category === 'Reading') {
+      readingTotal++;
+    } else if (question.question_category === 'Listening') {
+      listeningTotal++;
+    }
 
-        if (options[selectedIndex] && options[selectedIndex].correctAnswer === 1) {
-          totalMarks += question.marks;
-          correctAnswers++;
+    if (selectedIndex !== null) {
+      if (options[selectedIndex] && options[selectedIndex].correctAnswer === 1) {
+        totalMarks += parseInt(question.marks);
+        correctAnswers++;
+        
+        // Count correct by category
+        if (question.question_category === 'Reading') {
+          readingCorrect++;
+        } else if (question.question_category === 'Listening') {
+          listeningCorrect++;
         }
+      } else {
+        wrongAnswers++;
       }
-    });
+    } else {
+      unanswered++;
+    }
+  });
 
-  return { totalMarks, correctAnswers };
+  const percentage = totalPossibleMarks > 0 ? ((totalMarks / totalPossibleMarks) * 100).toFixed(1) : 0;
+  
+  return { 
+    totalMarks, 
+    correctAnswers, 
+    wrongAnswers, 
+    unanswered, 
+    totalPossibleMarks, 
+    percentage,
+    readingCorrect,
+    listeningCorrect,
+    readingTotal,
+    listeningTotal
+  };
 }
 
 function stopTimers() {
+  // DISABLED FOR TESTING - Timer stopping functionality commented out
+  /*
   if (readingTimer) clearInterval(readingTimer);
   if (listeningTimer) clearInterval(listeningTimer);
   if (timer) clearInterval(timer);
+  */
 }
 
 function endQuiz() {
   $("#next-btn").addClass('d-none');
   $("#prev-btn").addClass("d-none");
-  stopTimers();
+  // DISABLED FOR TESTING - Timer stopping commented out
+  // stopTimers();
   saveAnswer();
-  const { totalMarks, correctAnswers } = calculateResults();
+  
+  // Calculate total time spent
+  totalTimeSpent = Math.floor((Date.now() - examStartTime) / 1000);
+  
+  const { 
+    totalMarks, 
+    correctAnswers, 
+    wrongAnswers, 
+    unanswered, 
+    totalPossibleMarks, 
+    percentage,
+    readingCorrect,
+    listeningCorrect,
+    readingTotal,
+    listeningTotal
+  } = calculateResults();
 
-  // Open a modal to display results
-  const resultModalContent = `
-    <div class=" position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50">
-        <div class="modal-content text-center rounded shadow w-50 d-flex justify-content-center align-items-center" style="background-image: url('assets/images/section-bg-11.png'); background-size: cover; background-position: center; background-repeat: no-repeat; height: 50%; border: 1px solid rgba(255, 255, 255, 0.3);">
-            <h3 style="color:#2ca347">Quiz Finished!</h3>
-            <h5>Total Marks: <strong>${totalMarks}</strong></h5>
-            <h5>Correct Answers: <strong>${correctAnswers}/${questions.filter((question) => !question.questionIsSample).length}</strong></h5>
-            <button type="button" class="exam-button py-3 mb-3 px-4 mt-3" id="finishQuizBtn">Go to Answers</button>
+  // Get cutoff mark (assuming 60% pass rate if not specified)
+  const cutoffPercentage = 60;
+  const isPassed = parseFloat(percentage) >= cutoffPercentage;
+  const passStatus = isPassed ? 'PASSED' : 'FAILED';
+  const passColor = isPassed ? '#28a745' : '#dc3545';
+  const totalQuestions = questions.filter((question) => !question.questionIsSample).length;
+
+  // Format time display
+  const formatTimeDisplay = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
+  };
+
+  // Store exam results in sessionStorage for later use
+  const examResults = {
+    totalMarks,
+    percentage,
+    isPassed,
+    correctAnswers,
+    wrongAnswers,
+    unanswered,
+    totalQuestions,
+    totalPossibleMarks,
+    readingCorrect,
+    listeningCorrect,
+    readingTotal,
+    listeningTotal,
+    totalTimeSpent,
+    readingTimeSpent,
+    listeningTimeSpent
+  };
+  sessionStorage.setItem('examResults', JSON.stringify(examResults));
+
+  // Display results in the same window frame instead of modal
+  const questionContainer = document.getElementById("question-container");
+  questionContainer.innerHTML = `
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+          <div class="card shadow-lg border-0" style="border-radius: 15px;">
+            <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #28a745, #20c997); border-radius: 15px 15px 0 0;">
+              <h2 class="text-white mb-0">
+                <i class="fa fa-trophy"></i> Exam Completed!
+              </h2>
+            </div>
+            
+            <div class="card-body p-5">
+              <div class="text-center mb-4">
+                <div class="badge badge-lg p-3 mb-3" style="background-color: ${passColor}; color: white; font-size: 1.5em; border-radius: 50px;">
+                  ${passStatus}
+                </div>
+              </div>
+              
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <div class="card border-primary mb-3" style="border-radius: 10px;">
+                    <div class="card-body text-center">
+                      <h2 style="color: #2ca347; margin: 0; font-size: 3rem;">${totalMarks}</h2>
+                      <h5 class="text-muted">Total Score</h5>
+                      <small class="text-muted">out of ${totalPossibleMarks}</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card border-info mb-3" style="border-radius: 10px;">
+                    <div class="card-body text-center">
+                      <h2 style="color: #17a2b8; margin: 0; font-size: 3rem;">${percentage}%</h2>
+                      <h5 class="text-muted">Percentage</h5>
+                      <small class="text-muted">Pass mark: ${cutoffPercentage}%</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <div class="col-md-4">
+                  <div class="text-center p-3" style="background: #d4edda; border-radius: 10px;">
+                    <i class="fa fa-check-circle fa-3x text-success mb-2"></i>
+                    <h3 class="text-success">${correctAnswers}</h3>
+                    <h6 class="text-muted">Correct</h6>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="text-center p-3" style="background: #f8d7da; border-radius: 10px;">
+                    <i class="fa fa-times-circle fa-3x text-danger mb-2"></i>
+                    <h3 class="text-danger">${wrongAnswers}</h3>
+                    <h6 class="text-muted">Wrong</h6>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="text-center p-3" style="background: #fff3cd; border-radius: 10px;">
+                    <i class="fa fa-question-circle fa-3x text-warning mb-2"></i>
+                    <h3 class="text-warning">${unanswered}</h3>
+                    <h6 class="text-muted">Unanswered</h6>
+                  </div>
+                </div>
+              </div>
+
+              ${readingTotal > 0 || listeningTotal > 0 ? `
+              <div class="row mb-4">
+                <div class="col-12">
+                  <h5 class="text-center mb-3">
+                    <i class="fa fa-chart-bar"></i> Section Performance
+                  </h5>
+                  <div class="row">
+                    ${readingTotal > 0 ? `
+                    <div class="col-md-6">
+                      <div class="text-center p-3" style="background: #e3f2fd; border-radius: 10px;">
+                        <i class="fa fa-book fa-2x text-primary mb-2"></i>
+                        <h5>Reading</h5>
+                        <h4 class="text-success">${readingCorrect}/${readingTotal}</h4>
+                        <small class="text-muted">${readingTotal > 0 ? ((readingCorrect/readingTotal)*100).toFixed(1) : 0}% accuracy</small>
+                        ${readingTimeSpent > 0 ? `<br><small class="text-info">Time: ${formatTimeDisplay(readingTimeSpent)}</small>` : ''}
+                      </div>
+                    </div>
+                    ` : ''}
+                    ${listeningTotal > 0 ? `
+                    <div class="col-md-6">
+                      <div class="text-center p-3" style="background: #e0f2f1; border-radius: 10px;">
+                        <i class="fa fa-headphones fa-2x text-info mb-2"></i>
+                        <h5>Listening</h5>
+                        <h4 class="text-success">${listeningCorrect}/${listeningTotal}</h4>
+                        <small class="text-muted">${listeningTotal > 0 ? ((listeningCorrect/listeningTotal)*100).toFixed(1) : 0}% accuracy</small>
+                        ${listeningTimeSpent > 0 ? `<br><small class="text-info">Time: ${formatTimeDisplay(listeningTimeSpent)}</small>` : ''}
+                      </div>
+                    </div>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+              ` : ''}
+
+              <div class="text-center">
+                <div class="alert alert-info mb-4" style="border-radius: 10px;">
+                  <i class="fa fa-info-circle"></i>
+                  <strong>Next Step:</strong> You will now proceed to the Color Blind Test to complete your assessment.
+                </div>
+                
+                <button type="button" class="btn btn-lg px-5 py-3 me-3" id="proceedToColorBlindBtn" 
+                        style="background: linear-gradient(135deg, #28a745, #20c997); border: none; color: white; font-weight: bold; border-radius: 50px;">
+                  <i class="fa fa-eye me-2"></i>Continue to Color Blind Test
+                </button>
+                
+                <button type="button" class="btn btn-outline-secondary btn-lg px-5 py-3" id="viewAnswersBtn" 
+                        style="border-radius: 50px;">
+                  <i class="fa fa-list-alt me-2"></i>View Detailed Answers
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
   `;
 
-  // Append the modal to the body
-  $('body').append(resultModalContent);
-
-  // Show the modal
-  $('#resultModal').modal('show');
-
-  // Handle the Finish button click event
-  $('#finishQuizBtn').on('click', function () {
-    $('#resultModal').modal('hide');
+  // Handle button clicks
+  document.getElementById('proceedToColorBlindBtn').addEventListener('click', function() {
+    // Save exam answers first
     const finalAnswers = answers.filter(answer => answer !== "sample").map(answer => answer === null ? 0 : answer + 1);
-
-    if (isSamplePaper) {
-      window.location = "answers?paper_id=" + paperId + "&answers=" + finalAnswers;
-    } else {
+    
+    if (!isSamplePaper) {
       const csrf_token = $('#csrf_token').val().trim();
       const examDetails = isExamPaper ? `&exam_id=${examId}` : '';
 
@@ -821,16 +1096,30 @@ function endQuiz() {
       })
         .then(response => response.json())
         .then(data => {
-          console.log(data);
           if (data.success) {
-            if (isExamPaper) {
-              window.location = "answers?paper_id=" + paperId + "&answers=" + finalAnswers + "&exam_id=" + examId;
-            } else {
-              window.location = "answers?paper_id=" + paperId + "&answers=" + finalAnswers;
-            }
+            // Redirect to color blind test
+            window.location.href = 'color-blind-test.php?exam_completed=true&paper_id=' + paperId + 
+                                 (isExamPaper ? '&exam_id=' + examId : '');
           }
         })
         .catch(error => console.error('Error:', error));
+    } else {
+      // For sample papers, go directly to color blind test
+      window.location.href = 'color-blind-test.php?exam_completed=true&paper_id=' + paperId + '&sample=true';
+    }
+  });
+
+  document.getElementById('viewAnswersBtn').addEventListener('click', function() {
+    const finalAnswers = answers.filter(answer => answer !== "sample").map(answer => answer === null ? 0 : answer + 1);
+    
+    if (isSamplePaper) {
+      window.location = "answers?paper_id=" + paperId + "&answers=" + finalAnswers + "&score=" + totalMarks + "&percentage=" + percentage + "&status=" + (isPassed ? 'passed' : 'failed') + "&time_spent=" + totalTimeSpent + "&reading_time=" + readingTimeSpent + "&listening_time=" + listeningTimeSpent;
+    } else {
+      if (isExamPaper) {
+        window.location = "answers?paper_id=" + paperId + "&answers=" + finalAnswers + "&exam_id=" + examId + "&score=" + totalMarks + "&percentage=" + percentage + "&status=" + (isPassed ? 'passed' : 'failed') + "&time_spent=" + totalTimeSpent + "&reading_time=" + readingTimeSpent + "&listening_time=" + listeningTimeSpent;
+      } else {
+        window.location = "answers?paper_id=" + paperId + "&answers=" + finalAnswers + "&score=" + totalMarks + "&percentage=" + percentage + "&status=" + (isPassed ? 'passed' : 'failed') + "&time_spent=" + totalTimeSpent + "&reading_time=" + readingTimeSpent + "&listening_time" + listeningTimeSpent;
+      }
     }
   });
 }
@@ -941,6 +1230,8 @@ function renderQuestionMap(openIfClosed){
     if (isAnswered) tile.classList.add('answered');
     if (isCurrent) tile.classList.add('current');
 
+    // DISABLED FOR TESTING - Listening question restrictions commented out
+    /*
     if (isListeningCategory && !isListeningStarted) {
       tile.classList.add('locked');
     } else {
@@ -952,6 +1243,15 @@ function renderQuestionMap(openIfClosed){
         closeQuestionMap();
       });
     }
+    */
+    
+    // TESTING MODE - Allow navigation to any question
+    tile.addEventListener('click', () => {
+      if (isTransitioningToListening) return;
+      currentQuestionIndex = idx;
+      displayQuestion(currentQuestionIndex);
+      closeQuestionMap();
+    });
 
     if (isAnswered){
       const dot = document.createElement('span');
