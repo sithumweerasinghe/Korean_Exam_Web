@@ -24,130 +24,464 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
     <link rel="shortcut icon" href="assets/images/favicon.png" />
     <link rel="stylesheet" href="assets/plugins/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/plugins/css/animate.min.css" />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/css/exam-styles.css" />
     <style>
+        body {
+            background-color: white !important;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Orientation overlay styles */
+        #orientation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        #orientation-overlay h2 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        #orientation-overlay p {
+            color: #e0e0e0;
+            font-size: 1rem;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        
+        #orientation-overlay .rotate-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: rotatePhone 2s infinite;
+        }
+        
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+            100% { transform: rotate(0deg); }
+        }
+        
+        /* Mobile orientation specific styles */
+        @media screen and (max-width: 768px) and (orientation: portrait) {
+            #orientation-overlay {
+                display: flex !important;
+            }
+        }
+        
+        @media screen and (max-width: 768px) and (orientation: landscape) {
+            #orientation-overlay {
+                display: none !important;
+            }
+        }
+        
         .color-blind-container {
             min-height: 100vh;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 50%, #198754 100%);
-            padding: 10px 0;
+            background-color: white;
+            padding: 10px;
         }
         
         .test-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.15);
-            padding: 20px;
-            margin: 10px auto;
-            max-width: 95%;
-            border: 2px solid rgba(40, 167, 69, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 15px;
+            margin: 5px auto;
+            max-width: 98%;
+            border: 1px solid #e0e0e0;
         }
         
         @media (min-width: 768px) {
             .test-card {
-                max-width: 700px;
-                padding: 25px;
-                margin: 15px auto;
+                max-width: 1000px;
+                padding: 20px;
+                margin: 10px auto;
             }
+        }
+        
+        .test-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        @media (min-width: 768px) {
+            .test-layout {
+                flex-direction: row;
+                gap: 20px;
+                align-items: flex-start;
+            }
+        }
+            
+            .left-side {
+                flex: 1;
+            }
+            
+            .right-side {
+                flex: 1;
+            }
+            
+            .test-image-container {
+                max-width: 100%;
+                padding: 30px;
+            }
+            
+            .test-image {
+                max-height: 400px;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .test-card {
+                max-width: 1000px;
+                padding: 40px;
+            }
+            
+            .test-image {
+                max-height: 450px;
+            }
+        }
+        
+        .left-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        .right-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 8px;
+            margin-left: 10px;
         }
         
         .test-image-container {
-            background: linear-gradient(135deg, #e8f5e8 0%, #f0f9f0 100%);
-            border-radius: 8px;
-            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
             text-align: center;
-            margin: 15px 0;
-            border: 2px solid #28a745;
-        }
-        
-        @media (min-width: 768px) {
-            .test-image-container {
-                padding: 25px;
-                margin: 20px 0;
-            }
+            border: 2px solid #dee2e6;
+            width: 100%;
+            max-width: 500px;
         }
         
         .test-image {
-            max-width: 250px;
-            max-height: 250px;
+            max-width: 100%;
+            max-height: 400px;
+            width: auto;
+            height: auto;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
-        }
-        
-        @media (min-width: 768px) {
-            .test-image {
-                max-width: 300px;
-                max-height: 300px;
-            }
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         .progress-bar {
             width: 100%;
-            height: 6px;
-            background: #e8f5e8;
-            border-radius: 3px;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
             overflow: hidden;
-            margin: 15px 0;
-            border: 1px solid #28a745;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
         }
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #28a745, #20c997);
+            background: linear-gradient(90deg, #007bff, #0056b3);
             transition: width 0.3s ease;
-            border-radius: 3px;
+            border-radius: 4px;
         }
         
         .test-controls {
             text-align: center;
-            margin: 20px 0;
+            margin: 25px 0;
         }
         
         .btn-primary {
-            background: linear-gradient(45deg, #28a745, #20c997);
+            background: linear-gradient(45deg, #007bff, #0056b3);
             border: none;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border-radius: 8px;
             font-weight: bold;
             transition: all 0.3s ease;
             color: white;
-        }
-        
-        @media (min-width: 768px) {
-            .btn-primary {
-                padding: 12px 30px;
-            }
+            font-size: 16px;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-            background: linear-gradient(45deg, #198754, #20c997);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+            background: linear-gradient(45deg, #0056b3, #004085);
+        }
+        
+        .number-display-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .number-display {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+        
+        .simple-keypad {
+            margin-top: 15px;
+        }
+        
+        .number-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            justify-content: center;
+        }
+        
+        .simple-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: normal;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 45px;
+            color: #333;
+        }
+        
+        .simple-btn:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+            color: #007bff;
+        }
+        
+        .simple-btn:active {
+            background: #e9ecef;
+            transform: translateY(1px);
+        }
+        
+        .clear-btn {
+            background: #f8f9fa !important;
+            color: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+        
+        .clear-btn:hover {
+            background: #dc3545 !important;
+            color: white !important;
+        }
+        
+        .back-btn {
+            background: #f8f9fa !important;
+            color: #6c757d !important;
+            border-color: #6c757d !important;
+        }
+        
+        .back-btn:hover {
+            background: #6c757d !important;
+            color: white !important;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        
+        .skip-btn {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .skip-btn:hover {
+            background: #e0a800;
+        }
+        
+        .submit-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            background: #218838;
+        }
+        
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .question-counter {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        }
+        
+        .instruction-text {
+            background: #e3f2fd;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 15px;
+            color: #333;
         }
         
         .results-container {
-            background: linear-gradient(135deg, #e8f5e8 0%, #f0f9f0 100%);
+            background: #f8f9fa;
             border-radius: 8px;
             padding: 20px;
-            margin: 15px 0;
+            margin: 20px 0;
             text-align: center;
-            border: 2px solid #28a745;
-        }
-        
-        @media (min-width: 768px) {
-            .results-container {
-                padding: 25px;
-                margin: 20px 0;
-            }
+            border: 2px solid #dee2e6;
         }
         
         .score-circle {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 20px auto;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .score-excellent { background: linear-gradient(45deg, #28a745, #20c997); }
+        .score-good { background: linear-gradient(45deg, #20c997, #17a2b8); }
+        .score-fair { background: linear-gradient(45deg, #ffc107, #fd7e14); }
+        .score-poor { background: linear-gradient(45deg, #dc3545, #c82333); }
+        
+        .score-circle-container {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .score-inner {
+            text-align: center;
+        }
+        
+        .score-number {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .score-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 3px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border: 2px solid transparent;
+            margin-bottom: 0;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .correct-card {
+            border-color: #28a745;
+        }
+        
+        
+        .wrong-card {
+            border-color: #dc3545;
+        }
+        
+        .wrong-card .stat-icon {
+            color: #dc3545;
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+        
+        .skipped-card {
+            border-color: #ffc107;
+        }
+        
+        .skipped-card .stat-icon {
+            color: #ffc107;
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 15px;
+            color: #6c757d;
+            font-weight: 500;
+        }
             margin: 15px auto;
             font-size: 18px;
             font-weight: bold;
@@ -257,62 +591,137 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             }
         }
         
-        .wrong-card {
-            border-color: #dc3545;
-        }
-        
-        .wrong-card .stat-icon {
-            color: #dc3545;
-            font-size: 30px;
-            margin-bottom: 8px;
-        }
-        
-        @media (min-width: 768px) {
-            .wrong-card .stat-icon {
-                font-size: 35px;
-                margin-bottom: 10px;
+        /* Mobile responsiveness */
+        @media (max-width: 767px) {
+            .color-blind-container {
+                padding: 5px;
+            }
+            
+            .test-card {
+                margin: 2px auto;
+                padding: 10px;
+                max-width: 99%;
+            }
+            
+            .test-layout {
+                gap: 15px;
+                flex-direction: column;
+            }
+            
+            .left-side, .right-side {
+                flex: 1;
+                max-width: 100%;
+                padding: 5px;
+                border-right: none;
+                background: transparent;
+                margin-left: 0;
+                border-radius: 0;
+            }
+            
+            .test-image-container {
+                padding: 15px;
+                max-width: 100%;
+            }
+            
+            .test-image {
+                max-height: 250px;
+                width: 100%;
+                object-fit: contain;
+            }
+            
+            .number-display {
+                font-size: 20px;
+                min-height: 40px;
+                padding: 12px;
+            }
+            
+            .simple-btn {
+                min-height: 40px;
+                font-size: 14px;
+                padding: 10px;
+            }
+            
+            .action-btn {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+            
+            .btn-sm {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+            
+            .question-counter {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+            
+            .instruction-text {
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            h6 {
+                font-size: 13px !important;
             }
         }
         
-        .skipped-card {
-            border-color: #ffc107;
-        }
-        
-        .skipped-card .stat-icon {
-            color: #ffc107;
-            font-size: 30px;
-            margin-bottom: 8px;
-        }
-        
-        @media (min-width: 768px) {
-            .skipped-card .stat-icon {
-                font-size: 35px;
-                margin-bottom: 10px;
+        /* Extra small devices */
+        @media (max-width: 576px) {
+            .test-card {
+                margin: 1px;
+                padding: 8px;
+                max-width: 100%;
+            }
+            
+            .test-layout {
+                gap: 10px;
+            }
+            
+            .number-row {
+                gap: 6px;
+                margin-bottom: 6px;
+            }
+            
+            .simple-btn {
+                min-height: 35px;
+                font-size: 13px;
+                padding: 8px;
+            }
+            
+            .test-image {
+                max-height: 200px;
+            }
+            
+            .number-display {
+                font-size: 14px;
+                min-height: 30px;
+                padding: 4px;
+            }
+            
+            .btn-sm {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+            
+            .number-display-container {
+                padding: 8px;
+                margin-bottom: 8px;
             }
         }
         
-        .stat-number {
-            font-size: 28px;
-            font-weight: bold;
-            margin: 8px 0;
+        /* Touch panel specific styles */
+        .answer-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         @media (min-width: 768px) {
-            .stat-number {
-                font-size: 32px;
-                margin: 10px 0;
-            }
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: #6c757d;
-            font-weight: 500;
-        }
-        
-        @media (min-width: 768px) {
-            .stat-label {
-                font-size: 15px;
+            .answer-section {
+                padding: 25px;
             }
         }
         
@@ -790,45 +1199,18 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                 padding: 5px 10px;
             }
         }
-        
-        /* Compact Header Styles */
-        .breadcrumb {
-            --bs-breadcrumb-divider: '>';
-            background: none;
-            padding: 0;
-        }
-        
-        .breadcrumb-item + .breadcrumb-item::before {
-            color: #28a745;
-        }
-        
-        .btn-group-sm .btn {
-            padding: 4px 8px;
-            font-size: 12px;
-        }
-        
-        @media (min-width: 768px) {
-            .btn-group-sm .btn {
-                padding: 6px 12px;
-                font-size: 13px;
-            }
-        }
-        
-        /* Compact breadcrumb for mobile */
-        @media (max-width: 576px) {
-            .breadcrumb {
-                font-size: 11px !important;
-            }
-            
-            .btn-group-sm .btn {
-                padding: 3px 6px;
-                font-size: 11px;
-            }
-        }
     </style>
 </head>
 
 <body class="element-wrapper">
+    <!-- Orientation Overlay for Mobile Portrait Mode -->
+    <div id="orientation-overlay">
+        <div class="rotate-icon">📱</div>
+        <h2>Please Rotate Your Device</h2>
+        <p>For the best color blind test experience, please rotate your device to landscape mode.</p>
+        <p>회전하여 가로 모드로 사용해주세요</p>
+    </div>
+    
     <div id="preloader">
         <div id="ed-preloader" class="ed-preloader">
             <div class="animation-preloader">
@@ -855,38 +1237,6 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
 
     <div class="color-blind-container">
         <div class="container">
-            <!-- Compact Navigation Header -->
-            <div class="test-card" style="padding: 10px 15px; margin-bottom: 10px;">
-                <div class="row align-items-center">
-                    <div class="col-6 col-md-8">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-0" style="font-size: 13px;">
-                                <li class="breadcrumb-item">
-                                    <a href="index.php" class="text-success text-decoration-none">
-                                        <i class="fa fa-home me-1"></i>Home
-                                    </a>
-                                </li>
-                                <?php if (isset($_GET['exam_completed'])): ?>
-                                <li class="breadcrumb-item text-success">Exam</li>
-                                <?php endif; ?>
-                                <li class="breadcrumb-item active text-muted">Color Vision Test</li>
-                            </ol>
-                        </nav>
-                    </div>
-                    <div class="col-6 col-md-4 text-end">
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-success btn-sm" onclick="window.location.href='index.php'">
-                                <i class="fa fa-home"></i>
-                                <span class="d-none d-md-inline ms-1">Home</span>
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
-                                <i class="fa fa-print"></i>
-                                <span class="d-none d-md-inline ms-1">Print</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <!-- Exam Results Banner (if coming from exam) -->
             <?php if (isset($_GET['exam_completed']) && $_GET['exam_completed'] === 'true'): ?>
             <div class="test-card" id="examResultsBanner" style="border: 2px solid #28a745;">
@@ -1040,64 +1390,68 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                     Question 1 of 10
                 </div>
 
-                <!-- Image Display -->
-                <div class="test-image-container">
-                    <img id="testImage" class="test-image" src="" alt="Color blind test image" style="display: none;">
-                    <div id="loadingText">
-                        <i class="fa fa-spinner fa-spin fa-2x text-primary"></i>
-                        <p class="mt-3">Loading test...</p>
-                    </div>
-                </div>
-
-                <!-- Answer Input Section - Calculator Style -->
-                <div class="answer-section" id="answerSection" style="display: none;">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header text-white text-center py-3" style="background: linear-gradient(135deg, #28a745, #20c997); font-weight: 600; font-size: 17px;">
-                            <i class="fa fa-keyboard-o me-2"></i>
-                            What number do you see in the image?
+                <!-- Left-Right Layout Container -->
+                <div class="test-layout">
+                    <!-- Left Side - Image Display -->
+                    <div class="left-side">
+                        <div class="test-image-container">
+                            <img id="testImage" class="test-image" src="" alt="Color blind test image" style="display: none;">
+                            <div id="loadingText">
+                                <i class="fa fa-spinner fa-spin fa-2x text-primary"></i>
+                                <p class="mt-3">Loading test...</p>
+                            </div>
                         </div>
-                        <div class="card-body p-4">
+                    </div>
+
+                    <!-- Right Side - Answer Input Section -->
+                    <div class="right-side">
+                        <div class="answer-section" id="answerSection" style="display: none;">
+                            <h6 class="text-center mb-2" style="color: #007bff; font-size: 14px;">
+                                <i class="fa fa-keyboard-o me-1"></i>
+                                What number?
+                            </h6>
+                            
                             <!-- Number Display -->
                             <div class="number-display-container text-center mb-4">
                                 <div class="number-display" id="numberDisplay">
-                                    <span id="displayValue">0</span>
+                                    <span id="displayValue">--</span>
                                 </div>
-                                <div class="input-feedback mt-2" id="inputFeedback">Enter the number you see (0-100)</div>
+                                <div class="input-feedback mt-1" id="inputFeedback" style="font-size: 11px; color: #666;">Enter number (0-100)</div>
                             </div>
 
-                            <!-- Calculator-style Number Panel -->
-                            <div class="calculator-panel">
-                                <div class="calculator-grid">
-                                    <!-- Row 1: 7,8,9,Clear -->
-                                    <button class="calc-btn number-btn" data-number="7">7</button>
-                                    <button class="calc-btn number-btn" data-number="8">8</button>
-                                    <button class="calc-btn number-btn" data-number="9">9</button>
-                                    <button class="calc-btn action-btn" id="clearBtn">
-                                        <i class="fa fa-eraser"></i><br><small>Clear</small>
-                                    </button>
-                                    
-                                    <!-- Row 2: 4,5,6,Backspace -->
-                                    <button class="calc-btn number-btn" data-number="4">4</button>
-                                    <button class="calc-btn number-btn" data-number="5">5</button>
-                                    <button class="calc-btn number-btn" data-number="6">6</button>
-                                    <button class="calc-btn action-btn" id="backspaceBtn">
-                                        <i class="fa fa-backspace"></i><br><small>Back</small>
-                                    </button>
-                                    
-                                    <!-- Row 3: 1,2,3,Skip -->
-                                    <button class="calc-btn number-btn" data-number="1">1</button>
-                                    <button class="calc-btn number-btn" data-number="2">2</button>
-                                    <button class="calc-btn number-btn" data-number="3">3</button>
-                                    <button class="calc-btn action-btn" id="skipBtn">
-                                        <i class="fa fa-forward"></i><br><small>Skip</small>
-                                    </button>
-                                    
-                                    <!-- Row 4: 0 (span 2), Submit (span 2) -->
-                                    <button class="calc-btn number-btn zero-btn" data-number="0">0</button>
-                                    <button class="calc-btn submit-btn" id="submitBtn" disabled>
-                                        <i class="fa fa-check"></i><br><small>Submit</small>
-                                    </button>
+                            <!-- Number Input -->
+                            <div class="simple-keypad">
+                                <!-- Number buttons in simple 3x3 grid -->
+                                <div class="number-row">
+                                    <button class="simple-btn" data-number="1">1</button>
+                                    <button class="simple-btn" data-number="2">2</button>
+                                    <button class="simple-btn" data-number="3">3</button>
                                 </div>
+                                <div class="number-row">
+                                    <button class="simple-btn" data-number="4">4</button>
+                                    <button class="simple-btn" data-number="5">5</button>
+                                    <button class="simple-btn" data-number="6">6</button>
+                                </div>
+                                <div class="number-row">
+                                    <button class="simple-btn" data-number="7">7</button>
+                                    <button class="simple-btn" data-number="8">8</button>
+                                    <button class="simple-btn" data-number="9">9</button>
+                                </div>
+                                <div class="number-row">
+                                    <button class="simple-btn clear-btn" id="clearBtn">Clear</button>
+                                    <button class="simple-btn" data-number="0">0</button>
+                                    <button class="simple-btn back-btn" id="backspaceBtn">Back</button>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <button class="action-btn skip-btn" id="skipBtn">
+                                    <i class="fa fa-forward me-1"></i>Skip Question
+                                </button>
+                                <button class="action-btn submit-btn" id="submitBtn" disabled>
+                                    <i class="fa fa-check me-1"></i>Submit Answer
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1105,7 +1459,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
 
                 <!-- Controls -->
                 <div class="test-controls">
-                    <button class="btn btn-success btn-lg" id="startBtn">
+                    <button class="btn btn-primary btn-lg" id="startBtn">
                         <i class="fa fa-play me-2"></i>Start Test
                     </button>
                 </div>
@@ -1205,5 +1559,76 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
     <script src="assets/plugins/js/jquery-3.6.0.min.js"></script>
     <script src="assets/plugins/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/color-blind-test.js"></script>
+    
+    <!-- Mobile Orientation Script -->
+    <script>
+        function isMobileDevice() {
+            return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile|Windows Phone|webOS/i.test(navigator.userAgent);
+        }
+        
+        // Force landscape orientation on mobile devices
+        function checkOrientation() {
+            if (isMobileDevice()) {
+                const orientationOverlay = document.getElementById('orientation-overlay');
+                if (window.innerHeight > window.innerWidth) {
+                    // Portrait mode - show overlay
+                    orientationOverlay.style.display = 'flex';
+                    exitFullscreen();
+                } else {
+                    // Landscape mode - hide overlay and enter fullscreen
+                    orientationOverlay.style.display = 'none';
+                    requestFullscreen();
+                }
+            }
+        }
+        
+        // Fullscreen functions
+        function requestFullscreen() {
+            if (isMobileDevice()) {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().catch(err => console.log('Fullscreen request failed:', err));
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                }
+            }
+        }
+        
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(err => console.log('Exit fullscreen failed:', err));
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            }
+        }
+        
+        // Handle fullscreen change events
+        function handleFullscreenChange() {
+            // This function can be used to handle fullscreen state changes if needed
+        }
+        
+        // Check orientation on load and resize
+        window.addEventListener('load', function() {
+            checkOrientation();
+            // Add fullscreen change listeners
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+        });
+        
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', function() {
+            setTimeout(checkOrientation, 100);
+        });
+    </script>
 </body>
 </html>
