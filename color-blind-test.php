@@ -92,63 +92,60 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         .color-blind-container {
             min-height: 100vh;
             background-color: white;
-            padding: 10px;
+            padding: 20px;
         }
         
         .test-card {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            padding: 15px;
-            margin: 5px auto;
-            max-width: 98%;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 95%;
             border: 1px solid #e0e0e0;
         }
         
         @media (min-width: 768px) {
             .test-card {
                 max-width: 1000px;
-                padding: 20px;
-                margin: 10px auto;
+                padding: 30px;
+                margin: 20px auto;
             }
         }
         
         .test-layout {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 30px;
             align-items: center;
         }
         
         @media (min-width: 768px) {
             .test-layout {
                 flex-direction: row;
-                gap: 20px;
+                gap: 50px;
                 align-items: flex-start;
             }
         }
+        
+        @media (min-width: 768px) {
+            .test-layout {
+                flex-direction: row;
+                gap: 50px;
+                align-items: flex-start;
+            }
             
             .left-side {
-                flex: 1;
+                flex: 2.5;
             }
             
             .right-side {
                 flex: 1;
+                max-width: 320px;
             }
             
             .test-image-container {
-                max-width: 100%;
-                padding: 30px;
-            }
-            
-            .test-image {
-                max-height: 400px;
-            }
-        }
-        
-        @media (min-width: 1200px) {
-            .test-card {
-                max-width: 1000px;
+                max-width: 600px;
                 padding: 40px;
             }
             
@@ -157,13 +154,26 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             }
         }
         
+        @media (min-width: 1200px) {
+            .test-card {
+                max-width: 1200px;
+                padding: 40px;
+            }
+            
+            .test-image-container {
+                max-width: 700px;
+            }
+            
+            .test-image {
+                max-height: 500px;
+            }
+        }
+        
         .left-side {
-            flex: 1;
+            flex: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px;
-            border-right: 1px solid #e0e0e0;
         }
         
         .right-side {
@@ -171,10 +181,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 15px;
-            background: #fafafa;
-            border-radius: 8px;
-            margin-left: 10px;
+            max-width: 350px;
         }
         
         .test-image-container {
@@ -239,124 +246,58 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             background: #f8f9fa;
             border-radius: 8px;
             padding: 15px;
-            border: 1px solid #ddd;
+            border: 2px solid #dee2e6;
             margin-bottom: 15px;
         }
         
         .number-display {
             background: white;
-            border: 2px solid #ddd;
+            border: 2px solid #007bff;
             border-radius: 6px;
-            padding: 15px;
+            padding: 12px;
             min-height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Arial', sans-serif;
-            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
             font-weight: bold;
-            color: #333;
-            text-align: center;
         }
         
-        .simple-keypad {
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
             margin-top: 15px;
         }
         
-        .number-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-            justify-content: center;
-        }
-        
-        .simple-btn {
-            flex: 1;
+        .number-btn, .action-btn {
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 2px solid #007bff;
             background: white;
             border-radius: 6px;
             font-size: 16px;
-            font-weight: normal;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease;
-            min-height: 45px;
-            color: #333;
-        }
-        
-        .simple-btn:hover {
-            background: #f8f9fa;
-            border-color: #007bff;
             color: #007bff;
         }
         
-        .simple-btn:active {
-            background: #e9ecef;
-            transform: translateY(1px);
-        }
-        
-        .clear-btn {
-            background: #f8f9fa !important;
-            color: #dc3545 !important;
-            border-color: #dc3545 !important;
-        }
-        
-        .clear-btn:hover {
-            background: #dc3545 !important;
-            color: white !important;
-        }
-        
-        .back-btn {
-            background: #f8f9fa !important;
-            color: #6c757d !important;
-            border-color: #6c757d !important;
-        }
-        
-        .back-btn:hover {
-            background: #6c757d !important;
-            color: white !important;
-        }
-        
-        .action-buttons {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .number-btn:hover, .action-btn:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-1px);
         }
         
         .action-btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
+            background: #f8f9fa;
+            border-color: #6c757d;
+            color: #6c757d;
         }
         
-        .skip-btn {
-            background: #ffc107;
-            color: #212529;
-        }
-        
-        .skip-btn:hover {
-            background: #e0a800;
-        }
-        
-        .submit-btn {
-            background: #28a745;
-            color: white;
-        }
-        
-        .submit-btn:hover:not(:disabled) {
-            background: #218838;
-        }
-        
-        .submit-btn:disabled {
+        .action-btn:hover {
             background: #6c757d;
-            cursor: not-allowed;
-            opacity: 0.6;
+            color: white;
         }
         
         .question-counter {
@@ -594,134 +535,85 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
         /* Mobile responsiveness */
         @media (max-width: 767px) {
             .color-blind-container {
-                padding: 5px;
+                padding: 10px;
             }
             
             .test-card {
-                margin: 2px auto;
-                padding: 10px;
-                max-width: 99%;
+                margin: 5px auto;
+                padding: 15px;
+                max-width: 98%;
             }
             
             .test-layout {
-                gap: 15px;
+                gap: 20px;
                 flex-direction: column;
             }
             
             .left-side, .right-side {
                 flex: 1;
                 max-width: 100%;
-                padding: 5px;
-                border-right: none;
-                background: transparent;
-                margin-left: 0;
-                border-radius: 0;
             }
             
             .test-image-container {
-                padding: 15px;
+                padding: 20px;
                 max-width: 100%;
             }
             
             .test-image {
-                max-height: 250px;
-                width: 100%;
-                object-fit: contain;
+                max-height: 280px;
             }
             
             .number-display {
-                font-size: 20px;
-                min-height: 40px;
-                padding: 12px;
-            }
-            
-            .simple-btn {
-                min-height: 40px;
-                font-size: 14px;
+                font-size: 18px;
+                min-height: 45px;
                 padding: 10px;
             }
             
-            .action-btn {
-                padding: 10px 15px;
-                font-size: 13px;
+            .number-btn, .action-btn {
+                padding: 10px;
+                font-size: 14px;
             }
             
-            .btn-sm {
-                padding: 6px 12px;
-                font-size: 11px;
+            .btn-primary {
+                padding: 10px 20px;
+                font-size: 14px;
             }
             
             .question-counter {
-                padding: 6px 12px;
-                font-size: 13px;
+                padding: 8px 16px;
+                font-size: 14px;
             }
             
             .instruction-text {
-                padding: 10px;
-                font-size: 13px;
-            }
-            
-            h6 {
-                font-size: 13px !important;
+                padding: 12px;
+                font-size: 14px;
             }
         }
         
         /* Extra small devices */
         @media (max-width: 576px) {
             .test-card {
-                margin: 1px;
-                padding: 8px;
-                max-width: 100%;
+                margin: 2px;
+                padding: 10px;
+                max-width: 99%;
             }
             
-            .test-layout {
-                gap: 10px;
+            .keypad {
+                gap: 8px;
             }
             
-            .number-row {
-                gap: 6px;
-                margin-bottom: 6px;
-            }
-            
-            .simple-btn {
-                min-height: 35px;
-                font-size: 13px;
-                padding: 8px;
+            .number-btn, .action-btn {
+                padding: 10px;
+                font-size: 14px;
             }
             
             .test-image {
                 max-height: 200px;
             }
             
-            .number-display {
+            .d-flex.gap-2 .btn {
                 font-size: 14px;
-                min-height: 30px;
-                padding: 4px;
-            }
-            
-            .btn-sm {
-                padding: 4px 8px;
-                font-size: 10px;
-            }
-            
-            .number-display-container {
-                padding: 8px;
-                margin-bottom: 8px;
-            }
-        }
-        
-        /* Touch panel specific styles */
-        .answer-section {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        @media (min-width: 768px) {
-            .answer-section {
-                padding: 25px;
+                padding: 8px 16px;
             }
         }
         
@@ -1199,6 +1091,41 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                 padding: 5px 10px;
             }
         }
+        
+        /* Compact Header Styles */
+        .breadcrumb {
+            --bs-breadcrumb-divider: '>';
+            background: none;
+            padding: 0;
+        }
+        
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: #28a745;
+        }
+        
+        .btn-group-sm .btn {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        
+        @media (min-width: 768px) {
+            .btn-group-sm .btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+        }
+        
+        /* Compact breadcrumb for mobile */
+        @media (max-width: 576px) {
+            .breadcrumb {
+                font-size: 11px !important;
+            }
+            
+            .btn-group-sm .btn {
+                padding: 3px 6px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 
@@ -1237,6 +1164,38 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
 
     <div class="color-blind-container">
         <div class="container">
+            <!-- Compact Navigation Header -->
+            <div class="test-card" style="padding: 10px 15px; margin-bottom: 10px;">
+                <div class="row align-items-center">
+                    <div class="col-6 col-md-8">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0" style="font-size: 13px;">
+                                <li class="breadcrumb-item">
+                                    <a href="index.php" class="text-success text-decoration-none">
+                                        <i class="fa fa-home me-1"></i>Home
+                                    </a>
+                                </li>
+                                <?php if (isset($_GET['exam_completed'])): ?>
+                                <li class="breadcrumb-item text-success">Exam</li>
+                                <?php endif; ?>
+                                <li class="breadcrumb-item active text-muted">Color Vision Test</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="col-6 col-md-4 text-end">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="window.location.href='index.php'">
+                                <i class="fa fa-home"></i>
+                                <span class="d-none d-md-inline ms-1">Home</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+                                <i class="fa fa-print"></i>
+                                <span class="d-none d-md-inline ms-1">Print</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Exam Results Banner (if coming from exam) -->
             <?php if (isset($_GET['exam_completed']) && $_GET['exam_completed'] === 'true'): ?>
             <div class="test-card" id="examResultsBanner" style="border: 2px solid #28a745;">
@@ -1406,51 +1365,46 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
                     <!-- Right Side - Answer Input Section -->
                     <div class="right-side">
                         <div class="answer-section" id="answerSection" style="display: none;">
-                            <h6 class="text-center mb-2" style="color: #007bff; font-size: 14px;">
-                                <i class="fa fa-keyboard-o me-1"></i>
-                                What number?
-                            </h6>
+                            <h5 class="text-center mb-3" style="color: #007bff;">
+                                <i class="fa fa-keyboard-o me-2"></i>
+                                What number do you see?
+                            </h5>
                             
                             <!-- Number Display -->
                             <div class="number-display-container text-center mb-4">
                                 <div class="number-display" id="numberDisplay">
                                     <span id="displayValue">--</span>
                                 </div>
-                                <div class="input-feedback mt-1" id="inputFeedback" style="font-size: 11px; color: #666;">Enter number (0-100)</div>
+                                <div class="input-feedback mt-2" id="inputFeedback">Enter the number you see (0-100)</div>
                             </div>
 
-                            <!-- Number Input -->
-                            <div class="simple-keypad">
-                                <!-- Number buttons in simple 3x3 grid -->
-                                <div class="number-row">
-                                    <button class="simple-btn" data-number="1">1</button>
-                                    <button class="simple-btn" data-number="2">2</button>
-                                    <button class="simple-btn" data-number="3">3</button>
-                                </div>
-                                <div class="number-row">
-                                    <button class="simple-btn" data-number="4">4</button>
-                                    <button class="simple-btn" data-number="5">5</button>
-                                    <button class="simple-btn" data-number="6">6</button>
-                                </div>
-                                <div class="number-row">
-                                    <button class="simple-btn" data-number="7">7</button>
-                                    <button class="simple-btn" data-number="8">8</button>
-                                    <button class="simple-btn" data-number="9">9</button>
-                                </div>
-                                <div class="number-row">
-                                    <button class="simple-btn clear-btn" id="clearBtn">Clear</button>
-                                    <button class="simple-btn" data-number="0">0</button>
-                                    <button class="simple-btn back-btn" id="backspaceBtn">Back</button>
-                                </div>
+                            <!-- Number Keypad -->
+                            <div class="keypad">
+                                <button class="number-btn" data-number="1">1</button>
+                                <button class="number-btn" data-number="2">2</button>
+                                <button class="number-btn" data-number="3">3</button>
+                                <button class="number-btn" data-number="4">4</button>
+                                <button class="number-btn" data-number="5">5</button>
+                                <button class="number-btn" data-number="6">6</button>
+                                <button class="number-btn" data-number="7">7</button>
+                                <button class="number-btn" data-number="8">8</button>
+                                <button class="number-btn" data-number="9">9</button>
+                                <button class="action-btn" id="clearBtn">
+                                    <i class="fa fa-eraser"></i> Clear
+                                </button>
+                                <button class="number-btn" data-number="0">0</button>
+                                <button class="action-btn" id="backspaceBtn">
+                                    <i class="fa fa-backspace"></i> Back
+                                </button>
                             </div>
 
                             <!-- Action Buttons -->
-                            <div class="action-buttons">
-                                <button class="action-btn skip-btn" id="skipBtn">
-                                    <i class="fa fa-forward me-1"></i>Skip Question
+                            <div class="d-flex gap-2 mt-3">
+                                <button class="btn btn-secondary flex-fill" id="skipBtn">
+                                    <i class="fa fa-forward me-1"></i>Skip
                                 </button>
-                                <button class="action-btn submit-btn" id="submitBtn" disabled>
-                                    <i class="fa fa-check me-1"></i>Submit Answer
+                                <button class="btn btn-primary flex-fill" id="submitBtn" disabled>
+                                    <i class="fa fa-check me-1"></i>Submit
                                 </button>
                             </div>
                         </div>
