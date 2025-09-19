@@ -12,7 +12,7 @@ class FaceVerification {
         this.isVerifying = false;
         this.verificationResult = null;
         this.profileImageUrl = null;
-        this.requiredSimilarity = 70; // Minimum 70% similarity required
+        this.requiredSimilarity = 80; // Enhanced 80% similarity required
         this.lastNotificationTime = 0;
         this.notificationCooldown = 3000; // 3 seconds between notifications
         
@@ -695,10 +695,10 @@ class FaceVerification {
             }
 
             try {
-                console.log('🚀 Sending to face verification API...');
+                console.log('🚀 Sending to enhanced face verification API...');
                 
-                // Call face comparison API (try simple version first)
-                const apiResponse = await fetch('api/client/simple_face_verification.php', {
+                // Call enhanced face comparison API
+                const apiResponse = await fetch('api/client/face_verification_enhanced.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -708,42 +708,89 @@ class FaceVerification {
                 }
 
                 const result = await apiResponse.json();
-                console.log('📊 API Response:', result);
+                console.log('📊 Enhanced API Response:', result);
                 
                 if (result.success) {
                     const similarity = parseFloat(result.similarity) || 0;
-                    console.log(`🎯 AI Similarity: ${similarity}%`);
+                    const faceConfidence = parseFloat(result.faceConfidence) || 0;
+                    console.log(`🎯 Enhanced Similarity: ${similarity}%, Face Confidence: ${faceConfidence}%`);
                     
                     this.updateVerificationProgress(similarity);
                     
-                    if (similarity >= this.requiredSimilarity) {
+                    if (similarity >= this.requiredSimilarity && result.passed) {
                         this.consecutiveSuccesses++;
                         console.log(`✅ Success ${this.consecutiveSuccesses}/${this.requiredConsecutiveSuccesses}`);
                         
                         if (this.consecutiveSuccesses >= this.requiredConsecutiveSuccesses) {
-                            // Verification successful!
-                            this.handleVerificationSuccess(similarity);
+                            // Enhanced verification successful!
+                            this.handleVerificationSuccess(similarity, result);
                             return;
                         } else {
-                            this.showVerificationFeedback(similarity, false, `Good! ${this.consecutiveSuccesses}/${this.requiredConsecutiveSuccesses} confirmations`);
+                            this.showVerificationFeedback(similarity, false, `Excellent! ${this.consecutiveSuccesses}/${this.requiredConsecutiveSuccesses} confirmations`);
                         }
                     } else {
                         // Reset consecutive successes if below threshold
                         this.consecutiveSuccesses = 0;
-                        this.showVerificationFeedback(similarity, false);
+                        const message = result.message || `Need ${this.requiredSimilarity}%+ similarity`;
+                        this.showVerificationFeedback(similarity, false, message);
+                        
+                        // Show suggestions if available
+                        if (result.suggestions && result.suggestions.length > 0) {
+                            console.log('💡 Suggestions:', result.suggestions);
+                            setTimeout(() => {
+                                const suggestion = result.suggestions[Math.floor(Math.random() * result.suggestions.length)];
+                                this.showVerificationFeedback(similarity, false, suggestion);
+                            }, 2000);
+                        }
                     }
                 } else {
-                    console.warn('❌ AI comparison failed:', result.message || 'Unknown error');
-                    this.showVerificationFeedback(0, false, result.message || 'Face detection failed');
+                    console.warn('❌ Enhanced verification failed:', result.message || 'Unknown error');
+                    const message = result.message || 'Face verification failed';
+                    this.showVerificationFeedback(0, false, message);
                     
-                    // Try simple similarity check as fallback
-                    this.performSimpleSimilarityCheck(canvas);
+                    // Show suggestions if available
+                    if (result.suggestions && result.suggestions.length > 0) {
+                        setTimeout(() => {
+                            const suggestion = result.suggestions[0];
+                            this.showVerificationFeedback(0, false, suggestion);
+                        }, 2000);
+                    } else {
+                        // Try simple similarity check as fallback
+                        this.performSimpleSimilarityCheck(canvas);
+                    }
                 }
             } catch (apiError) {
-                console.error('🚨 AI API error:', apiError);
+                console.error('🚨 Enhanced API error:', apiError);
                 
-                // Fallback to simple similarity check
-                this.performSimpleSimilarityCheck(canvas);
+                // Fallback to simple verification API
+                try {
+                    const fallbackResponse = await fetch('api/client/simple_face_verification.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const fallbackResult = await fallbackResponse.json();
+                    
+                    if (fallbackResult.success) {
+                        const similarity = parseFloat(fallbackResult.similarity) || 0;
+                        this.updateVerificationProgress(similarity);
+                        
+                        if (similarity >= this.requiredSimilarity) {
+                            this.consecutiveSuccesses++;
+                            if (this.consecutiveSuccesses >= this.requiredConsecutiveSuccesses) {
+                                this.handleVerificationSuccess(similarity);
+                                return;
+                            }
+                        } else {
+                            this.consecutiveSuccesses = 0;
+                        }
+                        this.showVerificationFeedback(similarity, false);
+                    } else {
+                        this.performSimpleSimilarityCheck(canvas);
+                    }
+                } catch (fallbackError) {
+                    console.error('🚨 Fallback API error:', fallbackError);
+                    this.performSimpleSimilarityCheck(canvas);
+                }
             }
 
         } catch (error) {
@@ -929,8 +976,16 @@ class FaceVerification {
         }
     }
 
-    handleVerificationSuccess(finalSimilarity) {
-        console.log(`🎉 AI Face Verification SUCCESS! Final similarity: ${finalSimilarity}%`);
+    handleVerificationSuccess(finalSimilarity, enhancedResult = null) {
+        console.log(`🎉 Enhanced Face Verification SUCCESS! Final similarity: ${finalSimilarity}%`);
+        
+        if (enhancedResult) {
+            console.log('📊 Enhanced verification details:', {
+                faceConfidence: enhancedResult.faceConfidence,
+                threshold: enhancedResult.threshold,
+                passed: enhancedResult.passed
+            });
+        }
         
         this.stopAIVerification();
         this.isVerifying = false;
@@ -941,22 +996,30 @@ class FaceVerification {
         // Update camera status
         const cameraStatus = document.getElementById('cameraStatus');
         if (cameraStatus) {
-            cameraStatus.innerHTML = '<span class="badge bg-success px-3 py-2">✅ Verification Complete</span>';
+            cameraStatus.innerHTML = '<span class="badge bg-success px-3 py-2">✅ Enhanced Verification Complete</span>';
         }
         
-        // Store verification result
+        // Store enhanced verification result
         this.verificationResult = {
             success: true,
             similarity: finalSimilarity,
-            timestamp: new Date().toISOString()
+            faceConfidence: enhancedResult?.faceConfidence || null,
+            threshold: enhancedResult?.threshold || 80,
+            timestamp: new Date().toISOString(),
+            enhanced: true
         };
         
         // Save to session storage
         sessionStorage.setItem('faceVerificationPassed', 'true');
         sessionStorage.setItem('faceVerificationScore', Math.round(finalSimilarity));
+        sessionStorage.setItem('faceVerificationEnhanced', 'true');
         
-        // Success notification
-        this.showNotification(`🎉 Face Verification Successful! Similarity: ${Math.round(finalSimilarity)}%`, 'success', 5000);
+        // Enhanced success notification
+        const message = enhancedResult?.faceConfidence ? 
+            `🎉 Enhanced Face Verification Successful! Similarity: ${Math.round(finalSimilarity)}% (Face Confidence: ${Math.round(enhancedResult.faceConfidence)}%)` :
+            `🎉 Enhanced Face Verification Successful! Similarity: ${Math.round(finalSimilarity)}%`;
+            
+        this.showNotification(message, 'success', 6000);
         
         // Auto close modal and proceed after 3 seconds
         setTimeout(() => {
@@ -978,7 +1041,7 @@ class FaceVerification {
         }
         
         // Show final success message
-        this.showNotification("✅ Face verification completed! You can now proceed to the exam.", 'success', 5000);
+        this.showNotification("✅ Enhanced face verification completed! You can now proceed to the exam.", 'success', 6000);
         
         // Trigger next step in exam flow
         if (typeof window.proceedToNextStep === 'function') {
@@ -1506,15 +1569,81 @@ If you don't see the camera icon, try:
 }
 
 // Global functions for exam flow integration
-function showFaceVerification(profileImageUrl) {
-    const modal = new bootstrap.Modal(document.getElementById('faceVerificationModal'));
-    const profileImg = document.getElementById('profileImageRef');
-    
-    if (profileImg && profileImageUrl) {
-        profileImg.src = profileImageUrl;
+async function showFaceVerification(profileImageUrl) {
+    // First check if user has a profile photo
+    try {
+        console.log('📸 Checking profile photo before showing face verification...');
+        
+        const response = await fetch('api/client/check_profile_photo.php', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+        
+        if (!result.success || !result.hasProfilePhoto) {
+            // Show warning message and redirect to profile
+            if (typeof Toastify !== 'undefined') {
+                Toastify({
+                    text: "⚠️ Profile photo required for face verification. Please upload your profile photo first.",
+                    duration: 8000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#ffc107",
+                    stopOnFocus: true
+                }).showToast();
+            } else {
+                alert('Profile photo required for face verification. Please upload your profile photo first.');
+            }
+            
+            // Redirect to profile page after a short delay
+            setTimeout(() => {
+                window.location.href = 'profile.php';
+            }, 2000);
+            
+            return;
+        }
+        
+        // Profile photo exists, proceed with face verification
+        console.log('✅ Profile photo found, proceeding with face verification');
+        
+        const modal = new bootstrap.Modal(document.getElementById('faceVerificationModal'));
+        const profileImg = document.getElementById('profileImageRef');
+        
+        // Use the profile image URL from the API response
+        if (profileImg && result.profileImageUrl) {
+            profileImg.src = result.profileImageUrl;
+        } else if (profileImg && profileImageUrl) {
+            // Fallback to provided URL
+            profileImg.src = profileImageUrl;
+        }
+        
+        // Update the required similarity to 80%
+        if (window.faceVerification) {
+            window.faceVerification.requiredSimilarity = 80;
+        }
+        
+        modal.show();
+        
+    } catch (error) {
+        console.error('❌ Error checking profile photo:', error);
+        
+        // Show error message
+        if (typeof Toastify !== 'undefined') {
+            Toastify({
+                text: "Error checking profile photo. Please try again or contact support.",
+                duration: 6000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc3545",
+                stopOnFocus: true
+            }).showToast();
+        } else {
+            alert('Error checking profile photo. Please try again or contact support.');
+        }
     }
-    
-    modal.show();
 }
 
 function proceedToNotice() {
