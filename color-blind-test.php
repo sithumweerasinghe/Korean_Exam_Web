@@ -1,9 +1,18 @@
 <?php
-session_start();
+include("includes/lang/lang-check.php");
+
 if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isset($_GET["sample"]) || $_GET["sample"] === "false")) {
     header("Location: ./?showModal=1");
     exit();
 }
+
+// Set active page class variables for header navigation
+$home = "";
+$papers = "";
+$leadboard = "";
+$about = "";
+$contact = "";
+$colorblind = "active"; // This page is active
 ?>
 
 <!DOCTYPE html>
@@ -24,6 +33,10 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
     <link rel="shortcut icon" href="assets/images/favicon.png" />
     <link rel="stylesheet" href="assets/plugins/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/plugins/css/animate.min.css" />
+    <!-- Main site CSS for header -->
+    <link rel="stylesheet" href="assets/plugins/css/icofont.css" />
+    <link rel="stylesheet" href="assets/plugins/css/uicons.css" />
+    <link rel="stylesheet" href="style.css" />
     <style>
         body {
             background-color: white !important;
@@ -1130,6 +1143,9 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
 </head>
 
 <body class="element-wrapper">
+    <!-- Include Main Header -->
+    <?php include("includes/header.php"); ?>
+    
     <!-- Orientation Overlay for Mobile Portrait Mode -->
     <div id="orientation-overlay">
         <div class="rotate-icon">📱</div>
@@ -1147,55 +1163,12 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
     </div>
 
     <?php
-    require_once "api/config/dbconnection.php";
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    include("api/client/services/userService.php");
-    $userService = new UserService();
-    $userArray = $userService->validateUserLoggedIn();
-
-    $userId = $userArray["userId"];
-    $firstName = $userArray["fname"];
-    $lastName = $userArray["lname"];
-    $fullName = $userArray["fullname"];
-    $profileImage = $userArray["profile"];
+    // Database connection and user service are already included via header.php
+    // All user variables ($userId, $firstName, $fullName, etc.) are available from header
     ?>
 
     <div class="color-blind-container">
         <div class="container">
-            <!-- Compact Navigation Header -->
-            <div class="test-card" style="padding: 10px 15px; margin-bottom: 10px;">
-                <div class="row align-items-center">
-                    <div class="col-6 col-md-8">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-0" style="font-size: 13px;">
-                                <li class="breadcrumb-item">
-                                    <a href="index.php" class="text-success text-decoration-none">
-                                        <i class="fa fa-home me-1"></i>Home
-                                    </a>
-                                </li>
-                                <?php if (isset($_GET['exam_completed'])): ?>
-                                <li class="breadcrumb-item text-success">Exam</li>
-                                <?php endif; ?>
-                                <li class="breadcrumb-item active text-muted">Color Vision Test</li>
-                            </ol>
-                        </nav>
-                    </div>
-                    <div class="col-6 col-md-4 text-end">
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-success btn-sm" onclick="window.location.href='index.php'">
-                                <i class="fa fa-home"></i>
-                                <span class="d-none d-md-inline ms-1">Home</span>
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
-                                <i class="fa fa-print"></i>
-                                <span class="d-none d-md-inline ms-1">Print</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <!-- Exam Results Banner (if coming from exam) -->
             <?php if (isset($_GET['exam_completed']) && $_GET['exam_completed'] === 'true'): ?>
             <div class="test-card" id="examResultsBanner" style="border: 2px solid #28a745;">
@@ -1507,6 +1480,9 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
             </div>
         </div>
     </div>
+
+    <!-- Include footer with login/register modals -->
+    <?php include("includes/footer.php") ?>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
