@@ -1,6 +1,27 @@
 <?php
 require_once "api/config/dbconnection.php";
 ?>
+
+<!-- Mobile responsive logo sizing -->
+<style>
+/* Mobile responsive header logo styling */
+@media (max-width: 767px) {
+    /* Main header logo for mobile */
+    .ed-topbar__logo img {
+        max-width: 80px !important;
+        height: 50px !important;
+        object-fit: contain;
+    }
+    
+    /* Mobile menu logo for mobile */
+    .offcanvas-logo img {
+        max-width: 80px !important;
+        height: 50px !important;
+        object-fit: contain;
+    }
+}
+</style>
+
 <div class="modal mobile-menu-modal offcanvas-modal fade" id="offcanvas-modal">
     <div class="modal-dialog offcanvas-dialog">
         <div class="modal-content">
