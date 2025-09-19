@@ -98,9 +98,19 @@
                 </div>
 
                 <section
-                    class="ed-contact ed-contact--style2 pt-5 position-relative">
+                    class="ed-contact ed-contact--style2 pt-5 position-relative bg-gradient-free">
                     <div class="container ed-container pt-5">
-                        <h5 class="text-center"><?= $translations['free_papers']['heading'] ?></h5>
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <div class="section-header">
+                                    <span class="badge bg-success text-white px-3 py-2 mb-3">
+                                        <i class="icofont-gift"></i> Free Content
+                                    </span>
+                                    <h5 class="section-title"><?= $translations['free_papers']['heading'] ?></h5>
+                                    <p class="text-muted">Practice with our free sample papers</p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row mt-5 d-flex justify-content-start">
                             <?php
                             if ($samplePapers) {
@@ -109,7 +119,7 @@
                                     <?php
                                     if ($paper["isSample"] == "1") {
                                     ?>
-                                        <div class="col-lg-3 col-12" onclick="window.location= 'exam?paper_id=<?= $paper['paper_id'] ?>&sample=true'">
+                                        <div class="col-lg-3 col-md-4 col-sm-6 col-12 mb-3" onclick="window.location= 'exam?paper_id=<?= $paper['paper_id'] ?>&sample=true'">
                                             <div class="ed-paper__card-item">
                                                 <div class="ed-paper__card-item__image object-fit-cover" style="height:100%; width: 100%;">
                                                     <img src="assets/images/papers/free.jpg" class="w-100 h-100 " alt="paper image" />
@@ -129,7 +139,9 @@
                             <?php
                             } else {
                             ?>
-                                <p class="text-center">No Papers</p>
+                                <div class="col-12 text-center p-4">
+                                    <div class="alert alert-info">No Papers</div>
+                                </div>
                             <?php
                             }
                             ?>
@@ -138,10 +150,36 @@
                     </div>
                 </section>
 
+                <!-- Section Divider -->
+                <div class="section-divider py-5">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="divider-line">
+                                <div class="divider-content text-center">
+                                    <span class="divider-text bg-white px-4">
+                                        <i class="icofont-arrow-down"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <section
-                    class="ed-contact mb-5 ed-contact--style2 pt-5 position-relative">
+                    class="ed-contact mb-5 ed-contact--style2 pt-5 position-relative bg-light">
                     <div class="container ed-container pt-5">
-                        <h5 class="text-center"><?= $translations['paid_papers']['heading'] ?></h5>
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <div class="section-header">
+                                    <span class="badge bg-primary text-white px-3 py-2 mb-3">
+                                        <i class="icofont-star"></i> Premium Content
+                                    </span>
+                                    <h5 class="section-title"><?= $translations['paid_papers']['heading'] ?></h5>
+                                    <p class="text-muted">Access our complete collection of exam papers</p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row mt-5" id="modal-paper-section">
                         </div>
                         <div class="row">
@@ -198,8 +236,19 @@
         // }
 
         const allPapers = <?= json_encode($nonSamplePapers); ?>;
-        const papersPerPage = 8;
+        let papersPerPage = 8;
         let currentPage = 1;
+
+        // Adjust papers per page based on screen size
+        function updatePapersPerPage() {
+            if (window.innerWidth <= 575) {
+                papersPerPage = 4; // Mobile phones
+            } else if (window.innerWidth <= 768) {
+                papersPerPage = 6; // Tablets
+            } else {
+                papersPerPage = 8; // Desktop
+            }
+        }
 
         function renderPapers(page) {
             const startIndex = (page - 1) * papersPerPage;
@@ -213,13 +262,13 @@
             const filteredPapers = papersToDisplay.filter(paper => paper.isSample === 0).filter(paper => paper.paper_status === 1);
 
             if (filteredPapers.length === 0) {
-                papersContainer.innerHTML = `<div class="text-center w-100">No papers to display</div>`;
+                papersContainer.innerHTML = `<div class="col-12 text-center p-4"><div class="alert alert-info">No papers to display</div></div>`;
                 return;
             }
 
             filteredPapers.forEach((paper) => {
                 const paperCard = `
-                <div class="col-lg-3 col-12" ${paper.status === 'locked' ? `onclick="window.location = 'pricing'"` : `onclick="window.location = 'exam?paper_id=${paper.paper_id}&sample=false'"`}>
+                <div class="col-lg-3 col-md-4 col-sm-6 col-12 mb-3" ${paper.status === 'locked' ? `onclick="window.location = 'pricing'"` : `onclick="window.location = 'exam?paper_id=${paper.paper_id}&sample=false'"`}>
                     <div class="ed-paper__card-item">
                            <div class="ed-paper__card-item__image object-fit-cover" style="height:100%; width: 100%;">
                                 <img src="assets/images/papers/paid.jpg" class="w-100 h-100 " alt="paper image" />
@@ -278,6 +327,15 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            updatePapersPerPage();
+            renderPapers(currentPage);
+            renderPagination();
+        });
+
+        // Update on window resize
+        window.addEventListener('resize', () => {
+            updatePapersPerPage();
+            currentPage = 1; // Reset to first page
             renderPapers(currentPage);
             renderPagination();
         });

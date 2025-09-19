@@ -13,6 +13,9 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid rgba(76, 175, 80, 0.1);
   box-shadow: 0 4px 20px rgba(46, 125, 50, 0.08);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 .ed-paper__card-item::before {
   content: "";
@@ -103,12 +106,26 @@
     height: auto;
     min-height: 400px;
   }
+  
+  /* Improve pagination on tablets */
+  .ed-pagination__list li a {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  /* Better container spacing for tablets */
+  .ed-contact .container {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
 }
 
 @media only screen and (max-width: 767px) {
   .ed-paper__card-item {
     height: 180px;
     margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
   }
   
   .ed-paper__card-item:hover {
@@ -126,16 +143,51 @@
     height: auto;
     min-height: 300px;
   }
+  
+  /* Better spacing for headings on mobile */
+  .container.ed-container h5 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Improve pagination spacing */
+  .ed-pagination {
+    margin-top: 2rem;
+    padding: 0 15px;
+  }
+  
+  .ed-pagination__list {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  .ed-pagination__list li a {
+    padding: 6px 10px;
+    font-size: 13px;
+    min-width: 35px;
+  }
+  
+  /* Mobile container padding */
+  .ed-contact .container {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
 }
 
 @media only screen and (max-width: 575px) {
   .ed-paper__card-item {
     height: 160px;
     margin-top: 8px;
+    margin-bottom: 15px;
+    margin-left: 3px;
+    margin-right: 3px;
   }
   
   .ed-paper__card-item .hover-text {
     font-size: 14px;
+    line-height: 1.2;
+    padding: 0 10px;
   }
   
   .countdown-bg {
@@ -144,5 +196,93 @@
     padding: 10px;
     height: auto;
     min-height: 250px;
+  }
+  
+  /* Mobile heading adjustments */
+  .container.ed-container h5 {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Better mobile pagination */
+  .ed-pagination {
+    padding: 0 10px;
+  }
+  
+  .ed-pagination__list li a {
+    padding: 5px 8px;
+    font-size: 12px;
+    min-width: 30px;
+  }
+  
+  /* Responsive paper title */
+  .ed-paper__card-item + div span {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    padding: 0 5px;
+  }
+  
+  /* Better touch targets for mobile */
+  .ed-paper__card-item {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Small mobile container padding */
+  .ed-contact .container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  /* Row spacing adjustments */
+  .ed-contact .row {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+  
+  .ed-contact .row [class*="col-"] {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+@media only screen and (max-width: 375px) {
+  .ed-paper__card-item {
+    height: 140px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  
+  .ed-paper__card-item .hover-text {
+    font-size: 13px;
+  }
+  
+  .container.ed-container h5 {
+    font-size: 1.1rem;
+  }
+  
+  .ed-paper__card-item + div span {
+    font-size: 0.85rem;
+  }
+  
+  /* Extra small mobile container padding */
+  .ed-contact .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  
+  .ed-contact .row {
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+  
+  .ed-contact .row [class*="col-"] {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  
+  /* Pagination adjustments for very small screens */
+  .ed-pagination {
+    padding: 0 5px;
   }
 }
