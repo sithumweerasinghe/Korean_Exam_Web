@@ -651,6 +651,8 @@
 @media only screen and (max-width: 767px) {
   .ed-header__right {
     justify-content: space-between;
+    display: flex !important;
+    align-items: center;
   }
 
   .ed-topbar__search-widget {
@@ -669,7 +671,7 @@
     padding: 16px 0px;
   }
   .ed-header__navigation {
-    display: none;
+    display: none !important;
   }
   .ed-header__contact {
     display: block;
@@ -699,14 +701,19 @@
   }
 
   .ed-header.ed-header--style2 .ed-header__right {
-    justify-content: right;
+    justify-content: space-between;
     gap: 12px;
+    flex-wrap: wrap;
   }
   .ed-topbar__info-buttons button {
-    padding: 12px 16px;
+    padding: 8px 12px;
+    font-size: 12px;
   }
   .ed-header--style2 .ed-header__action {
-    gap: 16px;
+    gap: 12px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
   }
   .ed-header.ed-header--style2 .ed-container-expand {
     max-width: 1170px;
@@ -714,6 +721,31 @@
   }
 
   .ed-header.ed-header--style5 .ed-header__action {
+    display: none;
+  }
+
+  /* Logo responsive */
+  .ed-topbar__logo img {
+    max-width: 120px;
+    height: 50px;
+  }
+
+  /* Language select responsive */
+  #language-select {
+    font-size: 12px;
+    padding: 4px 8px;
+    max-width: 80px;
+  }
+
+  /* Profile image responsive */
+  .ed-header__action .position-relative {
+    width: 35px !important;
+    height: 35px !important;
+  }
+
+  /* User name responsive */
+  .ed-header__action label {
+    font-size: 11px !important;
     display: none;
   }
 }

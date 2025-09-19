@@ -1,0 +1,559 @@
+/* Mobile-specific improvements for header */
+
+/* General mobile fixes */
+@media only screen and (max-width: 991px) {
+  /* Ensure proper spacing and layout */
+  .ed-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+  
+  /* Hide desktop navigation */
+  .ed-header__navigation.ed-header__center {
+    display: none !important;
+  }
+  
+  /* Show mobile menu button */
+  .mobile-menu-offcanvas-toggler {
+    display: block !important;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .ed-header__inner {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .ed-header__left--style2 {
+    flex: 1;
+  }
+  
+  .ed-header__right {
+    flex: 0 0 auto;
+    min-width: fit-content;
+  }
+  
+  .ed-topbar__logo img {
+    max-width: 100px;
+    height: 40px;
+  }
+  
+  #language-select {
+    max-width: 70px;
+    font-size: 11px;
+    padding: 2px 4px;
+  }
+  
+  .ed-header__action .position-relative {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  
+  .ed-topbar__info-buttons button {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+  
+  .mobile-menu-offcanvas-toggler {
+    width: 24px;
+    height: 20px;
+  }
+  
+  .mobile-menu-offcanvas-toggler .line {
+    width: 20px;
+    height: 2px;
+  }
+}
+
+/* Fix for very small screens */
+@media only screen and (max-width: 375px) {
+  .ed-topbar__logo img {
+    max-width: 80px;
+    height: 35px;
+  }
+  
+  #language-select {
+    max-width: 60px;
+    font-size: 10px;
+  }
+  
+  .ed-topbar__info-buttons .login-btn {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+  
+  .ed-header__action .position-relative {
+    width: 25px !important;
+    height: 25px !important;
+  }
+  
+  .mobile-menu-modal .offcanvas-dialog {
+    max-width: 280px;
+  }
+}
+
+/* Landscape orientation fixes */
+@media only screen and (max-height: 500px) and (orientation: landscape) {
+  .ed-header {
+    padding: 8px 0px;
+  }
+  
+  .ed-topbar__logo img {
+    height: 30px;
+  }
+  
+  .mobile-menu-modal .modal-content {
+    overflow-y: auto;
+  }
+}
+
+/* Touch device improvements */
+@media (hover: none) and (pointer: coarse) {
+  .mobile-menu-offcanvas-toggler {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .ed-topbar__info-buttons button {
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+  
+  .ed-header__action .position-relative {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Profile Page Mobile Responsive Styles */
+
+/* Hide mobile toggle by default */
+.mobile-nav-toggle {
+  display: none;
+}
+
+/* Mobile Layout - Stack sidebar and content vertically */
+@media only screen and (max-width: 991px) {
+  /* Container adjustments */
+  .ed-container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  
+  /* Profile main container */
+  .ed-contact .row.shadow {
+    height: auto !important;
+    min-height: auto !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  /* Stack sidebar and content */
+  .ed-contact .row.shadow .col-3,
+  .ed-contact .row.shadow .col-9 {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+  
+  /* Sidebar styling for mobile */
+  .ed-contact .row.shadow .col-3 {
+    order: 1;
+    padding: 20px;
+    border-radius: 10px 10px 0 0 !important;
+  }
+  
+  /* Content area styling for mobile */
+  .ed-contact .row.shadow .col-9 {
+    order: 2;
+    padding: 20px;
+    border-radius: 0 0 10px 10px !important;
+  }
+  
+  /* Hide sidebar navigation on mobile initially */
+  .ed-contact .nav.flex-column {
+    display: none;
+  }
+  
+  /* Show mobile navigation toggle */
+  .mobile-nav-toggle {
+    display: block !important;
+    width: 100%;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .mobile-nav-toggle:hover {
+    background: #0056b3;
+  }
+  
+  .mobile-nav-toggle:active {
+    background: #004494;
+  }
+  
+  /* Show navigation when active */
+  .nav-mobile-active .nav.flex-column {
+    display: block;
+    margin-bottom: 20px;
+  }
+  
+  /* Profile image container adjustments */
+  .ed-contact .figure {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
+  /* Navigation items mobile styling */
+  .nav.flex-column .nav-item {
+    margin-bottom: 5px;
+  }
+  
+  .nav.flex-column .nav-link {
+    padding: 12px 16px !important;
+    font-size: 14px;
+    border-radius: 5px;
+  }
+}
+
+/* Tablet adjustments */
+@media only screen and (max-width: 768px) {
+  /* Profile section padding adjustments */
+  .fieldset {
+    padding: 15px !important;
+  }
+  
+  /* Form group spacing */
+  .ed-checkout__form-group {
+    margin-bottom: 15px;
+  }
+  
+  /* Profile image adjustments */
+  .figure img {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  
+  /* Button improvements for touch */
+  .ed-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Input field improvements */
+  .ed-checkout__input {
+    padding: 12px 15px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Table responsive wrapper */
+  .table-responsive-mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Table mobile styling */
+  .table-responsive-mobile table {
+    min-width: 600px;
+    font-size: 12px;
+  }
+  
+  .table-responsive-mobile th,
+  .table-responsive-mobile td {
+    padding: 8px 4px !important;
+    white-space: nowrap;
+  }
+  
+  /* Pagination mobile styling */
+  .ed-pagination__list {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .ed-pagination__list li {
+    margin: 2px;
+  }
+  
+  .ed-pagination__list a {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
+/* Mobile phone adjustments */
+@media only screen and (max-width: 575px) {
+  /* Container padding */
+  .ed-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  /* Profile main container */
+  .ed-contact .row.shadow {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Content padding */
+  .ed-contact .row.shadow .col-3,
+  .ed-contact .row.shadow .col-9 {
+    padding: 15px;
+  }
+  
+  /* Profile image even smaller */
+  .figure img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  /* Form label improvements */
+  .ed-checkout__label {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  /* Table mobile card layout */
+  .table-mobile-cards {
+    display: none;
+  }
+  
+  .table-mobile-cards.active {
+    display: block;
+  }
+  
+  .table-mobile-cards.active + .table-responsive-mobile {
+    display: none;
+  }
+  
+  .mobile-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .mobile-card-header {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  
+  .mobile-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .mobile-card-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  .mobile-card-label {
+    font-weight: 600;
+    color: #666;
+    font-size: 12px;
+  }
+  
+  .mobile-card-value {
+    font-size: 14px;
+    color: #333;
+    text-align: right;
+  }
+  
+  /* Button adjustments in mobile cards */
+  .mobile-card .btn {
+    font-size: 12px;
+    padding: 6px 12px;
+    margin-top: 5px;
+  }
+  
+  /* Hide desktop table on mobile */
+  .hide-on-mobile {
+    display: none !important;
+  }
+  
+  /* Modal adjustments for mobile */
+  .modal-dialog {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+  
+  .modal-content {
+    border-radius: 10px;
+  }
+  
+  .modal-body {
+    padding: 20px 15px;
+    font-size: 14px;
+  }
+}
+
+/* Extra small phones */
+@media only screen and (max-width: 375px) {
+  /* Even tighter spacing */
+  .ed-container {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  
+  .ed-contact .row.shadow .col-3,
+  .ed-contact .row.shadow .col-9 {
+    padding: 10px;
+  }
+  
+  /* Smaller typography */
+  .fieldset label {
+    font-size: 16px;
+  }
+  
+  .mobile-nav-toggle {
+    font-size: 14px;
+    padding: 10px;
+  }
+  
+  /* Mobile card adjustments */
+  .mobile-card {
+    padding: 10px;
+  }
+  
+  .mobile-card-header {
+    font-size: 14px;
+  }
+  
+  .mobile-card-value {
+    font-size: 12px;
+  }
+}
+
+/* Additional mobile improvements */
+@media only screen and (max-width: 991px) {
+  /* Profile specific improvements */
+  .ed-contact .pt-5 {
+    padding-top: 2rem !important;
+  }
+  
+  /* Ensure proper height adjustment */
+  .ed-contact .row.shadow {
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  /* Logout button improvement */
+  .btn-outline-danger {
+    width: 100%;
+    margin-top: 15px;
+  }
+  
+  /* Form improvements */
+  .ed-checkout__form-group {
+    margin-bottom: 20px;
+  }
+  
+  .ed-checkout__label {
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 600;
+  }
+  
+  /* Button container improvements */
+  .ed-hero__btn {
+    margin-top: 20px;
+  }
+  
+  .ed-btn {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    padding: 12px 20px;
+  }
+}
+
+/* Touch improvements for better mobile interaction */
+@media (pointer: coarse) {
+  /* Increase touch targets */
+  .nav-link {
+    min-height: 48px;
+    padding: 12px 16px !important;
+  }
+  
+  .btn {
+    min-height: 44px;
+    padding: 10px 15px;
+  }
+  
+  /* Table touch improvements */
+  .table td, .table th {
+    padding: 12px 8px;
+  }
+  
+  /* Pagination touch targets */
+  .ed-pagination__list a {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media only screen and (max-width: 768px) and (orientation: landscape) {
+  .ed-contact .row.shadow .col-3 {
+    padding: 15px;
+  }
+  
+  .ed-contact .row.shadow .col-9 {
+    padding: 15px;
+  }
+  
+  /* Smaller profile image in landscape */
+  .figure img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .mobile-nav-toggle,
+  .ed-header,
+  .ed-footer,
+  #preloader,
+  .progress-wrap {
+    display: none !important;
+  }
+  
+  .ed-contact .row.shadow {
+    box-shadow: none !important;
+    border: 1px solid #ccc;
+  }
+  
+  .table {
+    font-size: 12px;
+  }
+}

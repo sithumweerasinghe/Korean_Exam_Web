@@ -88,3 +88,61 @@
   margin: 60px;
   height: 600px;
 }
+
+/* Mobile responsive styles for papers */
+@media only screen and (max-width: 991px) {
+  .ed-paper__card-item {
+    height: 200px;
+    margin-top: 15px;
+  }
+  
+  .countdown-bg {
+    width: 85%;
+    margin: 40px auto;
+    padding: 20px;
+    height: auto;
+    min-height: 400px;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .ed-paper__card-item {
+    height: 180px;
+    margin-top: 10px;
+  }
+  
+  .ed-paper__card-item:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+  
+  .ed-paper__card-item .hover-text {
+    font-size: 16px;
+  }
+  
+  .countdown-bg {
+    width: 95%;
+    margin: 20px auto;
+    padding: 15px;
+    height: auto;
+    min-height: 300px;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .ed-paper__card-item {
+    height: 160px;
+    margin-top: 8px;
+  }
+  
+  .ed-paper__card-item .hover-text {
+    font-size: 14px;
+  }
+  
+  .countdown-bg {
+    width: 100%;
+    margin: 15px auto;
+    padding: 10px;
+    height: auto;
+    min-height: 250px;
+  }
+}

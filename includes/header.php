@@ -30,9 +30,6 @@ require_once "api/config/dbconnection.php";
                         <li class="offcanvas__menu_li">
                             <a class="offcanvas__menu_item <?php echo $contact ?>" href="contact"> <?= $translations['contact']; ?></a>
                         </li>
-                        <li class="offcanvas__menu_li">
-                            <a class="offcanvas__menu_item <?php echo $contact ?>" href="mouse-training"><?= $translations['mouse_training']; ?></a>
-                        </li>
                     </ul>
                 </nav>
             </div>
@@ -68,9 +65,7 @@ require_once "api/config/dbconnection.php";
                     <li class="<?php echo $contact ?>" style="padding-left: 20px;">
                         <a href="contact"><?= $translations['contact']; ?></a>
                     </li>
-                    <li style="padding-left: 20px;">
-                        <a href="mouse-training"><?= $translations['mouse_training']; ?></a>
-                    </li>
+
                 </ul>
             </nav>
             <div class="ed-header__right">
@@ -101,7 +96,7 @@ require_once "api/config/dbconnection.php";
 
                     if ($fullName) {
                     ?>
-                        <label style="font-size: 14px;" class="text-black fw-medium"><?= $firstName . " " . $lastName; ?></label>
+                        <label style="font-size: 14px;" class="text-black fw-medium d-none d-md-inline"><?= $firstName . " " . $lastName; ?></label>
                         <div class="d-inline-block position-relative overflow-hidden rounded-circle" style="width: 50px; height: 50px;" onclick="window.location = 'profile'">
                             <img src="<?= $profileImage ?>" alt="profile_img" class="w-100 h-100 object-fit-cover">
                         </div>
@@ -109,7 +104,7 @@ require_once "api/config/dbconnection.php";
                     } else {
                     ?>
                         <div class="ed-topbar__info-buttons">
-                            <button type="button" class="register-btn w-auto" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            <button type="button" class="register-btn w-auto d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#registerModal">
                                 <?= $translations['register']; ?>
                             </button>
                             <button type="button" class="login-btn" data-bs-toggle="modal" data-bs-target="#loginModal">

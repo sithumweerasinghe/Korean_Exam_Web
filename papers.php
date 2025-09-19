@@ -187,12 +187,15 @@
     <script src="assets/js/clientScript.js"></script>
     <script src="assets/js/language.js"></script>
     <script>
+        // Mobile device function for future use (redirect removed)
         function isMobileDevice() {
             return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile|Windows Phone|webOS/i.test(navigator.userAgent);
         }
-        if (isMobileDevice()) {
-            window.location.href = "./mobile";
-        }
+        
+        // Removed mobile redirect as the site is now mobile responsive
+        // if (isMobileDevice()) {
+        //     window.location.href = "./mobile";
+        // }
 
         const allPapers = <?= json_encode($nonSamplePapers); ?>;
         const papersPerPage = 8;

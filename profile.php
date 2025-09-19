@@ -69,6 +69,11 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                     <div class="container ed-container mt-3 pt-5">
                         <div class="row mt-5 shadow rounded mb-5" style="height: 670px; ">
                             <div class="col-3 bg-white py-5 text-center ">
+                                <!-- Mobile Navigation Toggle -->
+                                <button class="mobile-nav-toggle d-none" onclick="toggleMobileNav()">
+                                    <i class="fa fa-bars me-2"></i> Navigation Menu
+                                </button>
+                                
                                 <div class="d-inline-block position-relative overflow-hidden rounded-circle" style="width: 100px; height: 100px;" onclick="window.location = 'profile'">
                                     <img src="<?= $profileImage ?>" alt="profile_img" class="w-100 h-100 object-fit-cover">
                                 </div>
@@ -152,7 +157,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                                 <?php if ($isGoogleUser) echo 'disabled'; ?> />
                                         </div>
                                     </div>
-                                    <div class=col-12">
+                                    <div class="col-12">
                                         <div class="ed-checkout__form-group">
                                             <label class="ed-checkout__label">Last Name</label>
                                             <input
@@ -164,7 +169,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                                 <?php if ($isGoogleUser) echo 'disabled'; ?> />
                                         </div>
                                     </div>
-                                    <div class=col-12">
+                                    <div class="col-12">
                                         <div class="ed-checkout__form-group">
                                             <label class="ed-checkout__label">Mobile</label>
                                             <input
@@ -202,7 +207,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                                     required />
                                             </div>
                                         </div>
-                                        <div class=col-12">
+                                        <div class="col-12">
                                             <div class="ed-checkout__form-group">
                                                 <label class="ed-checkout__label">New Password*</label>
                                                 <input
@@ -213,7 +218,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                                     required />
                                             </div>
                                         </div>
-                                        <div class=col-12">
+                                        <div class="col-12">
                                             <div class="ed-checkout__form-group">
                                                 <label class="ed-checkout__label">Confirm Password*</label>
                                                 <input
@@ -256,17 +261,18 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                         $chunks = array_chunk($invoices, $invoicesPerPage);
                                     ?>
 
-                                        <table class="table table-hover" id="invoiceTable">
-                                            <thead class="table-light">
-                                                <tr class="" style="height: 60px;">
-                                                    <th>Package or Paper</th>
-                                                    <th scope="col">Created On</th>
-                                                    <th scope="col">Total</th>
-                                                    <th scope="col">Status</th>
-                                                    <th scope="col">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" id="invoiceTable">
+                                                <thead class="table-light">
+                                                    <tr class="" style="height: 60px;">
+                                                        <th>Package or Paper</th>
+                                                        <th scope="col">Created On</th>
+                                                        <th scope="col">Total</th>
+                                                        <th scope="col">Status</th>
+                                                        <th scope="col">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
                                                 <?php
                                                 foreach ($chunks[0] as $invoice) {
                                                 ?>
@@ -290,6 +296,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                                 ?>
                                             </tbody>
                                         </table>
+                                        </div>
                                         <div class="row">
                                             <div class="col-12">
                                                 <div class="ed-pagination">
@@ -327,18 +334,19 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                         $totalPages = ceil($totalResults / $resultsPerPage);
                                         $resultChunks = array_chunk($examResults, $resultsPerPage);
                                     ?>
-                                        <table class="table table-hover" id="invoiceTable">
-                                            <thead class="table-light">
-                                                <tr class="" style="height: 60px;">
-                                                    <th>Exam</th>
-                                                    <th scope="col">Admission No</th>
-                                                    <th scope="col">Mark</th>
-                                                    <th scope="col">Cutoff Mark</th>
-                                                    <th scope="col">Done by</th>
-                                                    <th scope="col">Share</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" id="examResultsTable">
+                                                <thead class="table-light">
+                                                    <tr class="" style="height: 60px;">
+                                                        <th>Exam</th>
+                                                        <th scope="col">Admission No</th>
+                                                        <th scope="col">Mark</th>
+                                                        <th scope="col">Cutoff Mark</th>
+                                                        <th scope="col">Done by</th>
+                                                        <th scope="col">Share</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
                                                 <?php
                                                 foreach ($resultChunks[0] as $result) {
                                                 ?>
@@ -361,6 +369,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                                 ?>
                                             </tbody>
                                         </table>
+                                        </div>
                                     <?php
                                     } else {
                                         echo "no results";
@@ -395,10 +404,11 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                         $totalPages = ceil($totalPaperResults / $resultsPerPage);
                                         $paperResultChunks = array_chunk($paperResults, $resultsPerPage);
                                     ?>
-                                        <table class="table table-hover" id="invoiceTable">
-                                            <thead class="table-light">
-                                                <tr class="" style="height: 60px;">
-                                                    <th>Paper</th>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" id="paperResultsTable">
+                                                <thead class="table-light">
+                                                    <tr class="" style="height: 60px;">
+                                                        <th>Paper</th>
                                                     <th scope="col">Admission No</th>
                                                     <th scope="col">Mark</th>
                                                     <th scope="col">Cutoff Mark</th>
@@ -421,6 +431,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                                 ?>
                                             </tbody>
                                         </table>
+                                        </div>
                                     <?php
                                     } else {
                                         echo "no results";
@@ -435,7 +446,6 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
                                             </div>
                                         </div>
                                     </div>
-                                    </script>
                                 </fieldset>
                             </div>
                         </div>
@@ -505,6 +515,111 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"]))) {
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
     <script>
+        // Mobile Navigation Toggle
+        function toggleMobileNav() {
+            const sidebar = document.querySelector('.col-3');
+            sidebar.classList.toggle('nav-mobile-active');
+        }
+
+        // Initialize mobile responsive features
+        function initMobileFeatures() {
+            // Add responsive classes based on screen size
+            function checkScreenSize() {
+                const isMobile = window.innerWidth <= 575;
+                const isTablet = window.innerWidth <= 768;
+                
+                // Add mobile classes
+                document.body.classList.toggle('mobile-view', isMobile);
+                document.body.classList.toggle('tablet-view', isTablet && !isMobile);
+                
+                // Handle table responsiveness
+                handleTableResponsiveness(isMobile);
+            }
+            
+            // Handle table responsiveness
+            function handleTableResponsiveness(isMobile) {
+                const tables = document.querySelectorAll('table');
+                tables.forEach(table => {
+                    const wrapper = table.parentElement;
+                    if (isMobile) {
+                        // Add mobile card view for very small screens
+                        if (!wrapper.classList.contains('table-responsive-mobile')) {
+                            wrapper.classList.add('table-responsive-mobile');
+                        }
+                        // Convert table to mobile cards if needed
+                        convertTableToMobileCards(table);
+                    } else {
+                        wrapper.classList.remove('table-responsive-mobile');
+                        // Remove mobile cards if they exist
+                        const mobileCards = wrapper.querySelector('.table-mobile-cards');
+                        if (mobileCards) {
+                            mobileCards.remove();
+                        }
+                        table.style.display = '';
+                    }
+                });
+            }
+            
+            // Convert table to mobile-friendly card layout
+            function convertTableToMobileCards(table) {
+                if (table.dataset.mobileConverted === 'true') return;
+                
+                const wrapper = table.parentElement;
+                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+                const rows = Array.from(table.querySelectorAll('tbody tr'));
+                
+                const mobileCardsContainer = document.createElement('div');
+                mobileCardsContainer.className = 'table-mobile-cards';
+                
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td, th'));
+                    const card = document.createElement('div');
+                    card.className = 'mobile-card';
+                    
+                    // Card header (first cell content)
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'mobile-card-header';
+                    cardHeader.textContent = cells[0]?.textContent.trim() || '';
+                    card.appendChild(cardHeader);
+                    
+                    // Card rows for each data point
+                    cells.forEach((cell, index) => {
+                        if (index === 0) return; // Skip first cell as it's the header
+                        
+                        const cardRow = document.createElement('div');
+                        cardRow.className = 'mobile-card-row';
+                        
+                        const label = document.createElement('div');
+                        label.className = 'mobile-card-label';
+                        label.textContent = headers[index] || '';
+                        
+                        const value = document.createElement('div');
+                        value.className = 'mobile-card-value';
+                        value.innerHTML = cell.innerHTML;
+                        
+                        cardRow.appendChild(label);
+                        cardRow.appendChild(value);
+                        card.appendChild(cardRow);
+                    });
+                    
+                    mobileCardsContainer.appendChild(card);
+                });
+                
+                wrapper.insertBefore(mobileCardsContainer, table);
+                table.classList.add('hide-on-mobile');
+                table.dataset.mobileConverted = 'true';
+            }
+            
+            // Initial check
+            checkScreenSize();
+            
+            // Listen for resize events
+            window.addEventListener('resize', checkScreenSize);
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initMobileFeatures);
+
         function shareResult(paperName, marks, cutoffMark) {
             const customMessage = `I scored ${marks} marks in ${paperName}! Preparing with TopikSir.com helped me a lot. If you're preparing for the Korean TOPIK exam, check it out and make your fear disappear!`;
             const shareData = {

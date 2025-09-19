@@ -31,6 +31,32 @@ function showToast(type, message) {
     }).showToast();
 }
 
+// Mobile menu enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    // Close mobile menu when clicking on a menu item
+    const mobileMenuItems = document.querySelectorAll('.offcanvas__menu_item');
+    mobileMenuItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            const mobileModal = document.getElementById('offcanvas-modal');
+            if (mobileModal) {
+                const modal = bootstrap.Modal.getInstance(mobileModal);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        });
+    });
+    
+    // Improve mobile touch experience
+    const mobileToggler = document.querySelector('.mobile-menu-offcanvas-toggler');
+    if (mobileToggler) {
+        mobileToggler.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            this.click();
+        });
+    }
+});
+
 function SignUp() {
     var name = $("#register_name").val().trim();
     var email = $("#register_email").val().trim();
