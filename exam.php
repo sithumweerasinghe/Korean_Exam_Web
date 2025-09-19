@@ -45,7 +45,7 @@ if (!(isset($_SESSION["client_id"]) || isset($_COOKIE["remember_me"])) && (!isse
     <link rel="stylesheet" href="assets/css/exam-styles.css" />
 </head>
 
-<body class="element-wrapper ">
+<body class="element-wrapper" style="background-image: url('assets/images/section-bg-11.png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; min-height: 100vh;">
     <!-- Orientation Overlay for Mobile Portrait Mode -->
     <div id="orientation-overlay">
         <div class="rotate-icon">📱</div>
