@@ -1234,3 +1234,99 @@
                 height: calc(100vh - 60px) !important;
             }
         }
+
+        /* Mobile Audio Control Button Styles */
+        .mobile-audio-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .mobile-audio-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mobile-audio-btn:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+        }
+
+        .mobile-audio-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+        }
+
+        .mobile-audio-btn.playing {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .mobile-audio-btn.playing:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        .mobile-audio-btn i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .mobile-audio-btn.loading {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            cursor: not-allowed;
+        }
+
+        .mobile-audio-btn.loading::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .mobile-audio-btn.loading i {
+            opacity: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Mobile responsive adjustments for audio button */
+        @media (max-width: 576px) {
+            .mobile-audio-btn {
+                min-width: 130px;
+                padding: 10px 18px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mobile-audio-btn {
+                min-width: 120px;
+                padding: 9px 16px;
+                font-size: 14px;
+            }
+        }

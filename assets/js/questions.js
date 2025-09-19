@@ -105,6 +105,11 @@ function updateAllAudioVolume(volume) {
   if (currentAudio) {
     currentAudio.volume = volume / 100;
   }
+  
+  // Update mobile audio player
+  if (mobileAudioElement) {
+    mobileAudioElement.volume = volume / 100;
+  }
 }
 
 let totalReadingTime = 0;
@@ -196,22 +201,21 @@ function renderDesktopLayout(question, isSampleQuestion, questionNumber, current
     return `
       <div class="question-desktop-layout">
         <!-- Left side - Media content -->
-        <div class="question-media-side">
-          ${question.image ? `
-            <img src="${question.image}" alt="Question Image" class="clickable-image" onclick="openImageModal('${question.image}')" title="Click to zoom" />
-          ` : ''}
+        <div class="question-media-side" style=" display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 250px;">
           ${question.audio ? `
-            <div class="audio-player-container">
-              <audio controls style="width: 100%;">
+            <div class="audio-player-container" style=" webkit-fill-available; width: 100%;">
+              <audio controls style="width: 200px;">
                 <source src="${question.audio}" type="audio/mpeg">
                 Your browser does not support the audio element.
               </audio>
               <p class="mt-2 text-center text-muted">
-                <i class="fa fa-headphones me-2"></i>
-                Please use headphones for better audio quality
               </p>
             </div>
           ` : ''}
+          ${question.image ? `
+            <img src="${question.image}" alt="Question Image" class="clickable-image" onclick="openImageModal('${question.image}')" title="Click to zoom" />
+          ` : ''}
+          
         </div>
         
         <!-- Right side - Question content -->
@@ -291,6 +295,14 @@ function renderMobileLayout(question, isSampleQuestion, questionNumber, currentG
         ${isSampleQuestion ? "" : `<span class="question-number">${questionNumber}.</span>`}
         ${question.question ? question.question.replace(/\n/g, '<br>') : ''}
       </h6>
+      ${question.audio ? `
+        <div class="mobile-audio-control mt-3 mb-3">
+          <button id="mobile-audio-btn" class="btn btn-primary mobile-audio-btn" onclick="toggleMobileAudio()" type="button">
+            <i class="fa fa-play me-2" id="mobile-audio-icon"></i>
+            <span id="mobile-audio-text">Play Audio</span>
+          </button>
+          <audio id="mobile-audio-player" src="${question.audio}" preload="auto" style="display: none;"></audio>
+        </div>` : ""}
       ${question.image ? `<div class="col-lg-12 mt-3 mb-3">
               <img src="${question.image}" width="100%" style="max-width: 350px;" alt="Image" class="img-fluid clickable-image" onclick="openImageModal('${question.image}')" title="Click to zoom">
             </div>` : ""}
@@ -343,39 +355,32 @@ function displayQuestion(index) {
     currentAudio.currentTime = 0;
   }
 
-  // Play audio if available (but not in desktop layout where audio controls are shown)
-  if (question.audio && !isDesktopLayout()) {
-    currentAudio = new Audio(question.audio);
+  // Clean up mobile audio controls
+  cleanupMobileAudio();
 
+  // For mobile layout with audio, we'll use the new audio control button
+  // No auto-play, user must manually trigger audio playback
+  if (question.audio && !isDesktopLayout()) {
+    // Audio will be handled by the mobile audio control button
+    // No automatic playback
+    console.log('Mobile audio question detected, controls will be available in UI');
+  } else if (question.audio && isDesktopLayout()) {
+    // Desktop layout - keep existing behavior if needed
+    currentAudio = new Audio(question.audio);
+    
     // Apply current volume setting
     const savedVolume = localStorage.getItem('examVolume') || '50';
     currentAudio.volume = parseInt(savedVolume) / 100;
 
-    // Add mobile-friendly play handling
-    const playPromise = currentAudio.play();
-    if (playPromise !== undefined) {
-      playPromise.then(() => {
-        isAudioPlaying = true;
-        document.getElementById("next-btn").disabled = true;
-        updateMobileNavState();
-      }).catch(error => {
-        console.warn('Audio autoplay failed:', error);
-        showAudioPlayButton(currentAudio);
-      });
-    }
-
+    // Desktop may have different audio handling
     currentAudio.onended = () => {
       isAudioPlaying = false;
-      document.getElementById("next-btn").disabled = false;
-      removeAudioPlayButton();
       updateMobileNavState();
     };
 
-    // Handle audio errors
     currentAudio.onerror = (error) => {
-      console.error('Audio playback error:', error);
+      console.error('Desktop audio playback error:', error);
       isAudioPlaying = false;
-      document.getElementById("next-btn").disabled = false;
       showAudioError();
       updateMobileNavState();
     };
@@ -588,6 +593,7 @@ function renderCategory(category, questions, startNumber) {
         */
         
         // TESTING MODE - Allow navigation to any question
+        cleanupMobileAudio(); // Clean up audio before navigation
         currentQuestionIndex = questionIndex;
         displayQuestion(questionIndex);
       }
@@ -746,6 +752,9 @@ function saveAnswer() {
 function nextQuestion() {
   saveAnswer();
 
+  // Clean up mobile audio before moving to next question
+  cleanupMobileAudio();
+
   // DISABLED FOR TESTING - Reading section completion check commented out
   /*
   if (
@@ -766,6 +775,9 @@ function nextQuestion() {
 }
 
 function previousQuestion() {
+  // Clean up mobile audio before moving to previous question
+  cleanupMobileAudio();
+
   if (currentQuestionIndex > 0) {
     currentQuestionIndex--;
     displayQuestion(currentQuestionIndex);
@@ -1248,6 +1260,7 @@ function renderQuestionMap(openIfClosed){
     // TESTING MODE - Allow navigation to any question
     tile.addEventListener('click', () => {
       if (isTransitioningToListening) return;
+      cleanupMobileAudio(); // Clean up audio before navigation
       currentQuestionIndex = idx;
       displayQuestion(currentQuestionIndex);
       closeQuestionMap();
@@ -1471,6 +1484,165 @@ function enhancedCloseImageModal() {
     currentZoom = 1;
     translateX = 0;
     translateY = 0;
+}
+
+// Mobile Audio Control Functions
+let mobileAudioIsPlaying = false;
+let mobileAudioElement = null;
+
+function toggleMobileAudio() {
+    const audioBtn = document.getElementById('mobile-audio-btn');
+    const audioIcon = document.getElementById('mobile-audio-icon');
+    const audioText = document.getElementById('mobile-audio-text');
+    const audioPlayer = document.getElementById('mobile-audio-player');
+    
+    if (!audioPlayer) {
+        console.error('Mobile audio player not found');
+        return;
+    }
+    
+    if (mobileAudioIsPlaying) {
+        // Stop audio
+        stopMobileAudio();
+    } else {
+        // Play audio
+        playMobileAudio();
+    }
+}
+
+function playMobileAudio() {
+    const audioBtn = document.getElementById('mobile-audio-btn');
+    const audioIcon = document.getElementById('mobile-audio-icon');
+    const audioText = document.getElementById('mobile-audio-text');
+    const audioPlayer = document.getElementById('mobile-audio-player');
+    
+    if (!audioPlayer) return;
+    
+    // Set loading state
+    audioBtn.classList.add('loading');
+    audioBtn.disabled = true;
+    audioText.textContent = 'Loading...';
+    
+    // Apply volume setting
+    const savedVolume = localStorage.getItem('examVolume') || '50';
+    audioPlayer.volume = parseInt(savedVolume) / 100;
+    
+    // Set up event listeners
+    audioPlayer.onloadstart = function() {
+        audioBtn.classList.add('loading');
+    };
+    
+    audioPlayer.oncanplaythrough = function() {
+        audioBtn.classList.remove('loading');
+    };
+    
+    audioPlayer.onended = function() {
+        stopMobileAudio();
+    };
+    
+    audioPlayer.onerror = function(error) {
+        console.error('Mobile audio playback error:', error);
+        audioBtn.classList.remove('loading', 'playing');
+        audioBtn.disabled = false;
+        audioIcon.className = 'fa fa-exclamation-triangle me-2';
+        audioText.textContent = 'Audio Error';
+        
+        if (typeof Toastify !== 'undefined') {
+            Toastify({
+                text: "Audio playback failed. Please try again.",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                backgroundColor: "#dc3545",
+            }).showToast();
+        }
+        
+        setTimeout(() => {
+            audioIcon.className = 'fa fa-play me-2';
+            audioText.textContent = 'Play Audio';
+        }, 2000);
+    };
+    
+    // Try to play audio
+    const playPromise = audioPlayer.play();
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            // Audio started successfully
+            mobileAudioIsPlaying = true;
+            mobileAudioElement = audioPlayer;
+            
+            audioBtn.classList.remove('loading');
+            audioBtn.classList.add('playing');
+            audioBtn.disabled = false;
+            audioIcon.className = 'fa fa-stop me-2';
+            audioText.textContent = 'Stop Audio';
+            
+            // Disable next button while audio is playing (if required)
+            const nextBtn = document.getElementById("next-btn");
+            if (nextBtn) {
+                nextBtn.disabled = true;
+            }
+            updateMobileNavState();
+            
+        }).catch(error => {
+            console.error('Mobile audio play failed:', error);
+            audioBtn.classList.remove('loading', 'playing');
+            audioBtn.disabled = false;
+            audioIcon.className = 'fa fa-play me-2';
+            audioText.textContent = 'Play Audio';
+            
+            if (typeof Toastify !== 'undefined') {
+                Toastify({
+                    text: "Please tap the play button to start audio.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: "#ffc107",
+                }).showToast();
+            }
+        });
+    }
+}
+
+function stopMobileAudio() {
+    const audioBtn = document.getElementById('mobile-audio-btn');
+    const audioIcon = document.getElementById('mobile-audio-icon');
+    const audioText = document.getElementById('mobile-audio-text');
+    const audioPlayer = document.getElementById('mobile-audio-player');
+    
+    if (audioPlayer && mobileAudioIsPlaying) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+    }
+    
+    // Reset UI state
+    if (audioBtn) {
+        audioBtn.classList.remove('loading', 'playing');
+        audioBtn.disabled = false;
+    }
+    if (audioIcon) {
+        audioIcon.className = 'fa fa-play me-2';
+    }
+    if (audioText) {
+        audioText.textContent = 'Play Audio';
+    }
+    
+    mobileAudioIsPlaying = false;
+    mobileAudioElement = null;
+    
+    // Re-enable next button
+    const nextBtn = document.getElementById("next-btn");
+    if (nextBtn) {
+        nextBtn.disabled = false;
+    }
+    updateMobileNavState();
+}
+
+// Function to clean up mobile audio when changing questions
+function cleanupMobileAudio() {
+    if (mobileAudioElement && mobileAudioIsPlaying) {
+        stopMobileAudio();
+    }
 }
 
 // Expose image modal functions globally
