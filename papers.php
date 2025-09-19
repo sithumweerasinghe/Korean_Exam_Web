@@ -76,10 +76,10 @@
     <div id="smooth-wrapper">
         <div id="smooth-content">
             <main>
-                <div class="section-bg hero-bg-2">
+                <div class="section-bg hero-bg-2" style="padding-top: 100px !important;">
                     <section
                         class="ed-breadcrumbs background-image"
-                        style="background-image: url('assets/images/breadcrumbs-bg.png')">
+                        style=" padding: 40px 0;">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-6 col-md-6 col-12">
@@ -98,14 +98,11 @@
                 </div>
 
                 <section
-                    class="ed-contact ed-contact--style2 pt-5 position-relative bg-gradient-free">
+                    class="ed-contact ed-contact--style2  position-relative bg-gradient-free pt-0">
                     <div class="container ed-container pt-5">
                         <div class="row mb-4">
                             <div class="col-12 text-center">
                                 <div class="section-header">
-                                    <span class="badge bg-success text-white px-3 py-2 mb-3">
-                                        <i class="icofont-gift"></i> Free Content
-                                    </span>
                                     <h5 class="section-title"><?= $translations['free_papers']['heading'] ?></h5>
                                     <p class="text-muted">Practice with our free sample papers</p>
                                 </div>
@@ -167,14 +164,11 @@
                 </div>
 
                 <section
-                    class="ed-contact mb-5 ed-contact--style2 pt-5 position-relative bg-light">
+                    class="ed-contact mb-5 ed-contact--style2 pt-0 position-relative bg-light">
                     <div class="container ed-container pt-5">
                         <div class="row mb-4">
                             <div class="col-12 text-center">
                                 <div class="section-header">
-                                    <span class="badge bg-primary text-white px-3 py-2 mb-3">
-                                        <i class="icofont-star"></i> Premium Content
-                                    </span>
                                     <h5 class="section-title"><?= $translations['paid_papers']['heading'] ?></h5>
                                     <p class="text-muted">Access our complete collection of exam papers</p>
                                 </div>
