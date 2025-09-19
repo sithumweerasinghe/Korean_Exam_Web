@@ -1,23 +1,26 @@
 /*
- * TESTING MODE: ALL TIMER FUNCTIONALITY AND NAVIGATION RESTRICTIONS DISABLED
- * ============================================================================
- * The following timer functions have been commented out for testing purposes:
- * - setupTimer() - Individual question timers
- * - startSectionTimers() - Reading/Listening section timers
- * - startListeningTimer() - Listening section timer
- * - stopTimers() - Timer cleanup function
- * - showListeningInstructions() instruction timer
- * - Time tracking in endQuiz()
+ * MIXED PROGRESSION EXAM MODE ENABLED
+ * ===================================
+ * Different behaviors for reading vs listening sections:
  * 
- * The following navigation restrictions have been disabled:
- * - nextQuestion() reading completion check
- * - Question map listening question locks
- * - Category navigation access restrictions
- * - "Complete reading before listening" enforcement
+ * READING QUESTIONS:
+ * - ✅ Next button ENABLED (manual progression)
+ * - ❌ NO countdown timers
+ * - ❌ NO auto-next functionality  
+ * - ✅ Manual navigation allowed
+ * - ✅ Complete 20 questions to unlock listening section
  * 
- * This allows testing the exam functionality without time constraints
- * and with free navigation between all questions.
- * To re-enable timers and restrictions, uncomment the marked sections.
+ * LISTENING QUESTIONS:
+ * - ❌ Next button DISABLED 
+ * - ✅ Countdown timers for each question
+ * - ✅ Auto-next when timer expires
+ * - ❌ No manual navigation during questions
+ * - ✅ Auto progression through all listening questions
+ * 
+ * SECTION TRANSITION:
+ * - Reading → 60-second instruction period → Listening
+ * - Automatic unlock of listening section after reading completion
+ * - Question map access control maintained
  */
 
 let questions = [];
@@ -112,6 +115,194 @@ function updateAllAudioVolume(volume) {
   }
 }
 
+// Face Detection Popup System
+function showFaceDetectionPopup() {
+  // Increment popup count
+  faceDetectionPopupCount++;
+  
+  console.log(`Face detection popup ${faceDetectionPopupCount} of ${faceDetectionMaxPopups}`);
+  
+  // Create popup overlay
+  const popup = document.createElement('div');
+  popup.id = 'face-detection-popup';
+  popup.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-in-out;
+  `;
+  
+  // Create popup content
+  const popupContent = document.createElement('div');
+  popupContent.style.cssText = `
+    background-color: #dc3545;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 300px;
+    margin: 20px;
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+    animation: slideIn 0.3s ease-out;
+    position: relative;
+  `;
+  
+  popupContent.innerHTML = `
+    <button onclick="closeFaceDetectionPopup(this)" style="
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">×</button>
+    <div style="font-size: 32px; margin-bottom: 10px;">⚠️</div>
+    <h4 style="margin: 0 0 8px 0; font-weight: bold; font-size: 16px;">Face Not Detected</h4>
+    <p style="margin: 0; font-size: 14px; line-height: 1.4;">
+      Please ensure your face is in front of the camera
+    </p>
+  `;
+  
+  popup.appendChild(popupContent);
+  document.body.appendChild(popup);
+  
+  // Add CSS animations if not already added
+  if (!document.getElementById('face-detection-styles')) {
+    const style = document.createElement('style');
+    style.id = 'face-detection-styles';
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes slideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  // Auto-dismiss popup after 3 seconds
+  setTimeout(() => {
+    popup.style.animation = 'fadeOut 0.3s ease-in-out';
+    setTimeout(() => {
+      if (popup.parentNode) {
+        popup.parentNode.removeChild(popup);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// Close face detection popup manually
+function closeFaceDetectionPopup(button) {
+  const popup = button.closest('#face-detection-popup');
+  if (popup) {
+    popup.style.animation = 'fadeOut 0.3s ease-in-out';
+    setTimeout(() => {
+      if (popup.parentNode) {
+        popup.parentNode.removeChild(popup);
+      }
+    }, 300);
+  }
+}
+
+// Random Timing System for Face Detection
+function initializeFaceDetectionSystem() {
+  // Clear any existing timers
+  clearFaceDetectionTimers();
+  
+  // Reset counter
+  faceDetectionPopupCount = 0;
+  faceDetectionActive = true;
+  
+  console.log('Initializing face detection system...');
+  
+  // Calculate total exam duration (reading + listening time in seconds)
+  const readingMinutes = parseInt(readingTimeLeft.split(':')[0]) || 0;
+  const readingSeconds = parseInt(readingTimeLeft.split(':')[1]) || 0;
+  const listeningMinutes = parseInt(listeningTimeLeft.split(':')[0]) || 0;
+  const listeningSecondsLeft = parseInt(listeningTimeLeft.split(':')[1]) || 0;
+  
+  const totalExamSeconds = (readingMinutes * 60 + readingSeconds) + (listeningMinutes * 60 + listeningSecondsLeft);
+  
+  console.log(`Total exam duration: ${totalExamSeconds} seconds`);
+  
+  // Don't initialize if exam is too short
+  if (totalExamSeconds < 300) { // Less than 5 minutes
+    console.log('Exam too short for face detection system');
+    return;
+  }
+  
+  // Generate 4 random intervals throughout the exam
+  const intervals = [];
+  const minInterval = 60; // Minimum 1 minute between popups
+  const maxInterval = Math.floor(totalExamSeconds / 4); // Divide exam into 4 quarters
+  
+  for (let i = 0; i < faceDetectionMaxPopups; i++) {
+    // Create random intervals in different quarters of the exam
+    const quarterStart = Math.floor((totalExamSeconds / faceDetectionMaxPopups) * i);
+    const quarterEnd = Math.floor((totalExamSeconds / faceDetectionMaxPopups) * (i + 1));
+    
+    // Random time within this quarter (but not too close to start/end)
+    const randomTime = quarterStart + minInterval + Math.random() * (quarterEnd - quarterStart - minInterval * 2);
+    intervals.push(Math.floor(randomTime) * 1000); // Convert to milliseconds
+  }
+  
+  console.log('Face detection intervals (seconds):', intervals.map(i => i / 1000));
+  
+  // Schedule the popups
+  intervals.forEach((interval, index) => {
+    const timeout = setTimeout(() => {
+      if (faceDetectionActive && faceDetectionPopupCount < faceDetectionMaxPopups) {
+        showFaceDetectionPopup();
+      }
+    }, interval);
+    
+    faceDetectionTimeouts.push(timeout);
+  });
+}
+
+function clearFaceDetectionTimers() {
+  // Clear all existing timeouts
+  faceDetectionTimeouts.forEach(timeout => clearTimeout(timeout));
+  faceDetectionTimeouts = [];
+  
+  // Clear any intervals if used
+  faceDetectionIntervals.forEach(interval => clearInterval(interval));
+  faceDetectionIntervals = [];
+  
+  console.log('Face detection timers cleared');
+}
+
+function stopFaceDetectionSystem() {
+  faceDetectionActive = false;
+  clearFaceDetectionTimers();
+  console.log('Face detection system stopped');
+}
+
 let totalReadingTime = 0;
 let totalListeningTime = 0;
 let readingTimer;
@@ -124,12 +315,27 @@ let listeningTimeSpent = 0; // Was tracking listening time
 let totalTimeSpent = 0; // Was tracking total time
 let examStartTime = Date.now(); // Keep for compatibility but not used
 
+// Face Detection System Variables
+let faceDetectionActive = false;
+let faceDetectionPopupCount = 0;
+let faceDetectionMaxPopups = 4;
+let faceDetectionIntervals = [];
+let faceDetectionTimeouts = [];
+
 let isListeningStarted = false;
 let isTransitioningToListening = false;
 
 let isSamplePaper = false;
 let isExamPaper = false;
 let isReadingCompleted = false;
+
+// Auto progression control variables
+let autoProgressionEnabled = true;
+let readingQuestionLimit = 20;
+let listeningQuestionLimit = 20;
+let questionTimeLimit = 30; // Default 30 seconds per question
+let autoNextEnabled = true;
+let readingAutoNextDisabled = true; // Disable auto-next for reading questions
 
 
 function loadQuestions(questions_array, isSample, isExam, paper_id, exam_id) {
@@ -173,8 +379,14 @@ function loadQuestions(questions_array, isSample, isExam, paper_id, exam_id) {
     console.log('Question displayed');
 
     console.log('Starting timers...');
-    // DISABLED FOR TESTING - Section timers start commented out
-    // startSectionTimers();
+    // Re-enabled section timers
+    startSectionTimers();
+    
+    // Initialize face detection system for exam papers only
+    if (isExamPaper) {
+        console.log('Initializing face detection system for exam...');
+        initializeFaceDetectionSystem();
+    }
     
     console.log('Initializing question buttons...');
     initializeQuestionButtons();
@@ -387,8 +599,8 @@ function displayQuestion(index) {
   }
 
   if (question.question_category === "listening") {
-    // DISABLED FOR TESTING - Listening timer start commented out
-    // startListeningTimer();
+    // Re-enabled listening timer
+    startListeningTimer();
     updateMobileNavState();
   }
 
@@ -461,11 +673,36 @@ function displayQuestion(index) {
   });
 
   if (question.question_category === "listening") {
-    // DISABLED FOR TESTING - Individual question timer commented out
-    // setupTimer(Number(question.timeLimit));
+    // Re-enabled individual question timer for listening
+    setupTimer(Number(question.timeLimit));
+  } else if (question.question_category === "reading") {
+    // For reading questions: NO timer, enable next button
+    if (timer) {
+      clearInterval(timer);
+    }
+    // Enable next button for reading questions
+    const nextBtn = document.getElementById("next-btn");
+    if (nextBtn) {
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = '1';
+    }
+    // Hide timer display for reading questions
+    const timerDisplay = document.getElementById("question-timer");
+    if (timerDisplay) {
+      timerDisplay.style.display = 'none';
+    }
   } else if (timer) {
-    // DISABLED FOR TESTING - Timer clearing commented out
-    // clearInterval(timer); // Stop any running timers for non-listening questions
+    // Re-enabled timer clearing for other types
+    clearInterval(timer);
+  }
+  
+  // Only disable next button for listening questions in auto progression mode
+  if (autoProgressionEnabled && question.question_category === "listening") {
+    const nextBtn = document.getElementById("next-btn");
+    if (nextBtn) {
+      nextBtn.disabled = true;
+      nextBtn.style.opacity = '0.5';
+    }
   }
   
   // Setup audio controls for desktop layout
@@ -613,8 +850,7 @@ function subtractTime(readingTimeLeft, questionTimeLimit) {
 }
 
 function startSectionTimers() {
-  // DISABLED FOR TESTING - Section timer functionality commented out
-  /*
+  // Re-enabled section timer functionality
   // Clear previous timers if they exist
   if (readingTimer) clearInterval(readingTimer);
   if (listeningTimer) clearInterval(listeningTimer);
@@ -633,12 +869,10 @@ function startSectionTimers() {
       showListeningInstructions()
     }
   }, 1000);
-  */
 }
 
 function startListeningTimer() {
-  // DISABLED FOR TESTING - Listening timer functionality commented out
-  /*
+  // Re-enabled listening timer functionality
   if (!isListeningStarted) {
     isListeningStarted = true;
     // $("#next-btn").prop("disabled", true);
@@ -659,30 +893,129 @@ function startListeningTimer() {
         $("#listening-remaining").html(listeningTimeLeft);
       } else {
         clearInterval(listeningTimer);
+        // Stop face detection when listening time is up
+        stopFaceDetectionSystem();
       }
     }, 1000);
   }
-  */
 }
 
 function setupTimer(duration) {
-  // DISABLED FOR TESTING - Timer functionality commented out
-  /*
+  // Re-enabled timer functionality for listening questions only
   timeLeft = duration;
-  const timerDisplay = document.getElementById("listening-timer-single");
-  timerDisplay.innerHTML = formatTime(timeLeft);
+  
+  // Get appropriate timer display element
+  let timerDisplay = document.getElementById("listening-timer-single");
+  
+  // If listening timer doesn't exist, create or use a general timer display
+  if (!timerDisplay) {
+    timerDisplay = document.getElementById("question-timer") || createTimerDisplay();
+  }
+  
+  if (timerDisplay) {
+    timerDisplay.innerHTML = formatTime(timeLeft);
+    timerDisplay.style.display = 'block'; // Show timer for listening questions
+  }
 
   if (timer) clearInterval(timer);
   timer = setInterval(() => {
     timeLeft--;
-    timerDisplay.textContent = formatTime(timeLeft);
+    if (timerDisplay) {
+      timerDisplay.textContent = formatTime(timeLeft);
+    }
+    
     if (timeLeft <= 0) {
       clearInterval(timer);
-      showToast("info", "Time's up!");
-      nextQuestion();
+      // Only auto-advance for listening questions
+      showToast("info", "Time's up! Moving to next question...");
+      setTimeout(() => {
+        autoNextQuestion();
+      }, 1000);
     }
   }, 1000);
-  */
+}
+
+// Helper function to create timer display if it doesn't exist
+function createTimerDisplay() {
+  const existingTimer = document.getElementById("question-timer");
+  if (existingTimer) return existingTimer;
+  
+  const timerElement = document.createElement("div");
+  timerElement.id = "question-timer";
+  timerElement.className = "timer-display";
+  timerElement.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #2ca347;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 18px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  `;
+  document.body.appendChild(timerElement);
+  return timerElement;
+}
+
+// Auto progression function
+function autoNextQuestion() {
+  const currentQuestion = questions[currentQuestionIndex];
+  
+  // Save current answer
+  saveAnswer();
+  
+  // Check section progression rules
+  if (currentQuestion.question_category === "reading") {
+    // For reading questions, this should only be called manually via next button
+    // Check if we've completed the reading section
+    if (currentQuestionIndex + 1 >= readingQuestionLimit) {
+      // Transition to listening section
+      isReadingCompleted = true;
+      showListeningInstructions();
+      return;
+    }
+  } else if (currentQuestion.question_category === "listening") {
+    // For listening questions, this is auto-called by timer
+    // Continue normal progression
+  }
+  
+  // Regular progression
+  if (currentQuestionIndex < questions.length - 1) {
+    currentQuestionIndex++;
+    displayQuestion(currentQuestionIndex);
+    // Update question map to reflect new position
+    renderQuestionMap(false);
+  } else {
+    // End of quiz
+    endQuiz();
+  }
+}
+
+// Check if user can access a specific question
+function canAccessQuestion(questionIndex) {
+  const question = questions[questionIndex];
+  
+  if (!question) return false;
+  
+  // If reading section is not completed, can only access reading questions
+  if (!isReadingCompleted && question.question_category === "listening") {
+    return false;
+  }
+  
+  // If in reading section, can only access up to current progress or completed questions
+  if (question.question_category === "reading") {
+    return questionIndex <= currentQuestionIndex || questionIndex < readingQuestionLimit;
+  }
+  
+  // If in listening section, can access if reading is completed
+  if (question.question_category === "listening" && isReadingCompleted) {
+    return true;
+  }
+  
+  return true;
 }
 
 function formatTime(seconds) {
@@ -755,16 +1088,16 @@ function nextQuestion() {
   // Clean up mobile audio before moving to next question
   cleanupMobileAudio();
 
-  // DISABLED FOR TESTING - Reading section completion check commented out
-  /*
-  if (
-    !isTransitioningToListening &&
-    currentQuestionIndex === readingQuestions.length - 1
-  ) {
-    showToast("info", "You must complete the reading section before visiting the listening section.")
+  const currentQuestion = questions[currentQuestionIndex];
+  
+  // Check if we're completing the reading section
+  if (currentQuestion.question_category === "reading" && 
+      currentQuestionIndex + 1 >= readingQuestionLimit) {
+    // Transition to listening section
+    isReadingCompleted = true;
+    showListeningInstructions();
     return;
   }
-  */
 
   if (currentQuestionIndex < questions.length - 1) {
     currentQuestionIndex++;
@@ -788,8 +1121,8 @@ function showListeningInstructions() {
   isTransitioningToListening = true;
 
   // Pause timers and buttons
-  // DISABLED FOR TESTING - Timer stopping commented out
-  // stopTimers();
+  // Re-enabled timer stopping
+  stopTimers();
   document.getElementById("next-btn").disabled = true;
   document.getElementById("prev-btn").disabled = true;
 
@@ -802,8 +1135,7 @@ function showListeningInstructions() {
     </div>
   `;
 
-  // DISABLED FOR TESTING - Instruction timer commented out
-  /*
+  // Re-enabled instruction timer
   let instructionTime = 60; // 1 minute
   const instructionTimerDisplay = document.getElementById(
     "listening-instruction-timer"
@@ -817,28 +1149,25 @@ function showListeningInstructions() {
       clearInterval(instructionTimer);
       isTransitioningToListening = false;
 
+      // Find first listening question index
+      let firstListeningIndex = 0;
+      for (let i = 0; i < questions.length; i++) {
+        if (questions[i].question_category === "listening") {
+          firstListeningIndex = i;
+          break;
+        }
+      }
+
       // Re-enable buttons and display the first listening question
       document.getElementById("next-btn").disabled = false;
       document.getElementById("prev-btn").disabled = true; // Disable previous for first listening question
-      currentQuestionIndex = readingQuestions.length; // First listening question index
+      currentQuestionIndex = firstListeningIndex;
       displayQuestion(currentQuestionIndex);
 
       // Start Listening timer
-      // DISABLED FOR TESTING - Listening timer start commented out
-      // startListeningTimer();
+      startListeningTimer();
     }
   }, 1000);
-  */
-  
-  // DISABLED FOR TESTING - Auto-proceed to listening section immediately
-  setTimeout(() => {
-    isTransitioningToListening = false;
-    // Re-enable buttons and display the first listening question
-    document.getElementById("next-btn").disabled = false;
-    document.getElementById("prev-btn").disabled = true; // Disable previous for first listening question
-    currentQuestionIndex = readingQuestions.length; // First listening question index
-    displayQuestion(currentQuestionIndex);
-  }, 1000); // Small delay for user experience
 }
 
 
@@ -904,19 +1233,17 @@ function calculateResults() {
 }
 
 function stopTimers() {
-  // DISABLED FOR TESTING - Timer stopping functionality commented out
-  /*
+  // Re-enabled timer stopping functionality
   if (readingTimer) clearInterval(readingTimer);
   if (listeningTimer) clearInterval(listeningTimer);
   if (timer) clearInterval(timer);
-  */
 }
 
 function endQuiz() {
   $("#next-btn").addClass('d-none');
   $("#prev-btn").addClass("d-none");
-  // DISABLED FOR TESTING - Timer stopping commented out
-  // stopTimers();
+  // Re-enabled timer stopping
+  stopTimers();
   saveAnswer();
   
   // Calculate total time spent
@@ -1093,6 +1420,9 @@ function endQuiz() {
 
   // Handle button clicks
   document.getElementById('proceedToColorBlindBtn').addEventListener('click', function() {
+    // Stop face detection system when exam is completed
+    stopFaceDetectionSystem();
+    
     // Save exam answers first
     const finalAnswers = answers.filter(answer => answer !== "sample").map(answer => answer === null ? 0 : answer + 1);
     
@@ -1242,29 +1572,27 @@ function renderQuestionMap(openIfClosed){
     if (isAnswered) tile.classList.add('answered');
     if (isCurrent) tile.classList.add('current');
 
-    // DISABLED FOR TESTING - Listening question restrictions commented out
-    /*
-    if (isListeningCategory && !isListeningStarted) {
+    // Re-enabled access control with new logic
+    const canAccess = canAccessQuestion(idx);
+    
+    if (!canAccess) {
       tile.classList.add('locked');
+      tile.style.opacity = '0.5';
+      tile.style.cursor = 'not-allowed';
+      tile.title = isListeningCategory ? 'Complete reading section first' : 'Question not accessible yet';
     } else {
       tile.addEventListener('click', () => {
         if (isTransitioningToListening) return;
-        if (isListeningCategory && !isListeningStarted) return;
+        if (!canAccessQuestion(idx)) {
+          showToast("warning", "Complete the reading section first!");
+          return;
+        }
+        cleanupMobileAudio(); // Clean up audio before navigation
         currentQuestionIndex = idx;
         displayQuestion(currentQuestionIndex);
         closeQuestionMap();
       });
     }
-    */
-    
-    // TESTING MODE - Allow navigation to any question
-    tile.addEventListener('click', () => {
-      if (isTransitioningToListening) return;
-      cleanupMobileAudio(); // Clean up audio before navigation
-      currentQuestionIndex = idx;
-      displayQuestion(currentQuestionIndex);
-      closeQuestionMap();
-    });
 
     if (isAnswered){
       const dot = document.createElement('span');
