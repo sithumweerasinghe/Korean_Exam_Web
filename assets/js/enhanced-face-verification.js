@@ -64,6 +64,33 @@ class EnhancedFaceVerification {
         }
     }
 
+    // Update CSRF token from API response
+    updateCSRFToken(result) {
+        if (result && result.csrf_token) {
+            console.log('🔄 Updating CSRF token from enhanced API response');
+            
+            // Update all CSRF token inputs and meta tags
+            const csrfInputs = document.querySelectorAll('input[name="csrf_token"]');
+            csrfInputs.forEach(input => {
+                input.value = result.csrf_token;
+            });
+            
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            if (csrfMeta) {
+                csrfMeta.setAttribute('content', result.csrf_token);
+            }
+            
+            // Update session storage as backup
+            try {
+                sessionStorage.setItem('csrf_token', result.csrf_token);
+            } catch (e) {
+                console.warn('Could not update sessionStorage CSRF token:', e);
+            }
+            
+            console.log('✅ Enhanced CSRF token updated successfully');
+        }
+    }
+
     async init() {
         console.log('🚀 Initializing Enhanced Face Verification System');
         
@@ -498,6 +525,9 @@ class EnhancedFaceVerification {
 
             const result = await response.json();
             console.log('📋 Enhanced verification result:', result);
+            
+            // Update CSRF token from response
+            this.updateCSRFToken(result);
             
             if (result.success) {
                 this.handleVerificationResult(result);

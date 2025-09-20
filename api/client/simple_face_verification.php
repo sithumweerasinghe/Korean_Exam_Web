@@ -71,23 +71,33 @@ try {
     // Simple face verification simulation
     $similarity = performSimpleFaceVerification($capturedImageData, $profileImageUrl, $isLiveMode);
     
+    // Generate new CSRF token for next request  
+    session_start();
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    
     // Return success response
     echo json_encode([
         'success' => true,
         'similarity' => round($similarity, 2),
         'message' => 'Face verification completed',
         'timestamp' => date('Y-m-d H:i:s'),
-        'live_mode' => $isLiveMode
+        'live_mode' => $isLiveMode,
+        'csrf_token' => $_SESSION['csrf_token']  // Return new CSRF token
     ]);
 
 } catch (Exception $e) {
+    // Generate new CSRF token for next request even on error
+    session_start();
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    
     // Return error response
     http_response_code(400);
     echo json_encode([
         'success' => false,
         'similarity' => 0,
         'message' => $e->getMessage(),
-        'timestamp' => date('Y-m-d H:i:s')
+        'timestamp' => date('Y-m-d H:i:s'),
+        'csrf_token' => $_SESSION['csrf_token']  // Return new CSRF token even on error
     ]);
 }
 

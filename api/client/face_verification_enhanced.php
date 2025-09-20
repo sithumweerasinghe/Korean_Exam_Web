@@ -106,6 +106,9 @@ try {
             logEnhancedVerificationAttempt($similarity, $passed, $faceDetectionResult['confidence']);
         }
 
+        // Generate new CSRF token for next request
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
         // Return detailed result
         echo json_encode([
             'success' => true,
@@ -118,7 +121,8 @@ try {
             'live_mode' => $isLiveMode,
             'timestamp' => date('Y-m-d H:i:s'),
             'requiresRetry' => !$passed && $similarity < $threshold,
-            'suggestions' => !$passed ? generateImprovementSuggestions($similarity, $faceDetectionResult['confidence']) : []
+            'suggestions' => !$passed ? generateImprovementSuggestions($similarity, $faceDetectionResult['confidence']) : [],
+            'csrf_token' => $_SESSION['csrf_token']  // Return new CSRF token
         ]);
 
     } finally {
@@ -134,6 +138,9 @@ try {
         unlink($capturedImagePath);
     }
 
+    // Generate new CSRF token for next request
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
     http_response_code(400);
     echo json_encode([
         'success' => false,
@@ -145,7 +152,8 @@ try {
         'message' => $e->getMessage(),
         'timestamp' => date('Y-m-d H:i:s'),
         'requiresRetry' => true,
-        'suggestions' => ['Please ensure good lighting', 'Position your face clearly in the center', 'Remove any obstructions from your face']
+        'suggestions' => ['Please ensure good lighting', 'Position your face clearly in the center', 'Remove any obstructions from your face'],
+        'csrf_token' => $_SESSION['csrf_token']  // Return new CSRF token even on error
     ]);
 }
 

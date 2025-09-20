@@ -99,6 +99,9 @@ try {
         logVerificationAttempt($similarity);
     }
 
+    // Generate new CSRF token for next request
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
     // Return result
     echo json_encode([
         'success' => true,
@@ -106,7 +109,8 @@ try {
         'passed' => $similarity >= 80,
         'threshold' => 80,
         'live_mode' => $isLiveMode,
-        'timestamp' => date('Y-m-d H:i:s')
+        'timestamp' => date('Y-m-d H:i:s'),
+        'csrf_token' => $_SESSION['csrf_token']  // Return new CSRF token
     ]);
 
 } catch (Exception $e) {
@@ -118,11 +122,15 @@ try {
         unlink($profileImagePath);
     }
 
+    // Generate new CSRF token for next request
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
     http_response_code(400);
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage(),
-        'timestamp' => date('Y-m-d H:i:s')
+        'timestamp' => date('Y-m-d H:i:s'),
+        'csrf_token' => $_SESSION['csrf_token']  // Return new CSRF token even on error
     ]);
 }
 

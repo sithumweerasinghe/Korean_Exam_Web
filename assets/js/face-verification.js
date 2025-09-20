@@ -16,6 +16,12 @@ class FaceVerification {
         this.lastNotificationTime = 0;
         this.notificationCooldown = 3000; // 3 seconds between notifications
         
+        // Rate limiting to prevent 503 errors
+        this.lastAPICall = 0;
+        this.minAPIInterval = 2000; // Minimum 2 seconds between API calls
+        this.consecutiveErrors = 0;
+        this.maxConsecutiveErrors = 3;
+        
         // Make this instance available globally for onclick handlers
         window.faceVerification = this;
         
@@ -638,27 +644,41 @@ class FaceVerification {
         
         this.isVerifying = true;
         this.verificationAttempts = 0;
-        this.maxAttempts = 60; // 60 attempts over 30 seconds
+        this.maxAttempts = 30; // 30 attempts over 60 seconds
         this.requiredSimilarity = 70; // 70% minimum similarity
         this.consecutiveSuccesses = 0;
         this.requiredConsecutiveSuccesses = 3; // Need 3 consecutive successful comparisons
         
-        // Start comparison every 500ms
+        // Start comparison every 2 seconds to prevent server overload
         this.verificationInterval = setInterval(() => {
             this.performAIComparison();
-        }, 500);
+        }, 2000);
         
-        // Auto timeout after 30 seconds if no success
+        // Auto timeout after 60 seconds if no success (30 attempts * 2 seconds)
         this.verificationTimeout = setTimeout(() => {
             if (this.isVerifying) {
                 this.handleVerificationTimeout();
             }
-        }, 30000);
+        }, 60000);
     }
 
     async performAIComparison() {
         if (!this.isVerifying || !this.video || this.video.videoWidth === 0) {
             return;
+        }
+
+        // Rate limiting check to prevent server overload
+        const now = Date.now();
+        if (now - this.lastAPICall < this.minAPIInterval) {
+            console.log('⏳ Skipping API call due to rate limiting');
+            return;
+        }
+        
+        // Skip if too many consecutive errors (server might be struggling)
+        if (this.consecutiveErrors >= this.maxConsecutiveErrors) {
+            console.log('🚨 Too many consecutive errors, increasing interval to reduce server load');
+            this.minAPIInterval = 4000; // Increase to 4 seconds
+            this.consecutiveErrors = 0; // Reset counter
         }
 
         this.verificationAttempts++;
@@ -686,7 +706,7 @@ class FaceVerification {
             formData.append('profile_image_url', this.profileImageUrl);
             formData.append('live_mode', 'true');
             
-            // Add CSRF token if available
+            // Enhanced CSRF token handling for live server
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
                             document.querySelector('input[name="csrf_token"]')?.value ||
                             sessionStorage.getItem('csrf_token');
@@ -697,18 +717,36 @@ class FaceVerification {
             try {
                 console.log('🚀 Sending to enhanced face verification API...');
                 
-                // Call enhanced face comparison API
+                // Track API call time for rate limiting
+                this.lastAPICall = Date.now();
+                
+                // Call enhanced face comparison API with retry logic for 403/503 errors
                 const apiResponse = await fetch('api/client/face_verification_enhanced.php', {
                     method: 'POST',
                     body: formData
                 });
 
-                if (!apiResponse.ok) {
+                // Handle 403 and 503 errors specifically
+                if (apiResponse.status === 403) {
+                    console.warn('🚨 403 Forbidden - CSRF token may be expired, refreshing...');
+                    this.consecutiveErrors++;
+                    await this.refreshCSRFToken();
+                    throw new Error('CSRF token expired - will retry with new token');
+                } else if (apiResponse.status === 503) {
+                    console.warn('🚨 503 Service Unavailable - Server overloaded, will retry later');
+                    this.consecutiveErrors++;
+                    // Increase interval to reduce server load
+                    this.minAPIInterval = Math.min(this.minAPIInterval * 1.5, 8000);
+                    throw new Error('Server temporarily unavailable - reducing request frequency');
+                } else if (!apiResponse.ok) {
                     throw new Error(`HTTP ${apiResponse.status}: ${apiResponse.statusText}`);
                 }
 
                 const result = await apiResponse.json();
                 console.log('📊 Enhanced API Response:', result);
+                
+                // Reset error counter on successful API response
+                this.consecutiveErrors = 0;
                 
                 if (result.success) {
                     const similarity = parseFloat(result.similarity) || 0;
@@ -762,12 +800,25 @@ class FaceVerification {
             } catch (apiError) {
                 console.error('🚨 Enhanced API error:', apiError);
                 
-                // Fallback to simple verification API
+                // Fallback to simple verification API with error handling
                 try {
                     const fallbackResponse = await fetch('api/client/simple_face_verification.php', {
                         method: 'POST',
                         body: formData
                     });
+                    
+                    // Handle errors for fallback API too
+                    if (fallbackResponse.status === 403) {
+                        console.warn('🚨 Fallback API 403 - CSRF token issue');
+                        await this.refreshCSRFToken();
+                        return; // Skip this attempt
+                    } else if (fallbackResponse.status === 503) {
+                        console.warn('🚨 Fallback API 503 - server overloaded');
+                        return; // Skip this attempt
+                    } else if (!fallbackResponse.ok) {
+                        throw new Error(`Fallback API HTTP ${fallbackResponse.status}`);
+                    }
+                    
                     const fallbackResult = await fallbackResponse.json();
                     
                     if (fallbackResult.success) {
@@ -1025,6 +1076,47 @@ class FaceVerification {
         setTimeout(() => {
             this.completeVerificationSuccess();
         }, 3000);
+    }
+
+    // CSRF Token refresh method to handle 403 errors
+    async refreshCSRFToken() {
+        try {
+            console.log('🔄 Refreshing CSRF token...');
+            
+            const response = await fetch('api/init.php', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.csrf_token) {
+                    // Update all possible CSRF token locations
+                    const metaToken = document.querySelector('meta[name="csrf-token"]');
+                    if (metaToken) {
+                        metaToken.setAttribute('content', data.csrf_token);
+                    }
+                    
+                    const inputToken = document.querySelector('input[name="csrf_token"]');
+                    if (inputToken) {
+                        inputToken.value = data.csrf_token;
+                    }
+                    
+                    sessionStorage.setItem('csrf_token', data.csrf_token);
+                    console.log('✅ CSRF token refreshed successfully');
+                    return data.csrf_token;
+                }
+            }
+            
+            console.warn('⚠️ Failed to refresh CSRF token');
+            return null;
+            
+        } catch (error) {
+            console.error('❌ Error refreshing CSRF token:', error);
+            return null;
+        }
     }
 
     completeVerificationSuccess() {
@@ -1324,6 +1416,18 @@ If you don't see the camera icon, try:
                 method: 'POST',
                 body: formData
             });
+
+            // Handle 403 and 503 errors for live verification too
+            if (response.status === 403) {
+                console.warn('🚨 Live verification 403 - refreshing CSRF token');
+                await this.refreshCSRFToken();
+                return; // Skip this attempt and continue with next interval
+            } else if (response.status === 503) {
+                console.warn('🚨 Live verification 503 - server overloaded');
+                return; // Skip this attempt and continue with next interval
+            } else if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
 
             const result = await response.json();
             
