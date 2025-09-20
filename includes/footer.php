@@ -1,7 +1,7 @@
 <section class="ed-call-action position-relative d-flex justify-content-center rounded-4">
     <div class="col-lg-6 col-12">
         <div class="shadow-lg">
-            <a href="http://topiksir.com">
+            <a href="https://topiksir.com">
                 <img src="assets/images/footer/banner.jpg" alt="call-action-img">
             </a>
         </div>
